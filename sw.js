@@ -1,8 +1,10 @@
 // Service worker del Revisor de Proyectos y Tareas
-// - Guarda la app en caché para que abra sin conexión.
+// - Guarda la app (y su tipografía) en caché para que abra sin conexión.
 // - Al pulsar una notificación, abre (o enfoca) la app y la tarea correspondiente.
-const CACHE = 'revisor-v9-3';
+const CACHE = 'revisor-v10-1';
+const FONT_CACHE = 'revisor-fonts-1';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
+const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
@@ -11,7 +13,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE && k !== FONT_CACHE).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -20,6 +22,17 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
+
+  // Tipografía de Google Fonts: primero la caché, para que también se vea sin conexión.
+  if (FONT_HOSTS.includes(url.hostname)) {
+    e.respondWith(
+      caches.open(FONT_CACHE).then(c => c.match(req).then(hit => hit || fetch(req).then(res => {
+        if (res.ok || res.type === 'opaque') c.put(req, res.clone());
+        return res;
+      })))
+    );
+    return;
+  }
   if (url.origin !== self.location.origin) return;
 
   // Páginas: primero la red (para recibir actualizaciones), y si no hay conexión, la caché.
