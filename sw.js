@@ -1,7 +1,7 @@
 // Service worker del Revisor de Proyectos y Tareas
 // - Guarda la app (y su tipografía) en caché para que abra sin conexión.
 // - Al pulsar una notificación, abre (o enfoca) la app y la tarea correspondiente.
-const CACHE = 'revisor-v10-1';
+const CACHE = 'revisor-v11-1';
 const FONT_CACHE = 'revisor-fonts-1';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
