@@ -1,7 +1,7 @@
 // Service worker del Revisor de Proyectos y Tareas
 // - Guarda la app en caché para que abra sin conexión.
 // - Al pulsar una notificación, abre (o enfoca) la app y la tarea correspondiente.
-const CACHE = 'revisor-v9-1';
+const CACHE = 'revisor-v9-2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png'];
 
 self.addEventListener('install', e => {

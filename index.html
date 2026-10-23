@@ -89,6 +89,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .prio-normal{background:var(--normal)}
 .tag-badge{padding:2px 8px;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;border:1px solid rgba(0,0,0,.05);transition:filter .2s}
 .tag-badge:hover{filter:brightness(.95)}
+.tag-picker{display:flex;flex-wrap:wrap;gap:8px}
+.tag-chip{padding:6px 12px;border-radius:99px;font-size:.9rem;border:2px solid transparent;opacity:.5;filter:grayscale(.4)}
+.tag-chip[aria-pressed=true]{opacity:1;filter:none;border-color:currentColor}
+.tag-chip:hover{opacity:.85}
+.tag-picker .hint{font-size:.88rem}
 .date-badge,.rec-badge,.rem-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:6px;font-size:.75rem;font-weight:600;background:#e9edf8;color:#3b465c}
 .date-badge.overdue{background:#ffebee;color:var(--urgent)}
 .date-badge.today{background:#fff3e0;color:var(--warning)}
@@ -358,12 +363,15 @@ kbd{background:#eef1f6;border:1px solid var(--line);border-bottom-width:2px;bord
   </div>
   <div class="grid-fields">
     <div class="field"><label for="modProject">Proyecto</label><select id="modProject"></select></div>
-    <div class="field"><label for="modTag">Etiqueta</label><select id="modTag"></select></div>
     <div class="field"><label for="modPriority">Prioridad</label>
       <select id="modPriority"><option value="normal">Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></div>
     <div class="field"><label for="modDate">Fecha límite</label><input type="date" id="modDate"></div>
     <div class="field"><label for="modTime">Hora (opcional)</label><input type="time" id="modTime"></div>
     <div class="field"><label for="modReminder">Aviso</label><select id="modReminder"></select></div>
+  </div>
+  <div class="field">
+    <label id="modTagsLabel">Etiquetas <span class="hint" style="font-weight:400;font-size:.8rem">Pulsa para marcar o desmarcar; puedes elegir varias</span></label>
+    <div id="modTags" class="tag-picker" role="group" aria-labelledby="modTagsLabel"></div>
   </div>
 
   <details id="recBox" class="rec-box">
@@ -632,7 +640,7 @@ function normalizeItem(raw){
   return {
     id:typeof it.id==='string'&&it.id?it.id:newId(),
     title:String(it.title??'Sin título').trim()||'Sin título',
-    tag:typeof it.tag==='string'?it.tag:'',
+    tags:[...new Set((Array.isArray(it.tags)?it.tags:(typeof it.tag==='string'&&it.tag?[it.tag]:[])).filter(x=>typeof x==='string'&&x))],
     priority:PRIO_WEIGHT[it.priority]?it.priority:'normal',
     dueDate,
     dueTime:dueDate&&/^\d{2}:\d{2}$/.test(it.dueTime||'')?it.dueTime:'',
@@ -676,7 +684,7 @@ function normalizeState(x){
       const it=normalizeItem(raw);
       if(seen.has(it.id)) it.id=newId();
       seen.add(it.id);
-      if(it.tag){ const t=tags.find(t=>t.id===it.tag)||tags.find(t=>t.name===it.tag); it.tag=t?t.id:''; }
+      it.tags=[...new Set(it.tags.map(x=>{ const t=tags.find(t=>t.id===x)||tags.find(t=>t.name===x); return t?t.id:''; }).filter(Boolean))];
       return it;
     });
     return {id:pid,name:String(p.name||'Sin título'),items};
@@ -716,7 +724,7 @@ function saveUI(){ try{ localStorage.setItem(UI_KEY,JSON.stringify(ui)); }catch(
 /* ================= Estado ================= */
 let appState=load();
 const ui=loadUI();
-let editingItemId=null, tempSubtasks=[], tempTags=[], modalInitial='';
+let editingItemId=null, tempSubtasks=[], tempTags=[], tempItemTags=[], modalInitial='';
 let recDays=[], recDirty=false, editingRecOcc=1;
 let drag={kind:null,id:null};
 let stDragIdx=null;
@@ -1035,10 +1043,10 @@ function getVisibleItems(p){
   const items=p.items.filter(sl=>{
     if(ui.status&&sl.status!==ui.status) return false;
     if(ui.priority&&sl.priority!==ui.priority) return false;
-    if(ui.tag==='__none'){ if(sl.tag) return false; } else if(ui.tag&&sl.tag!==ui.tag) return false;
+    if(ui.tag==='__none'){ if(sl.tags.length) return false; } else if(ui.tag&&!sl.tags.includes(ui.tag)) return false;
     if(words.length){
-      const t=getTag(sl.tag);
-      const hay=norm([sl.title,sl.notes,t?t.name:'',...sl.subtasks.map(s=>s.title)].join('\n'));
+      const tagNames=sl.tags.map(getTag).filter(Boolean).map(t=>t.name);
+      const hay=norm([sl.title,sl.notes,...tagNames,...sl.subtasks.map(s=>s.title)].join('\n'));
       if(!words.every(w=>hay.includes(w))) return false;
     }
     return true;
@@ -1068,7 +1076,15 @@ function renderBulkBar(){
   if(!selectMode) return;
   const n=selected.size;
   $('bulkCount').textContent=pl(n,'seleccionado','seleccionados');
-  fillTagSelect($('bulkTag'),'Etiqueta…',{none:'Quitar etiqueta'}); $('bulkTag').value='';
+  const bt=$('bulkTag'); bt.replaceChildren(opt('','Etiquetas…'));
+  if(appState.tags.length){
+    const add=document.createElement('optgroup'); add.label='Añadir etiqueta';
+    appState.tags.forEach(t=>add.append(opt('add:'+t.id,`＋ ${t.emoji} ${t.name}`)));
+    const rm=document.createElement('optgroup'); rm.label='Quitar etiqueta';
+    appState.tags.forEach(t=>rm.append(opt('rm:'+t.id,`－ ${t.emoji} ${t.name}`)));
+    bt.append(add,rm);
+  }
+  bt.append(opt('__none','Quitar todas las etiquetas')); bt.value='';
   ['bulkStatus','bulkTag','bulkPriority','bulkMoveBtn','bulkDeleteBtn','bulkNoneBtn'].forEach(id=>$(id).disabled=!n);
 }
 function selectedItems(){ return currentProject().items.filter(i=>selected.has(i.id)); }
@@ -1127,14 +1143,13 @@ function createCard(sl,p,ctx){
   const db=dateBadge(sl); if(db) badges.append(db);
   if(sl.recurrence){ const rb=el('span','rec-badge','🔁 '+REC_FREQ[sl.recurrence.freq]); rb.title=recSummary(sl.recurrence); badges.append(rb); }
   if(sl.reminder!=='none'&&sl.dueDate&&sl.status!=='done'){ const rm=el('span','rem-badge','🔔'); rm.title='Aviso: '+REMINDERS[sl.reminder]; badges.append(rm); }
-  const tag=getTag(sl.tag);
-  if(tag){
+  appState.tags.filter(t=>sl.tags.includes(t.id)).forEach(tag=>{
     const tb=el('span','tag-badge',`${tag.emoji} ${tag.name}`);
     tb.style.backgroundColor=tag.bg; tb.style.color=tag.text; tb.title='Filtrar por esta etiqueta'; tb.setAttribute('role','button'); tb.tabIndex=0;
     const f=e=>{ e.stopPropagation(); ui.tag=tag.id; saveUI(); renderApp(); };
     tb.addEventListener('click',f); tb.addEventListener('keydown',e=>{ if(e.key==='Enter') f(e); });
     badges.append(tb);
-  }
+  });
   if(badges.childNodes.length) header.append(badges);
   content.append(header);
 
@@ -1351,17 +1366,31 @@ function showMarkdownPreview(){
   $('notesPreview').innerHTML=parseMD($('modNotes').value)||'<span style="color:#aaa">No hay notas.</span>';
   $('modNotes').classList.add('inactive'); $('notesPreview').classList.add('active'); $('tabEdit').classList.remove('active'); $('tabPrev').classList.add('active');
 }
+function renderTagPicker(){
+  const box=$('modTags'); box.replaceChildren();
+  if(!appState.tags.length){ box.append(el('span','hint','No hay etiquetas. Créalas en «🏷️ Gestor de etiquetas».')); return; }
+  appState.tags.forEach(t=>{
+    const on=tempItemTags.includes(t.id);
+    const b=btn(`${t.emoji} ${t.name}`,'tag-chip',null,()=>{
+      tempItemTags=tempItemTags.includes(t.id)?tempItemTags.filter(x=>x!==t.id):[...tempItemTags,t.id];
+      renderTagPicker();
+    });
+    b.style.backgroundColor=t.bg; b.style.color=t.text;
+    b.setAttribute('aria-pressed',on?'true':'false');
+    box.append(b);
+  });
+}
 function formSignature(){
-  return JSON.stringify([$('modTitle').value,$('modProject').value,$('modTag').value,$('modPriority').value,$('modDate').value,$('modTime').value,
+  return JSON.stringify([$('modTitle').value,$('modProject').value,[...tempItemTags].sort(),$('modPriority').value,$('modDate').value,$('modTime').value,
     $('modReminder').value,$('modLink').value,$('modNotes').value,$('modNewSubtask').value,tempSubtasks,recFromForm()]);
 }
 function openModal(item=null){
   if($('itemModal').open) return;
   const p=currentProject();
-  fillTagSelect($('modTag'),'Sin etiqueta'); fillProjectSelect($('modProject')); $('modProject').value=p.id;
+  fillProjectSelect($('modProject')); $('modProject').value=p.id;
   if(item){
     editingItemId=item.id; $('modalTitle').textContent='Editar elemento';
-    $('modTitle').value=item.title; $('modTag').value=getTag(item.tag)?item.tag:'';
+    $('modTitle').value=item.title; tempItemTags=item.tags.filter(id=>getTag(id));
     $('modPriority').value=item.priority; $('modDate').value=item.dueDate; $('modTime').value=item.dueTime;
     $('modReminder').value=item.reminder; $('modLink').value=item.link; $('modNotes').value=item.notes;
     tempSubtasks=clone(item.subtasks); editingRecOcc=item.recurrence?item.recurrence.occurrence:1;
@@ -1369,13 +1398,13 @@ function openModal(item=null){
   } else {
     editingItemId=null; $('modalTitle').textContent='Nuevo elemento';
     ['modTitle','modDate','modTime','modLink','modNotes'].forEach(id=>$(id).value='');
-    $('modTag').value=ui.tag&&ui.tag!=='__none'?ui.tag:''; $('modPriority').value='normal'; $('modReminder').value='none';
+    tempItemTags=ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
     tempSubtasks=[]; editingRecOcc=1; recToForm(null,'');
   }
   $('modNewSubtask').value='';
   $('recBox').open=!!(item&&item.recurrence);
   $('modTime').disabled=$('modReminder').disabled=!$('modDate').value;
-  renderTempSubtasks(); showMarkdownEdit(); updateRecUI();
+  renderTagPicker(); renderTempSubtasks(); showMarkdownEdit(); updateRecUI();
   $('itemModal').showModal();
   modalInitial=formSignature();
   setTimeout(()=>$('modTitle').focus(),0);
@@ -1395,7 +1424,7 @@ function saveModal(){
   let due=$('modDate').value;
   if(rec&&!due) due=ymd(firstOccurrence(rec));
   if(rec) rec.anchor=due;
-  const fields={title,tag:$('modTag').value,priority:$('modPriority').value,dueDate:due,dueTime:due?$('modTime').value:'',
+  const fields={title,tags:appState.tags.filter(t=>tempItemTags.includes(t.id)).map(t=>t.id),priority:$('modPriority').value,dueDate:due,dueTime:due?$('modTime').value:'',
     reminder:due?$('modReminder').value:'none',link,notes:$('modNotes').value,
     subtasks:clone(tempSubtasks).filter(s=>s.title.trim()),recurrence:rec};
   const src=currentProject(), dst=appState.projects.find(p=>p.id===$('modProject').value)||src, editing=editingItemId;
@@ -1433,7 +1462,7 @@ function syncMoveBtn(){ $('moveMoveBtn').disabled=$('moveTarget').value===appSta
 /* ================= Etiquetas ================= */
 function renderTagManager(){
   const list=$('tagsListContainer'); list.replaceChildren();
-  const uses={}; appState.projects.forEach(p=>p.items.forEach(i=>{ if(i.tag) uses[i.tag]=(uses[i.tag]||0)+1; }));
+  const uses={}; appState.projects.forEach(p=>p.items.forEach(i=>i.tags.forEach(id=>{ uses[id]=(uses[id]||0)+1; })));
   tempTags.forEach((t,idx)=>{
     const row=el('div','tag-edit-row');
     const em=el('input','tag-emoji'); em.type='text'; em.value=t.emoji; em.placeholder='🚀'; em.setAttribute('aria-label','Emoji');
@@ -1453,7 +1482,7 @@ function saveTags(){
   $('tagModal').close();
   commit(null,()=>{
     let affected=0;
-    appState.projects.forEach(p=>p.items.forEach(i=>{ if(i.tag&&!keptIds.has(i.tag)){ i.tag=''; affected++; } }));
+    appState.projects.forEach(p=>p.items.forEach(i=>{ const n=i.tags.length; i.tags=i.tags.filter(id=>keptIds.has(id)); if(i.tags.length!==n) affected++; }));
     const removed=appState.tags.filter(t=>!keptIds.has(t.id)).length;
     appState.tags=kept;
     if(ui.tag&&ui.tag!=='__none'&&!keptIds.has(ui.tag)){ ui.tag=''; saveUI(); }
@@ -1650,8 +1679,14 @@ $('bulkStatus').addEventListener('change',e=>{
 });
 $('bulkTag').addEventListener('change',e=>{
   const v=e.target.value; e.target.value=''; if(!v) return;
-  const tag=v==='__none'?'':v, t=getTag(tag);
-  commit(null,()=>{ const items=selectedItems(); items.forEach(i=>i.tag=tag); return items.length?`🏷️ ${pl(items.length,'elemento','elementos')} → ${t?t.name:'sin etiqueta'}`:false; });
+  commit(null,()=>{
+    const items=selectedItems(); if(!items.length) return false;
+    const n=pl(items.length,'elemento','elementos');
+    if(v==='__none'){ items.forEach(i=>i.tags=[]); return `🏷️ Etiquetas quitadas de ${n}`; }
+    const [op,id]=v.split(':'), t=getTag(id); if(!t) return false;
+    if(op==='add'){ items.forEach(i=>{ if(!i.tags.includes(id)) i.tags.push(id); }); return `🏷️ «${t.name}» añadida a ${n}`; }
+    items.forEach(i=>{ i.tags=i.tags.filter(x=>x!==id); }); return `🏷️ «${t.name}» quitada de ${n}`;
+  });
 });
 $('bulkPriority').addEventListener('change',e=>{
   const v=e.target.value; e.target.value=''; if(!v) return;
