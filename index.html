@@ -75,7 +75,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .view-toggle{display:flex;background:#e9edf8;border-radius:8px;overflow:hidden}
 .view-btn{background:transparent;color:#26385f;border-radius:0;padding:6px 16px;font-size:.9rem}
 .view-btn.active{background:var(--accent);color:#fff}
-#selectModeBtn.active{background:var(--accent);color:#fff}
+#selectModeBtn.active,#schedBtn.active{background:var(--accent);color:#fff}
+.slide.snoozed{border-style:dashed;opacity:.75;background:#f7f8fb}
+.snz-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:6px;font-size:.75rem;font-weight:600;background:#eceff4;color:#55607a}
 
 /* Progreso */
 .progressline{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.95rem;margin:14px 0 8px}
@@ -318,7 +320,10 @@ kbd{background:#eef1f6;border:1px solid var(--line);border-bottom-width:2px;bord
       </div>
       <div class="list-head">
         <h2 id="listHeaderTitle">Lista de comprobación</h2>
-        <span id="countLabel"></span>
+        <div class="row" style="gap:10px">
+          <button type="button" id="schedBtn" class="secondary small" title="Tareas repetitivas ya hechas, ocultas hasta el día en que vuelven a tocar" hidden></button>
+          <span id="countLabel"></span>
+        </div>
       </div>
       <p class="hint" id="dragHint"></p>
       <div id="slides" class="list-view"></div>
@@ -411,7 +416,16 @@ kbd{background:#eef1f6;border:1px solid var(--line);border-bottom-width:2px;bord
         </div>
         <label class="check-line"><input type="checkbox" id="recFromCompletion"> Calcular la siguiente fecha desde el día en que la complete (en lugar de desde la fecha límite)</label>
         <p class="rec-preview" id="recPreview"></p>
-        <p class="hint" style="margin:0">Al marcar la tarea como revisada se crea automáticamente la siguiente, con la nueva fecha límite y las sub-tareas sin marcar.</p>
+        <label class="opt-line">Al completarla, ocultarla y que vuelva a aparecer
+          <select id="recShowBefore">
+            <option value="0">el día que vence</option>
+            <option value="1">1 día antes</option>
+            <option value="2">2 días antes</option>
+            <option value="3">3 días antes</option>
+            <option value="7">1 semana antes</option>
+            <option value="14">2 semanas antes</option>
+          </select></label>
+        <p class="hint" style="margin:0">Al marcarla como revisada no se crea ninguna copia: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar, y queda oculta («programada») hasta ese día. Las ocultas se pueden ver con «💤 Ver programadas».</p>
       </div>
     </div>
   </details>
@@ -630,7 +644,8 @@ function normalizeRec(r){
     endCount:clamp(int(r.endCount,10),1,9999),
     endUntil:parseYMD(r.endUntil)?r.endUntil:'',
     anchor:parseYMD(r.anchor)?r.anchor:'',
-    occurrence:clamp(int(r.occurrence,1),1,99999)
+    occurrence:clamp(int(r.occurrence,1),1,99999),
+    showBefore:clamp(int(r.showBefore,0),0,60)
   };
 }
 function normalizeItem(raw){
@@ -651,7 +666,8 @@ function normalizeItem(raw){
     reopenStatus:it.reopenStatus==='review'?'review':'pending',
     subtasks:Array.isArray(it.subtasks)?it.subtasks.filter(s=>s&&typeof s==='object').map(s=>({id:typeof s.id==='string'&&s.id?s.id:newId(),title:String(s.title??''),done:!!s.done})):[],
     recurrence:normalizeRec(it.recurrence),
-    recurrenceSpawned:!!it.recurrenceSpawned,
+    snoozedUntil:parseYMD(it.snoozedUntil)&&status!=='done'?it.snoozedUntil:'',
+    history:Array.isArray(it.history)?it.history.filter(validIso).slice(-200):[],
     notified:typeof it.notified==='string'?it.notified:'',
     createdAt:validIso(it.createdAt)?it.createdAt:new Date().toISOString(),
     completedAt:status==='done'&&validIso(it.completedAt)?it.completedAt:''
@@ -701,13 +717,14 @@ function load(){
   return {version:9,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS),settings:normalizeSettings({})};
 }
 function loadUI(){
-  const d={view:'list',sort:'manual',search:'',status:'',tag:'',priority:''};
+  const d={view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
       if(['list','kanban'].includes(u.view)) d.view=u.view;
       if(['manual','priority','dateAsc','dateDesc'].includes(u.sort)) d.sort=u.sort;
       ['search','status','tag','priority'].forEach(k=>{ if(typeof u[k]==='string') d[k]=u[k]; });
+      d.showScheduled=u.showScheduled===true;
     }
   }catch(e){}
   if(!LABEL[d.status]) d.status='';
@@ -725,7 +742,7 @@ function saveUI(){ try{ localStorage.setItem(UI_KEY,JSON.stringify(ui)); }catch(
 let appState=load();
 const ui=loadUI();
 let editingItemId=null, tempSubtasks=[], tempTags=[], tempItemTags=[], modalInitial='';
-let recDays=[], recDirty=false, editingRecOcc=1;
+let recDays=[], recDirty=false, editingRecOcc=1, editingHistory=[];
 let drag={kind:null,id:null};
 let stDragIdx=null;
 let selectMode=false; const selected=new Set();
@@ -843,28 +860,30 @@ function recSummary(r){
   if(r.fromCompletion) s+=' · contando desde que se completa';
   return s;
 }
-function spawnNext(item,p){
-  const next=computeNext(item);
-  item.recurrenceSpawned=true;
-  if(!next) return null;
-  const c=normalizeItem(clone(item));
-  c.id=newId(); c.status='pending'; c.reopenStatus='pending'; c.completedAt=''; c.notified=''; c.recurrenceSpawned=false;
-  c.createdAt=new Date().toISOString(); c.dueDate=ymd(next);
-  c.subtasks.forEach(s=>{s.done=false; s.id=newId();});
-  c.recurrence.occurrence=item.recurrence.occurrence+1;
-  c.recurrence.anchor=c.dueDate;
-  p.items.splice(p.items.indexOf(item)+1,0,c);
-  return c;
+/* Tareas repetitivas: al completarlas, la MISMA tarea se reprograma a su siguiente fecha
+   y queda oculta («programada») hasta el día en que debe volver a aparecer. */
+const isSnoozed=it=>!!it.snoozedUntil&&it.status!=='done'&&todayStr()<it.snoozedUntil;
+const snoozeDateFor=(due,r)=>{ const d=parseYMD(due); if(!d||!r) return ''; const s=ymd(addDays(d,-r.showBefore)); return s>todayStr()?s:''; };
+function reschedule(item){
+  const next=computeNext(item); if(!next) return null;
+  item.history=[...item.history,new Date().toISOString()].slice(-200);
+  item.dueDate=ymd(next); item.status='pending'; item.reopenStatus='pending'; item.completedAt=''; item.notified='';
+  item.subtasks.forEach(s=>{ s.done=false; });
+  item.recurrence.occurrence++; item.recurrence.anchor=item.dueDate;
+  item.snoozedUntil=snoozeDateFor(item.dueDate,item.recurrence);
+  return item;
 }
 function applyStatus(item,p,v){
   if(item.status===v) return null;
-  if(v==='done'){ item.reopenStatus=item.status==='review'?'review':'pending'; item.completedAt=new Date().toISOString(); }
+  if(v==='done'&&item.recurrence){ const r=reschedule(item); if(r) return r; }
+  if(v==='done'){ item.reopenStatus=item.status==='review'?'review':'pending'; item.completedAt=new Date().toISOString(); if(item.recurrence) item.history=[...item.history,item.completedAt].slice(-200); }
   else item.completedAt='';
   item.status=v;
-  if(v==='done'&&item.recurrence&&!item.recurrenceSpawned) return spawnNext(item,p);
   return null;
 }
-const spawnMsg=s=>`🔁 Siguiente repetición creada para el ${fmtDate(s.dueDate,true)}`;
+const spawnMsg=s=>s.snoozedUntil
+  ?`🔁 Hecha. Volverá a aparecer el ${fmtDate(s.snoozedUntil,true)} (vence el ${fmtDate(s.dueDate,true)})`
+  :`🔁 Hecha. Siguiente repetición: vence el ${fmtDate(s.dueDate,true)}`;
 function setItemStatus(sl,v,card){
   if(sl.status===v) return;
   const run=()=>commit(null,()=>{
@@ -919,7 +938,7 @@ function duplicateItems(ids,targetId,reset){
   const set=new Set(ids);
   const copies=src.items.filter(i=>set.has(i.id)).map(i=>{
     const c=clone(i); c.id=newId(); c.subtasks.forEach(s=>s.id=newId());
-    c.notified=''; c.recurrenceSpawned=false; c.createdAt=new Date().toISOString();
+    c.notified=''; c.history=[]; c.createdAt=new Date().toISOString();
     if(dst===src) c.title+=' (copia)';
     if(reset){ c.status='pending'; c.reopenStatus='pending'; c.completedAt=''; c.subtasks.forEach(s=>s.done=false); }
     return c;
@@ -953,9 +972,10 @@ function renderSidebar(){
   projects.forEach((p,idx)=>{
     const li=el('li',p.id===appState.activeId?'active-project':'');
     li.dataset.id=p.id; li.draggable=true; li.tabIndex=0;
-    const total=p.items.length, done=p.items.filter(i=>i.status==='done').length;
+    const active=p.items.filter(i=>!isSnoozed(i)), total=active.length, done=active.filter(i=>i.status==='done').length;
+    const sched=p.items.length-total;
     const cnt=el('span','proj-count'+(total&&done===total?' complete':''),`${done}/${total}`);
-    cnt.title=`${done} de ${total} completados`;
+    cnt.title=`${done} de ${total} completados`+(sched?` · ${pl(sched,'repetitiva programada','repetitivas programadas')} (ocultas)`:'');
     li.append(el('span','proj-name',p.name||'Sin título'),cnt);
     if(p.id===appState.activeId){
       const tools=el('span','proj-tools');
@@ -1041,6 +1061,7 @@ const isFiltered=()=>!!(ui.search.trim()||ui.status||ui.tag||ui.priority);
 function getVisibleItems(p){
   const words=norm(ui.search).split(/\s+/).filter(Boolean);
   const items=p.items.filter(sl=>{
+    if(!ui.showScheduled&&isSnoozed(sl)) return false;
     if(ui.status&&sl.status!==ui.status) return false;
     if(ui.priority&&sl.priority!==ui.priority) return false;
     if(ui.tag==='__none'){ if(sl.tags.length) return false; } else if(ui.tag&&!sl.tags.includes(ui.tag)) return false;
@@ -1091,7 +1112,7 @@ function selectedItems(){ return currentProject().items.filter(i=>selected.has(i
 
 /* ================= Tarjetas ================= */
 function createCard(sl,p,ctx){
-  const card=el('div','slide'+(sl.status==='done'?' done':sl.status==='review'?' review':'')+(selected.has(sl.id)?' selected':''));
+  const card=el('div','slide'+(sl.status==='done'?' done':sl.status==='review'?' review':'')+(selected.has(sl.id)?' selected':'')+(isSnoozed(sl)?' snoozed':''));
   card.dataset.id=sl.id;
   const canDrag=!selectMode, canReorder=canDrag&&ctx.manual;
   if(canDrag){
@@ -1141,7 +1162,11 @@ function createCard(sl,p,ctx){
   const badges=el('div','badges-row');
   if(sl.priority!=='normal') badges.append(el('span','prio-badge prio-'+sl.priority,PRIO_LABEL[sl.priority].toUpperCase()));
   const db=dateBadge(sl); if(db) badges.append(db);
-  if(sl.recurrence){ const rb=el('span','rec-badge','🔁 '+REC_FREQ[sl.recurrence.freq]); rb.title=recSummary(sl.recurrence); badges.append(rb); }
+  if(sl.recurrence){ const rb=el('span','rec-badge','🔁 '+REC_FREQ[sl.recurrence.freq]); rb.title=recSummary(sl.recurrence)+(sl.history.length?` · hecha ${pl(sl.history.length,'vez','veces')}`:''); badges.append(rb); }
+  if(isSnoozed(sl)){
+    const zb=el('span','snz-badge','💤 Aparece el '+fmtDate(sl.snoozedUntil,true)); zb.title='Repetitiva ya hecha: está oculta hasta ese día'; badges.append(zb);
+    badges.append(btn('Mostrar ya','secondary small','Mostrarla ya en el tablero',e=>{ e.stopPropagation(); commit(null,()=>{ sl.snoozedUntil=''; }); }));
+  }
   if(sl.reminder!=='none'&&sl.dueDate&&sl.status!=='done'){ const rm=el('span','rem-badge','🔔'); rm.title='Aviso: '+REMINDERS[sl.reminder]; badges.append(rm); }
   appState.tags.filter(t=>sl.tags.includes(t.id)).forEach(tag=>{
     const tb=el('span','tag-badge',`${tag.emoji} ${tag.name}`);
@@ -1191,7 +1216,10 @@ function createCard(sl,p,ctx){
   controls.append(sel,
     btn('Editar','secondary',null,()=>openModal(sl)),
     btn('⇄','secondary','Mover o duplicar',()=>openMoveModal([sl.id])),
-    btn('Borrar','danger',null,()=>commit(`🗑️ «${short(sl.title)}» eliminado`,()=>{ p.items=p.items.filter(i=>i.id!==sl.id); }))
+    btn('Borrar','danger',null,()=>{
+      if(sl.recurrence&&!confirm('Esta tarea se repite. Si la borras, se acaba la serie y no volverá a aparecer.\n\nPara marcarla como hecha usa la casilla de la izquierda.\n\n¿Borrarla de todas formas?')) return;
+      commit(`🗑️ «${short(sl.title)}» eliminado`,()=>{ p.items=p.items.filter(i=>i.id!==sl.id); });
+    })
   );
   top.append(cb,content,controls);
   card.append(top);
@@ -1205,7 +1233,8 @@ function renderApp(){
   renderSidebar(); renderTagFilter(); renderBackupBanner();
   if(document.activeElement!==$('deckName')) $('deckName').value=p.name;
 
-  const total=p.items.length, done=p.items.filter(i=>i.status==='done').length, pct=total?Math.round(done/total*100):0;
+  const active=p.items.filter(i=>!isSnoozed(i)), schedCount=p.items.length-active.length;
+  const total=active.length, done=active.filter(i=>i.status==='done').length, pct=total?Math.round(done/total*100):0;
   const prev=lastPctByProject[p.id];
   if(!suppressConfetti&&total>0&&pct===100&&prev!==undefined&&prev<100) shootConfetti();
   lastPctByProject[p.id]=pct; suppressConfetti=false;
@@ -1217,7 +1246,11 @@ function renderApp(){
   const manual=ui.sort==='manual';
   const visible=getVisibleItems(p);
   lastVisibleIds=visible.map(i=>i.id);
-  $('countLabel').textContent=pl(visible.length,'elemento','elementos')+(isFiltered()?` (de ${total})`:'');
+  $('countLabel').textContent=pl(visible.length,'elemento','elementos')+(isFiltered()?` (de ${p.items.length})`:'');
+  const sb=$('schedBtn');
+  sb.hidden=!schedCount&&!ui.showScheduled;
+  sb.textContent=ui.showScheduled?`💤 Ocultar programadas (${schedCount})`:`💤 Ver programadas (${schedCount})`;
+  sb.classList.toggle('active',ui.showScheduled);
   $('viewListBtn').classList.toggle('active',ui.view==='list');
   $('viewKanbanBtn').classList.toggle('active',ui.view==='kanban');
   $('listHeaderTitle').textContent=ui.view==='kanban'?'Tablero Kanban':'Lista de comprobación';
@@ -1293,6 +1326,8 @@ function recToForm(r,dateStr){
   $('recEndCount').value=r?r.endCount:10;
   $('recEndUntil').value=r?r.endUntil:'';
   $('recFromCompletion').checked=!!(r&&r.fromCompletion);
+  $('recShowBefore').value=String(r?r.showBefore:0);
+  if($('recShowBefore').value==='') $('recShowBefore').append(opt(String(r.showBefore),`${r.showBefore} días antes`)), $('recShowBefore').value=String(r.showBefore);
   if(r){
     recDays=[...r.days]; $('recMonthDay').value=r.monthDay; $('recNth').value=String(r.nth);
     $('recNthWd').value=String(r.nthWeekday); $('recYearMonth').value=String(r.yearMonth); recDirty=true;
@@ -1302,7 +1337,7 @@ function recToForm(r,dateStr){
 function recFromForm(){
   const freq=$('recFreq').value; if(freq==='none') return null;
   return normalizeRec({freq,interval:$('recInterval').value,days:recDays,monthMode:getRadio('recMonthMode'),monthDay:$('recMonthDay').value,
-    nth:$('recNth').value,nthWeekday:$('recNthWd').value,yearMonth:$('recYearMonth').value,fromCompletion:$('recFromCompletion').checked,
+    nth:$('recNth').value,nthWeekday:$('recNthWd').value,yearMonth:$('recYearMonth').value,fromCompletion:$('recFromCompletion').checked,showBefore:$('recShowBefore').value,
     endType:getRadio('recEnd'),endCount:$('recEndCount').value,endUntil:$('recEndUntil').value,anchor:$('modDate').value,occurrence:editingRecOcc});
 }
 function updateRecUI(){
@@ -1321,9 +1356,11 @@ function updateRecUI(){
     if(!due) prev=`Sin fecha límite: al guardar se pondrá la primera fecha que encaje con la regla (${fmtDate(ymd(firstOccurrence(rec)),true)}).`;
     else{
       const n=computeNext({dueDate:due,recurrence:{...rec,anchor:due}});
-      prev=n?`${rec.fromCompletion?'Si la completas hoy, la':'Al completarla, la'} siguiente vencerá el ${fmtDate(ymd(n),true)}.`:'Esta es la última repetición: al completarla no se creará otra.';
+      const z=n?snoozeDateFor(ymd(n),rec):'';
+      prev=n?`${rec.fromCompletion?'Si la completas hoy, la':'Al completarla, la'} siguiente vencerá el ${fmtDate(ymd(n),true)}${z?` y estará oculta hasta el ${fmtDate(z,true)}`:''}.`:'Esta es la última repetición: al completarla quedará como revisada y la serie terminará.';
     }
   }
+  if(rec&&editingHistory.length) prev+=` Completada ${pl(editingHistory.length,'vez','veces')}; la última, el ${new Date(editingHistory[editingHistory.length-1]).toLocaleDateString('es-ES')}.`;
   $('recPreview').textContent=prev;
 }
 function syncDateDependents(){
@@ -1393,13 +1430,13 @@ function openModal(item=null){
     $('modTitle').value=item.title; tempItemTags=item.tags.filter(id=>getTag(id));
     $('modPriority').value=item.priority; $('modDate').value=item.dueDate; $('modTime').value=item.dueTime;
     $('modReminder').value=item.reminder; $('modLink').value=item.link; $('modNotes').value=item.notes;
-    tempSubtasks=clone(item.subtasks); editingRecOcc=item.recurrence?item.recurrence.occurrence:1;
+    tempSubtasks=clone(item.subtasks); editingRecOcc=item.recurrence?item.recurrence.occurrence:1; editingHistory=item.history;
     recToForm(item.recurrence,item.dueDate);
   } else {
     editingItemId=null; $('modalTitle').textContent='Nuevo elemento';
     ['modTitle','modDate','modTime','modLink','modNotes'].forEach(id=>$(id).value='');
     tempItemTags=ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
-    tempSubtasks=[]; editingRecOcc=1; recToForm(null,'');
+    tempSubtasks=[]; editingRecOcc=1; editingHistory=[]; recToForm(null,'');
   }
   $('modNewSubtask').value='';
   $('recBox').open=!!(item&&item.recurrence);
@@ -1434,8 +1471,11 @@ function saveModal(){
       const sl=src.items.find(i=>i.id===editing);
       if(!sl){ dst.items.push(normalizeItem({...fields,status:'pending'})); return 'El elemento ya no existía (¿otra pestaña?); se ha creado de nuevo'; }
       if(sl.dueDate!==fields.dueDate||sl.dueTime!==fields.dueTime||sl.reminder!==fields.reminder) sl.notified='';
-      if(!rec) sl.recurrenceSpawned=false;
+      const wasSnoozed=!!sl.snoozedUntil, dateChanged=sl.dueDate!==fields.dueDate;
       Object.assign(sl,fields);
+      if(!rec) sl.snoozedUntil='';
+      else if(wasSnoozed) sl.snoozedUntil=snoozeDateFor(sl.dueDate,rec);
+      if(dateChanged&&!wasSnoozed) sl.snoozedUntil='';
       if(dst!==src){ src.items=src.items.filter(i=>i!==sl); dst.items.push(sl); return `✅ Guardado y movido a «${dst.name}»`; }
       return '✅ Cambios guardados';
     }
@@ -1624,7 +1664,7 @@ $('tabEdit').addEventListener('click',showMarkdownEdit);
 $('tabPrev').addEventListener('click',showMarkdownPreview);
 $('modDate').addEventListener('input',syncDateDependents);
 $('recFreq').addEventListener('change',updateRecUI);
-['recInterval','recEndCount','recEndUntil','recFromCompletion'].forEach(id=>$(id).addEventListener('input',updateRecUI));
+['recInterval','recEndCount','recEndUntil','recFromCompletion','recShowBefore'].forEach(id=>$(id).addEventListener('input',updateRecUI));
 ['recMonthDay','recNth','recNthWd','recYearMonth'].forEach(id=>$(id).addEventListener('input',()=>{ recDirty=true; updateRecUI(); }));
 document.querySelectorAll('input[name="recMonthMode"]').forEach(r=>r.addEventListener('change',()=>{ recDirty=true; updateRecUI(); }));
 document.querySelectorAll('input[name="recEnd"]').forEach(r=>r.addEventListener('change',updateRecUI));
@@ -1667,6 +1707,7 @@ $('clearFiltersBtn').addEventListener('click',()=>{ ui.search=ui.status=ui.tag=u
 $('viewListBtn').addEventListener('click',()=>{ ui.view='list'; saveUI(); renderApp(); });
 $('viewKanbanBtn').addEventListener('click',()=>{ ui.view='kanban'; saveUI(); renderApp(); });
 $('selectModeBtn').addEventListener('click',()=>setSelectMode(!selectMode));
+$('schedBtn').addEventListener('click',()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); });
 
 $('bulkStatus').addEventListener('change',e=>{
   const v=e.target.value; e.target.value=''; if(!v) return;
