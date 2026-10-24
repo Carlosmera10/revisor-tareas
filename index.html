@@ -353,11 +353,12 @@ textarea.inactive{display:none}
   .progress{margin-top:10px}
   .banner{font-size:.88rem;padding:10px 12px}
   .toolbar{padding:8px;gap:8px;margin-bottom:12px}
-  .search-wrap{min-width:0}
+  .search-wrap{min-width:0;flex:1 1 calc(100% - 140px)}
+  #filtersToggle{flex:0 0 auto}
   #filtersToggle{display:inline-flex}
   body:not(.filters-open) .toolbar .tool-row:first-child>:not(.search-wrap):not(#filtersToggle){display:none}
   body:not(.filters-open) .toolbar .tool-row.split{display:none}
-  .toolbar .tool-row:first-child select{flex:1 1 46%}
+  .toolbar .tool-row:first-child select{flex:1 1 46%;min-width:0;font-size:.86rem;padding:8px 6px}
   .tool-row.split,.tool-row.split>.row{width:100%}
   .tool-row.split>.row:first-child select{flex:1}
   #dragHint{font-size:.8rem}
