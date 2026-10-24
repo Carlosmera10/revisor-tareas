@@ -86,7 +86,7 @@ body.selecting main{padding-bottom:150px}
 @media (pointer:coarse){#projectList li.active .proj-tools{display:flex}}
 .proj-tools button{background:transparent;color:var(--nav-muted);width:24px;height:24px;padding:0;border-radius:6px}
 .proj-tools button:hover:not(:disabled){background:rgba(255,255,255,.1);color:#fff}
-body.dragging-item #projectList li:not(.active),body.dragging-item #todayBtn{border-color:rgba(255,255,255,.18)}
+body.dragging-item #projectList li:not(.active),body.dragging-item #todayBtn,body.dragging-item #tomorrowBtn{border-color:rgba(255,255,255,.18)}
 .drop-target{background:rgba(143,166,255,.22)!important;border:1px solid #8fa6ff!important}
 .side-hint{font-size:.76rem;color:var(--nav-muted);padding:10px 10px 0;margin:0;line-height:1.4}
 .side-actions{display:flex;flex-direction:column;gap:2px;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)}
@@ -490,6 +490,8 @@ textarea.inactive{display:none}
   <aside class="sidebar">
     <div class="brand"><span class="mark"><svg class="ic sm"><use href="#i-checks"/></svg></span>Revisor de tareas</div>
     <button type="button" class="nav-item today-item" id="todayBtn"><svg class="ic"><use href="#i-sun"/></svg>Hoy<span class="nav-count" id="todayCount">0</span></button>
+    <button type="button" class="nav-item" id="tomorrowBtn"><svg class="ic"><use href="#i-sunrise"/></svg>Mañana<span class="nav-count" id="tomorrowCount">0</span></button>
+    <button type="button" class="nav-item" id="weekBtn"><svg class="ic"><use href="#i-calendar-range"/></svg>Próximos 7 días<span class="nav-count" id="weekCount">0</span></button>
     <div class="nav-section">Proyectos <button type="button" id="newProjectBtn" title="Crear proyecto" aria-label="Crear proyecto"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>
     <ul id="projectList"></ul>
         <div class="side-actions">
@@ -509,7 +511,7 @@ textarea.inactive{display:none}
             <div class="subline" id="subline"></div>
           </div>
           <div id="todayHead" hidden>
-            <h1 class="today-title">Hoy</h1>
+            <h1 class="today-title" id="todayTitle">Hoy</h1>
             <div class="today-date" id="todayDate"></div>
           </div>
         </div>
@@ -846,7 +848,7 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado.</li><li>El buscador ignora las tildes. Vista, orden y filtros se recuerdan.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos vencidas, con fecha de hoy o sin fecha.</li><li>Suelta una tarea sobre «Hoy» para ponerle la fecha de hoy.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos vencidas, con fecha de hoy o sin fecha.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Abre la ficha y despliega «Repetición».</li><li>Al marcarla como revisada <strong>no se crea ninguna copia</strong>: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar.</li><li>Queda oculta hasta ese día, o hasta los días antes que elijas en «Volver a mostrarla».</li><li>Las ocultas se ven con <strong>«Ver programadas»</strong>; desde su menú puedes «Mostrar ya».</li><li>«Contar desde el día en que la complete»: la siguiente fecha se calcula desde que la terminas, no desde la fecha límite.</li><li>Mensual «el día 31»: si el mes es más corto, se usa su último día.</li><li>Semanal sin días marcados: se usa el mismo día de la semana que la fecha límite.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1067,7 +1069,7 @@ function loadUI(){
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
-      if(['project','today'].includes(u.mode)) d.mode=u.mode;
+      if(['project','today','tomorrow','week'].includes(u.mode)) d.mode=u.mode;
       if(['list','kanban'].includes(u.view)) d.view=u.view;
       if(['manual','priority','dateAsc','dateDesc'].includes(u.sort)) d.sort=u.sort;
       ['search','status','tag','priority'].forEach(k=>{ if(typeof u[k]==='string') d[k]=u[k]; });
@@ -1104,6 +1106,8 @@ const getTag=id=>appState.tags.find(t=>t.id===id)||null;
 const findProjectOf=id=>appState.projects.find(p=>p.items.some(i=>i.id===id));
 const findItem=id=>{ const p=findProjectOf(id); return p?{p,it:p.items.find(i=>i.id===id)}:null; };
 const isToday=()=>ui.mode==='today';
+const DAY_MODES=['today','tomorrow','week'];
+const isDayView=()=>DAY_MODES.includes(ui.mode);
 
 /* ================= Avisos y deshacer ================= */
 let toastTimer=null;
@@ -1286,7 +1290,7 @@ function moveItems(ids,targetId){
   appState.projects.forEach(p=>{ if(p===dst) return; const m=p.items.filter(i=>set.has(i.id)); if(m.length){ moving.push(...m); p.items=p.items.filter(i=>!set.has(i.id)); } });
   if(!moving.length) return false;
   dst.items.push(...moving);
-  if(!isToday()) moving.forEach(i=>selected.delete(i.id));
+  if(!isDayView()) moving.forEach(i=>selected.delete(i.id));
   return `⇄ ${pl(moving.length,'elemento movido','elementos movidos')} a «${dst.name}»`;
 }
 function duplicateItems(ids,targetId,reset){
@@ -1333,14 +1337,30 @@ function todayEntries(){
   return out;
 }
 const todayPending=()=>todayEntries().filter(e=>e.it.status!=='done').length;
-function switchToToday(){
-  closeDrawer();
-  if(isToday()) return;
-  ui.mode='today'; saveUI(); selected.clear(); suppressConfetti=true; renderApp(); window.scrollTo(0,0);
+/* «Mañana»: lo que vence mañana. «Próximos 7 días»: vencidas pendientes + de hoy a dentro de 6 días.
+   Incluyen las repetitivas ocultas, porque vencen en esas fechas. */
+function rangeEntries(mode){
+  const t=todayStr(), tm=ymd(addDays(new Date(),1)), end=ymd(addDays(new Date(),6)), out=[];
+  appState.projects.forEach(p=>p.items.forEach(it=>{
+    if(!it.dueDate) return;
+    if(mode==='tomorrow'){ if(it.dueDate===tm) out.push({p,it}); return; }
+    if(it.dueDate>end) return;
+    if(it.dueDate<t){ if(it.status!=='done'&&!isSnoozed(it)) out.push({p,it}); return; }
+    out.push({p,it});
+  }));
+  return out;
 }
+const viewEntries=mode=>mode==='today'?todayEntries():rangeEntries(mode);
+const rangePending=mode=>rangeEntries(mode).filter(e=>e.it.status!=='done').length;
+function switchToView(mode){
+  closeDrawer();
+  if(ui.mode===mode) return;
+  ui.mode=mode; saveUI(); selected.clear(); suppressConfetti=true; renderApp(); window.scrollTo(0,0);
+}
+const switchToToday=()=>switchToView('today');
 function switchToProject(id){ kbIndex=0;
   closeDrawer();
-  if(!isToday()&&appState.activeId===id) return;
+  if(!isDayView()&&appState.activeId===id) return;
   ui.mode='project'; saveUI(); appState.activeId=id; selected.clear(); suppressConfetti=true; save(); renderApp(); window.scrollTo(0,0);
 }
 
@@ -1396,8 +1416,8 @@ function openMoreSheet(){
   const p=currentProject(), sched=p.items.filter(isSnoozed).length;
   openSheet('Más opciones',[
     {label:selectMode?'Terminar la selección':'Seleccionar varias',icon:'square-check',fn:()=>setSelectMode(!selectMode)},
-    !isToday()?{label:ui.view==='kanban'?'Ver como lista':'Ver como Kanban',icon:ui.view==='kanban'?'list':'columns',fn:()=>{ ui.view=ui.view==='kanban'?'list':'kanban'; saveUI(); renderApp(); }}:null,
-    !isToday()&&(sched||ui.showScheduled)?{label:ui.showScheduled?'Ocultar programadas':'Ver programadas',note:String(sched),icon:'clock',fn:()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); }}:null,
+    !isDayView()?{label:ui.view==='kanban'?'Ver como lista':'Ver como Kanban',icon:ui.view==='kanban'?'list':'columns',fn:()=>{ ui.view=ui.view==='kanban'?'list':'kanban'; saveUI(); renderApp(); }}:null,
+    !isDayView()&&(sched||ui.showScheduled)?{label:ui.showScheduled?'Ocultar programadas':'Ver programadas',note:String(sched),icon:'clock',fn:()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); }}:null,
     {label:'Etiquetas',icon:'tag',fn:()=>$('openTagsBtn').click()},
     {label:'Ajustes y avisos',icon:'sliders',fn:()=>$('openSettingsBtn').click()},
     {label:'Instrucciones',icon:'help',fn:()=>$('openHelpBtn').click()},
@@ -1554,11 +1574,16 @@ function renderSidebar(){
   $('todayCount').title=pl(tp,'tarea pendiente para hoy o sin fecha','tareas pendientes para hoy o sin fecha');
   $('bnTodayCount').textContent=tp&&!isToday()?String(tp):'';
   $('bnToday').classList.toggle('active',isToday());
-  $('bnProjects').classList.toggle('active',!isToday());
+  $('bnProjects').classList.toggle('active',!isDayView());
+  $('tomorrowBtn').classList.toggle('active',ui.mode==='tomorrow');
+  $('weekBtn').classList.toggle('active',ui.mode==='week');
+  const tmc=rangePending('tomorrow'), wc=rangePending('week');
+  $('tomorrowCount').textContent=tmc; $('tomorrowCount').title=pl(tmc,'tarea pendiente para mañana','tareas pendientes para mañana');
+  $('weekCount').textContent=wc; $('weekCount').title=pl(wc,'tarea pendiente en los próximos 7 días (incluidas las vencidas)','tareas pendientes en los próximos 7 días (incluidas las vencidas)');
   const list=$('projectList'); list.replaceChildren();
   const projects=appState.projects;
   projects.forEach((p,idx)=>{
-    const active=!isToday()&&p.id===appState.activeId;
+    const active=!isDayView()&&p.id===appState.activeId;
     const li=el('li',active?'active':'');
     li.dataset.id=p.id; li.draggable=true; li.tabIndex=0;
     const act=p.items.filter(i=>!isSnoozed(i)), total=act.length, done=act.filter(i=>i.status==='done').length, sched=p.items.length-total;
@@ -1822,24 +1847,25 @@ function emptyState(title,text){ const e=el('div','empty'); e.append(el('strong'
 
 /* ================= Render principal ================= */
 function renderHeader(entries){
-  const td=isToday();
+  const td=isDayView();
   $('projectHead').hidden=td; $('todayHead').hidden=!td;
   if(td){
-    const d=new Date();
-    const s=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-    $('todayDate').textContent=s.charAt(0).toUpperCase()+s.slice(1);
-    document.title='Hoy · Revisor de tareas';
+    const long=d=>{ const s=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); return s.charAt(0).toUpperCase()+s.slice(1); };
+    const title={today:'Hoy',tomorrow:'Mañana',week:'Próximos 7 días'}[ui.mode];
+    $('todayTitle').textContent=title;
+    $('todayDate').textContent=ui.mode==='today'?long(new Date()):ui.mode==='tomorrow'?long(addDays(new Date(),1)):`Del ${fmtDate(todayStr(),true)} al ${fmtDate(ymd(addDays(new Date(),6)),true)}`;
+    document.title=title+' · Revisor de tareas';
   } else {
     const p=currentProject();
     if(document.activeElement!==$('deckName')) $('deckName').value=p.name;
     document.title=`${p.name} · Revisor de tareas`;
   }
   const total=entries.length, done=entries.filter(i=>i.status==='done').length, pct=total?Math.round(done/total*100):0;
-  const key=td?'__today':currentProject().id;
+  const key=td?'__'+ui.mode:currentProject().id;
   const prev=lastPctByKey[key];
   if(!suppressConfetti&&total>0&&pct===100&&prev!==undefined&&prev<100) shootConfetti();
   lastPctByKey[key]=pct; suppressConfetti=false;
-  $('progressText').textContent=td?`${done} de ${total} hechas hoy`:`${done} de ${total} completadas`;
+  $('progressText').textContent=ui.mode==='today'?`${done} de ${total} hechas hoy`:`${done} de ${total} completadas`;
   $('percent').textContent=pct+' %';
   $('bar').style.width=pct+'%';
   $('progress').setAttribute('aria-valuenow',pct);
@@ -1852,7 +1878,7 @@ function renderHeader(entries){
   }
 }
 function renderApp(){
-  const td=isToday();
+  const td=isDayView();
   [...selected].forEach(id=>{ if(!findProjectOf(id)) selected.delete(id); });
   renderSidebar(); renderTagFilter(); renderBackupBanner();
   document.body.classList.toggle('today-mode',td);
@@ -1866,21 +1892,35 @@ function renderApp(){
   let hint;
 
   if(td){
-    const all=todayEntries();
+    const all=viewEntries(ui.mode);
     renderHeader(all.map(e=>e.it));
     const vis=all.filter(e=>matches(e.it,w));
     if(s) vis.sort((a,b)=>s(a.it,b.it));
+    else if(ui.mode!=='today') vis.sort((a,b)=>(PRIO_WEIGHT[b.it.priority]-PRIO_WEIGHT[a.it.priority])||(a.it.dueTime||'99').localeCompare(b.it.dueTime||'99'));
     lastVisibleIds=vis.map(e=>e.it.id);
-    const t=todayStr();
-    const groups=[
+    const t=todayStr(), tm=ymd(addDays(new Date(),1));
+    let groups;
+    if(ui.mode==='today') groups=[
       {title:'Vencidas',icon:'alert-circle',cls:'overdue',items:vis.filter(e=>e.it.dueDate&&e.it.dueDate<t)},
       {title:'Para hoy',icon:'sun',cls:'',items:vis.filter(e=>e.it.dueDate===t)},
       {title:'Sin fecha',icon:'inbox',cls:'',items:vis.filter(e=>!e.it.dueDate)}
     ];
+    else if(ui.mode==='tomorrow') groups=[{title:'Para mañana',icon:'sunrise',cls:'',items:vis}];
+    else {
+      groups=[{title:'Vencidas',icon:'alert-circle',cls:'overdue',items:vis.filter(e=>e.it.dueDate<t)}];
+      for(let i=0;i<7;i++){
+        const d=ymd(addDays(new Date(),i));
+        const lbl=i===0?'Hoy':i===1?'Mañana':(x=>x.charAt(0).toUpperCase()+x.slice(1))(parseYMD(d).toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'short'}));
+        groups.push({title:lbl,icon:i===0?'sun':i===1?'sunrise':'calendar',cls:'',items:vis.filter(e=>e.it.dueDate===d)});
+      }
+    }
     $('listHeaderTitle').textContent='Tareas de todos los proyectos';
     $('countLabel').textContent=pl(vis.length,'tarea','tareas')+(isFiltered()?` (de ${all.length})`:'');
     list.className='list-view';
-    if(!vis.length) list.append(all.length?emptyState('Nada coincide con los filtros','Prueba a pulsar «Limpiar».'):emptyState('No tienes nada para hoy','No hay tareas con fecha de hoy, vencidas ni sin fecha. Usa «Planificar» para repartir el trabajo.'));
+    const emptyMsg={today:['No tienes nada para hoy','No hay tareas con fecha de hoy, vencidas ni sin fecha. Usa «Planificar» para repartir el trabajo.'],
+      tomorrow:['No tienes nada para mañana','Ninguna tarea vence mañana.'],
+      week:['Semana despejada','No hay tareas vencidas ni con fecha en los próximos 7 días.']}[ui.mode];
+    if(!vis.length) list.append(all.length?emptyState('Nada coincide con los filtros','Prueba a pulsar «Limpiar».'):emptyState(...emptyMsg));
     groups.forEach(g=>{
       if(!g.items.length) return;
       const h=el('div','group-title '+g.cls); h.append(ic(g.icon,'sm'),document.createTextNode(g.title+' '),el('span','n',`(${g.items.length})`));
@@ -2101,7 +2141,7 @@ function openModal(item=null){
   } else {
     editingItemId=null; $('modalTitle').textContent='Nuevo elemento';
     ['modTitle','modDate','modTime','modLink','modNotes'].forEach(id=>$(id).value='');
-    if(isToday()) $('modDate').value=todayStr();
+    if(isDayView()) $('modDate').value=ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):todayStr();
     tempItemTags=ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
     tempSubtasks=[]; editingRecOcc=1; editingHistory=[]; recToForm(null,$('modDate').value);
   }
@@ -2147,7 +2187,7 @@ function saveModal(){
       return '✅ Cambios guardados';
     }
     dst.items.push(normalizeItem({...fields,status:'pending'}));
-    return isToday()||dst.id===appState.activeId?'✅ Elemento creado':`✅ Elemento creado en «${dst.name}»`;
+    return isDayView()||dst.id===appState.activeId?'✅ Elemento creado':`✅ Elemento creado en «${dst.name}»`;
   });
 }
 
@@ -2416,7 +2456,7 @@ function tick(){
 function openItemById(pid,iid){
   const p=appState.projects.find(x=>x.id===pid); if(!p) return;
   const it=p.items.find(i=>i.id===iid); if(!it) return;
-  if(!isToday()&&appState.activeId!==pid){ appState.activeId=pid; selected.clear(); suppressConfetti=true; save(); renderApp(); }
+  if(!isDayView()&&appState.activeId!==pid){ appState.activeId=pid; selected.clear(); suppressConfetti=true; save(); renderApp(); }
   window.focus(); openModal(it);
 }
 
@@ -2465,6 +2505,15 @@ $('filtersToggle').addEventListener('click',()=>{ const on=document.body.classLi
 mqMobile.addEventListener('change',()=>{ closeDrawer(); closeSheet(); renderApp(); });
 $('planBtn').addEventListener('click',openPlanner);
 $('todayBtn').addEventListener('click',switchToToday);
+$('tomorrowBtn').addEventListener('click',()=>switchToView('tomorrow'));
+$('weekBtn').addEventListener('click',()=>switchToView('week'));
+$('tomorrowBtn').addEventListener('dragover',e=>{ if(drag.kind!=='item') return; e.preventDefault(); $('tomorrowBtn').classList.add('drop-target'); });
+$('tomorrowBtn').addEventListener('dragleave',()=>$('tomorrowBtn').classList.remove('drop-target'));
+$('tomorrowBtn').addEventListener('drop',e=>{
+  if(drag.kind!=='item') return; e.preventDefault();
+  const id=drag.id; endDrag();
+  commit(null,()=>{ const f=findItem(id); if(!f) return false; setDue(f.it,ymd(addDays(new Date(),1))); return `📅 «${short(f.it.title)}» queda para mañana`; });
+});
 $('todayBtn').addEventListener('dragover',e=>{ if(drag.kind!=='item') return; e.preventDefault(); $('todayBtn').classList.add('drop-target'); });
 $('todayBtn').addEventListener('dragleave',()=>$('todayBtn').classList.remove('drop-target'));
 $('todayBtn').addEventListener('drop',e=>{
