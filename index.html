@@ -299,7 +299,22 @@ textarea.inactive{display:none}
 .plan-tools select{padding:7px 10px;font-size:.9rem}
 .plan-progress{display:flex;align-items:center;gap:12px;font-size:.86rem;color:var(--muted);margin-top:12px}
 .plan-progress .track{height:4px}
-.plan-card{border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:#fbfcfe;margin:14px 0}
+.plan-deck{position:relative;margin:14px 0 22px}
+.plan-deck.more::before,.plan-deck.more::after{content:"";position:absolute;left:14px;right:14px;bottom:-7px;height:20px;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;background:#f3f5f9;z-index:0}
+.plan-deck.more::after{left:28px;right:28px;bottom:-13px;background:#eceff4;z-index:-1}
+.plan-card{position:relative;z-index:1;border:1px solid var(--line);border-radius:12px;padding:18px 20px;background:#fff;margin:0;box-shadow:0 2px 6px rgba(10,16,30,.06);touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;transition:transform .2s ease,opacity .2s ease}
+.plan-card.dragging{transition:none;cursor:grabbing}
+.plan-card.out-left{transform:translateX(-120%) rotate(-6deg);opacity:0}
+.plan-card.out-right{transform:translateX(120%) rotate(6deg);opacity:0}
+.plan-card.in-right{animation:plan-in-r .22s ease-out}
+.plan-card.in-left{animation:plan-in-l .22s ease-out}
+@keyframes plan-in-r{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes plan-in-l{from{transform:translateX(-40px);opacity:0}to{transform:none;opacity:1}}
+.plan-card .plan-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:10px;border-top:1px solid var(--line)}
+.plan-card .plan-nav .pos{font-size:.84rem;color:var(--muted)}
+.plan-card.end{text-align:center;padding:30px 20px}
+.plan-card.end .ic.big{width:44px;height:44px;color:var(--done);margin-bottom:8px}
+.plan-card.end strong{display:block;font-size:1.25rem;margin-bottom:4px}
 .plan-title{font-size:1.3rem;font-weight:700;letter-spacing:-.015em;line-height:1.25;margin:0 0 10px;overflow-wrap:anywhere}
 .plan-notes{color:var(--muted);font-size:.92rem;margin-top:10px}
 .plan-opts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
@@ -740,8 +755,8 @@ textarea.inactive{display:none}
       <option value="project">Solo el proyecto actual</option>
     </select>
     <select id="planWhich" aria-label="Qué tareas">
-      <option value="unplanned">Sin fecha y vencidas</option>
       <option value="all">Todas las pendientes</option>
+      <option value="unplanned">Sin fecha y vencidas</option>
     </select>
   </div>
   <div id="planBody"></div>
@@ -830,7 +845,7 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado.</li><li>El buscador ignora las tildes. Vista, orden y filtros se recuerdan.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos vencidas, con fecha de hoy o sin fecha.</li><li>Suelta una tarea sobre «Hoy» para ponerle la fecha de hoy.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas una a una para decidir cuándo hacerlas: Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1).</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos vencidas, con fecha de hoy o sin fecha.</li><li>Suelta una tarea sobre «Hoy» para ponerle la fecha de hoy.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Abre la ficha y despliega «Repetición».</li><li>Al marcarla como revisada <strong>no se crea ninguna copia</strong>: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar.</li><li>Queda oculta hasta ese día, o hasta los días antes que elijas en «Volver a mostrarla».</li><li>Las ocultas se ven con <strong>«Ver programadas»</strong>; desde su menú puedes «Mostrar ya».</li><li>«Contar desde el día en que la complete»: la siguiente fecha se calcula desde que la terminas, no desde la fecha límite.</li><li>Mensual «el día 31»: si el mes es más corto, se usa su último día.</li><li>Semanal sin días marcados: se usa el mismo día de la semana que la fecha límite.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -844,7 +859,7 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-monitor-down"/></svg>Instalar la app<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>PC (Chrome)</strong>: pulsa «Instalar app» en la barra lateral o el icono de instalar de la barra de direcciones. Si no aparece: menú ⋮ → «Transmitir, guardar y compartir» → «Instalar página como aplicación».</li><li><strong>Android (Chrome)</strong>: menú ⋮ → «Añadir a pantalla de inicio» → «Instalar».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-keyboard"/></svg>Atajos de teclado<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul class="kbd-list" style="padding-left:18px"><li><kbd>/</kbd> (en teclado español, <kbd>Mayús</kbd>+<kbd>7</kbd>): ir al buscador</li><li><kbd>P</kbd>: abrir el planificador; dentro, <kbd>1</kbd>–<kbd>4</kbd> eligen la fecha, <kbd>S</kbd> salta y <kbd>H</kbd> marca como hecha</li><li><kbd>?</kbd>: abrir estas instrucciones</li><li><kbd>Ctrl</kbd>+<kbd>Z</kbd>: deshacer el último cambio</li><li><kbd>Ctrl</kbd>+<kbd>Intro</kbd>: guardar la ficha abierta</li><li><kbd>Esc</kbd>: cerrar ventanas, limpiar la búsqueda o terminar la selección</li></ul></div></details>
+    <div class="help-body"><ul class="kbd-list" style="padding-left:18px"><li><kbd>/</kbd> (en teclado español, <kbd>Mayús</kbd>+<kbd>7</kbd>): ir al buscador</li><li><kbd>P</kbd>: abrir el planificador; dentro, <kbd>1</kbd>–<kbd>4</kbd> eligen la fecha, <kbd>→</kbd> o <kbd>S</kbd> pasa a la siguiente, <kbd>←</kbd> vuelve y <kbd>H</kbd> marca como hecha</li><li><kbd>?</kbd>: abrir estas instrucciones</li><li><kbd>Ctrl</kbd>+<kbd>Z</kbd>: deshacer el último cambio</li><li><kbd>Ctrl</kbd>+<kbd>Intro</kbd>: guardar la ficha abierta</li><li><kbd>Esc</kbd>: cerrar ventanas, limpiar la búsqueda o terminar la selección</li></ul></div></details>
   <div class="modal-footer"><span></span><button type="button" id="helpDoneBtn">Cerrar</button></div>
 </dialog>
 
@@ -2145,15 +2160,15 @@ function planCandidates(){
     if(which==='unplanned'&&it.dueDate&&it.dueDate>=t) return;
     out.push({pid:p.id,id:it.id,due:it.dueDate,w:PRIO_WEIGHT[it.priority]});
   }));
-  const rank=e=>!e.due?1:e.due<t?0:2;
-  out.sort((a,b)=>rank(a)-rank(b)||(b.w-a.w)||(a.due||'').localeCompare(b.due||''));
+  out.sort((a,b)=>(!a.due)-(!b.due)||(a.due||'').localeCompare(b.due||'')||(b.w-a.w));
   return out;
 }
 function openPlanner(){
   if(document.querySelector('dialog[open]')) return;
-  $('planScope').value=isToday()?'all':'project';
-  startPlan(); $('planModal').showModal();
+  $('planScope').value='all'; $('planWhich').value='all';
+  planDir=''; startPlan(); $('planModal').showModal();
 }
+let planDir='';
 function startPlan(){ plan={queue:planCandidates(),idx:0,steps:[],count:0}; renderPlanner(); }
 function planCurrent(){
   while(plan.idx<plan.queue.length){
@@ -2167,6 +2182,7 @@ function planAct(kind){
   const cur=planCurrent(); if(!cur) return;
   const idx=plan.idx, id=cur.it.id;
   let ok;
+  planDir='right';
   if(kind==='skip'){ plan.steps.push({type:'skip',idx}); plan.idx++; renderPlanner(); return; }
   if(kind==='done') ok=commit(null,()=>{ const f=findItem(id); if(!f) return false; const s=applyStatus(f.it,f.p,'done'); return s?spawnMsg(s):undefined; });
   else{ const d=kind==='none'?'':quickDates()[kind]; ok=commit(null,()=>{ const f=findItem(id); if(!f) return false; setDue(f.it,d); }); }
@@ -2176,31 +2192,70 @@ function planAct(kind){
 function planBack(){
   const s=plan.steps.pop(); if(!s) return;
   if(s.type==='commit'){ undo(true); plan.count=Math.max(0,plan.count-1); }
-  plan.idx=s.idx; renderPlanner();
+  plan.idx=s.idx; planDir='left'; renderPlanner();
+}
+/* Pasar a la siguiente (se queda como está) o, tras la última, cerrar */
+function planNext(){ if(planCurrent()) planAct('skip'); else $('planModal').close(); }
+function attachPlanSwipe(card){
+  let sx=0,sy=0,dx=0,active=false,locked=null;
+  card.addEventListener('pointerdown',e=>{
+    if(e.button>0||e.target.closest('button,a,select,input')) return;
+    sx=e.clientX; sy=e.clientY; dx=0; active=true; locked=null;
+  });
+  card.addEventListener('pointermove',e=>{
+    if(!active) return;
+    const mx=e.clientX-sx, my=e.clientY-sy;
+    if(locked===null){
+      if(Math.abs(mx)>10&&Math.abs(mx)>Math.abs(my)*1.2){ locked='x'; card.classList.add('dragging'); try{ card.setPointerCapture(e.pointerId); }catch(_){} }
+      else if(Math.abs(my)>12){ active=false; return; }
+      else return;
+    }
+    dx=mx; card.style.transform=`translateX(${dx}px) rotate(${dx/40}deg)`;
+  });
+  const end=()=>{
+    if(!active) return; active=false;
+    card.classList.remove('dragging'); card.style.transform='';
+    if(locked!=='x') return;
+    if(dx<-80){ card.classList.add('out-left'); setTimeout(planNext,reducedMotion()?0:170); }
+    else if(dx>80&&plan.steps.length){ card.classList.add('out-right'); setTimeout(planBack,reducedMotion()?0:170); }
+  };
+  card.addEventListener('pointerup',end);
+  card.addEventListener('pointercancel',()=>{ active=false; card.classList.remove('dragging'); card.style.transform=''; });
 }
 function renderPlanner(){
   const body=$('planBody'); body.replaceChildren();
   const total=plan.queue.length, cur=planCurrent();
+  const anim=planDir==='right'?'in-right':planDir==='left'?'in-left':''; planDir='';
+  const navRow=(posText)=>{
+    const nav=el('div','plan-nav');
+    const back=btn('Anterior','ghost small','Volver a la anterior (←)',planBack,'chev-left'); back.disabled=!plan.steps.length;
+    const next=btn(cur?'Siguiente':'Cerrar',cur?'secondary small':'small',cur?'Pasar sin cambiarla (→)':'Cerrar el planificador',planNext,cur?'chev-right':'check');
+    nav.append(back,el('span','pos',posText),next); return nav;
+  };
   if(!total){
-    const e=el('div','plan-end'); e.append(ic('check-circle'),el('strong','','No hay nada que planificar'),
-      document.createTextNode($('planWhich').value==='unplanned'?'Todas las tareas pendientes tienen fecha y ninguna está vencida. Elige «Todas las pendientes» para repasarlas igualmente.':'No hay tareas pendientes.'));
-    body.append(e); return;
+    const deck=el('div','plan-deck'), c=el('div','plan-card end');
+    c.append(ic('check-circle','big'),el('strong','','No hay nada que planificar'),
+      document.createTextNode($('planWhich').value==='unplanned'?'Todas las tareas pendientes tienen fecha y ninguna está vencida.':'No hay tareas pendientes.'));
+    const r=el('div','row'); r.style.cssText='justify-content:center;margin-top:16px'; r.append(btn('Cerrar','',null,()=>$('planModal').close(),'check')); c.append(r);
+    deck.append(c); body.append(deck); return;
   }
   const prog=el('div','plan-progress');
-  const pos=Math.min(plan.idx+1,total);
-  const tr=el('div','track'), bar=el('div'); bar.style.cssText=`height:100%;background:var(--accent);border-radius:99px;width:${Math.round(plan.idx/total*100)}%`; tr.append(bar);
-  prog.append(el('span','',cur?`Tarea ${pos} de ${total}`:`${total} de ${total}`),tr,el('span','',pl(plan.count,'planificada','planificadas')));
+  const tr=el('div','track'), bar=el('div'); bar.style.cssText=`height:100%;background:var(--accent);border-radius:99px;width:${Math.round(Math.min(plan.idx,total)/total*100)}%`; tr.append(bar);
+  prog.append(el('span','',cur?`Tarea ${plan.idx+1} de ${total}`:`${total} de ${total}`),tr,el('span','',pl(plan.count,'planificada','planificadas')));
   body.append(prog);
   if(!cur){
-    const e=el('div','plan-end'); e.append(ic('check-circle'),el('strong','','Planificación terminada'),
-      document.createTextNode(`Has decidido la fecha de ${pl(plan.count,'tarea','tareas')}.`));
-    const r=el('div','row'); r.style.cssText='justify-content:center;margin-top:16px';
-    r.append(btn('Atrás','secondary',null,planBack,'chev-left'),btn('Volver a empezar','secondary',null,startPlan,'repeat'),btn('Cerrar','',null,()=>$('planModal').close(),'check'));
-    if(!plan.steps.length) r.firstChild.disabled=true;
-    e.append(r); body.append(e); return;
+    const deck=el('div','plan-deck'), c=el('div','plan-card end'+(anim?' '+anim:''));
+    c.append(ic('check-circle','big'),el('strong','','Todo revisado'),
+      document.createTextNode((plan.count?`Has cambiado ${pl(plan.count,'tarea','tareas')}.`:'Has pasado por todas las tareas.')+' Pásala una vez más para cerrar.'));
+    c.append(navRow(''));
+    attachPlanSwipe(c); deck.append(c); body.append(deck);
+    const r=el('div','row'); r.style.cssText='justify-content:center';
+    r.append(btn('Volver a empezar','ghost small',null,startPlan,'repeat'));
+    body.append(r); return;
   }
   const {p,it}=cur;
-  const card=el('div','plan-card');
+  const deck=el('div','plan-deck'+(plan.idx<total-1?' more':''));
+  const card=el('div','plan-card'+(anim?' '+anim:''));
   card.append(el('h3','plan-title',it.title));
   const meta=el('div','plan-meta badges-row');
   meta.append(badge('proj','folder',p.name||'Sin título'));
@@ -2212,7 +2267,9 @@ function renderPlanner(){
   card.append(meta);
   if(it.notes.trim()){ let txt=it.notes; if(txt.length>220) txt=txt.slice(0,220).replace(/\s+\S*$/,'')+'…'; const n=el('div','plan-notes'); n.innerHTML=parseMD(txt); card.append(n); }
   if(it.subtasks.length) card.append(el('div','plan-notes',`Sub-tareas: ${it.subtasks.filter(s=>s.done).length} de ${it.subtasks.length} hechas`));
-  body.append(card);
+  card.append(navRow(`${plan.idx+1} / ${total}`));
+  attachPlanSwipe(card);
+  deck.append(card); body.append(deck);
   const q=quickDates();
   const opts=el('div','plan-opts');
   QUICK.forEach((o,i)=>{
@@ -2224,10 +2281,9 @@ function renderPlanner(){
   body.append(opts);
   const sec=el('div','plan-sec');
   const left=el('div','row'), right=el('div','row');
-  const back=btn('Atrás','ghost small',null,planBack,'chev-left'); back.disabled=!plan.steps.length;
-  left.append(back,btn('Saltar','secondary small','Dejarla como está (S)',()=>planAct('skip'),'skip'));
-  right.append(btn('Quitar fecha','secondary small',null,()=>planAct('none'),'x'),btn('Hecha','done-btn small','Marcar como revisada (H)',()=>planAct('done'),'check'),btn('Abrir ficha','ghost small',null,()=>{ $('planModal').close(); openModal(it); },'pencil'));
-  if(!it.dueDate) right.firstChild.disabled=true;
+  const nd=btn('Quitar fecha','secondary small',null,()=>planAct('none'),'x'); nd.disabled=!it.dueDate;
+  left.append(nd);
+  right.append(btn('Hecha','done-btn small','Marcar como revisada (H)',()=>planAct('done'),'check'),btn('Abrir ficha','ghost small',null,()=>{ $('planModal').close(); openModal(it); },'pencil'));
   sec.append(left,right);
   body.append(sec);
 }
@@ -2444,9 +2500,9 @@ $('planModal').addEventListener('keydown',e=>{
   if(['SELECT','INPUT'].includes(e.target.tagName)||e.ctrlKey||e.metaKey||e.altKey) return;
   const k=e.key.toLowerCase();
   if(['1','2','3','4'].includes(k)&&planCurrent()){ e.preventDefault(); planAct(QUICK[+k-1].k); }
-  else if(k==='s'&&planCurrent()){ e.preventDefault(); planAct('skip'); }
+  else if(k==='s'||k==='arrowright'){ e.preventDefault(); planNext(); }
   else if(k==='h'&&planCurrent()){ e.preventDefault(); planAct('done'); }
-  else if(k==='backspace'){ e.preventDefault(); planBack(); }
+  else if(k==='backspace'||k==='arrowleft'){ e.preventDefault(); planBack(); }
 });
 
 $('openTagsBtn').addEventListener('click',()=>{ tempTags=clone(appState.tags); renderTagManager(); $('tagModal').showModal(); });
