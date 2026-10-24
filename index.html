@@ -360,6 +360,24 @@ textarea.inactive{display:none}
   .slide.swipe-later::after{content:"Soltar: aplazar";background:var(--high)}
   .badges-row{gap:5px}
   .kanban-view .slide-top{flex-direction:row}
+  /* Kanban en horizontal, como Trello: una columna por pantalla, se pasa deslizando */
+  #slides.kanban-view{display:flex;grid-template-columns:none;gap:10px;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;margin:0 -12px;padding:0 12px 6px;scroll-padding:0 12px;scrollbar-width:none;align-items:flex-start}
+  #slides.kanban-view::-webkit-scrollbar{display:none}
+  #slides.kanban-view.kb-dragging{scroll-snap-type:none}
+  .kanban-col{flex:0 0 calc(100% - 34px);scroll-snap-align:start;scroll-snap-stop:always;min-height:160px;min-width:0}
+  .kanban-col h3{display:none}
+  .kanban-view .slide{touch-action:pan-x pan-y}
+  .kanban-view .drag-handle{touch-action:none}
+  .kb-tabs{display:flex;gap:6px;margin:0 0 10px;position:sticky;top:0;z-index:4;background:var(--paper);padding:6px 0}
+  .kb-tabs[hidden]{display:none}
+  .kb-tab{flex:1;min-width:0;background:#fff;color:var(--muted);border:1px solid var(--line-strong);border-radius:99px;padding:7px 6px;font-size:.84rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .kb-tab:hover{background:#fff}
+  .kb-tab .n{font-weight:500;opacity:.75;margin-left:3px}
+  .kb-tab.active{background:var(--nav);border-color:var(--nav);color:#fff}
+  .kb-tab.drop-hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+  .kanban-col.kb-over{background:#e3e9f8;border:2px dashed var(--accent)}
+  .kb-ghost{position:fixed;z-index:600;pointer-events:none;margin:0;box-shadow:0 18px 40px rgba(10,16,30,.3);transform:rotate(2deg);opacity:.97;transition:none}
+  .slide.kb-source{opacity:.35}
   .bottom-nav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:300;background:var(--nav);padding:6px 6px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(10,16,30,.18)}
   .bottom-nav button{flex-direction:column;gap:2px;background:transparent;color:var(--nav-muted);font-size:.7rem;font-weight:600;padding:6px 2px;border-radius:10px;position:relative}
   .bottom-nav button .ic{width:22px;height:22px}
@@ -550,6 +568,7 @@ textarea.inactive{display:none}
       <span id="countLabel"></span>
     </div>
     <p class="hint" id="dragHint"></p>
+    <div id="kbTabs" class="kb-tabs" role="tablist" aria-label="Columnas" hidden></div>
     <div id="slides" class="list-view"></div>
   </main>
 </div>
@@ -817,7 +836,7 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Las notas admiten formato sencillo; míralo con «Vista previa»:</p><ul><li><code>**negrita**</code> y <code>*cursiva*</code></li><li><code>[texto](https://…)</code> para un enlace</li><li><code>- elemento</code> al principio de línea para una lista</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-menu"/></svg>En el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Desliza una tarjeta <strong>a la derecha</strong> para marcarla como hecha y <strong>a la izquierda</strong> para aplazarla.</li><li>Mantén pulsada el asa para reordenar.</li><li>El botón de los tres puntos de cada tarjeta abre sus acciones; «Más», en la barra inferior, el resto de opciones.</li></ul></div></details>
+    <div class="help-body"><ul><li>En la lista, desliza una tarjeta <strong>a la derecha</strong> para marcarla como hecha y <strong>a la izquierda</strong> para aplazarla.</li><li>Mantén pulsada el asa para reordenar.</li><li><strong>Kanban</strong>: las columnas van una al lado de otra; desliza a los lados o pulsa las pestañas de arriba para cambiar de columna. Para pasar una tarjeta a otra columna, arrástrala desde el asa hasta la pestaña o hasta el borde de la pantalla.</li><li>El botón de los tres puntos de cada tarjeta abre sus acciones; «Más», en la barra inferior, el resto de opciones.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-bell"/></svg>Avisos<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Actívalos en «Ajustes y avisos» → «Activar notificaciones».</li><li>Cada tarea tiene su propio campo «Aviso». Las que no tienen hora usan la «Hora del aviso en tareas sin hora».</li><li>Los avisos llegan mientras la app esté abierta, aunque esté minimizada. Si estaba cerrada, verás los pendientes al abrirla.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-save"/></svg>Copias de seguridad<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1303,7 +1322,7 @@ function switchToToday(){
   if(isToday()) return;
   ui.mode='today'; saveUI(); selected.clear(); suppressConfetti=true; renderApp(); window.scrollTo(0,0);
 }
-function switchToProject(id){
+function switchToProject(id){ kbIndex=0;
   closeDrawer();
   if(!isToday()&&appState.activeId===id) return;
   ui.mode='project'; saveUI(); appState.activeId=id; selected.clear(); suppressConfetti=true; save(); renderApp(); window.scrollTo(0,0);
@@ -1428,6 +1447,84 @@ function attachTouchReorder(handle,card,sl,p){
       card.classList.remove('lifting'); card.style.transform=''; card.style.pointerEvents='';
       clearDropMarks();
       if(target) commit(null,()=>moveInArray(p.items,sl.id,target,before)||false);
+    };
+    handle.addEventListener('pointermove',move); handle.addEventListener('pointerup',up); handle.addEventListener('pointercancel',up);
+  });
+}
+
+/* Kanban en el móvil: columnas en horizontal y arrastre entre columnas con el asa */
+const KB_COLS=[['pending','Pendiente'],['review','En revisión'],['done','Revisada']];
+let kbIndex=0;
+function kbBoard(){ const b=$('slides'); return b.classList.contains('kanban-view')?b:null; }
+function kbColWidth(b){ const c=b.querySelector('.kanban-col'); return c?c.getBoundingClientRect().width+10:b.clientWidth; }
+function kbCurrent(b){ return Math.max(0,Math.min(KB_COLS.length-1,Math.round(b.scrollLeft/kbColWidth(b)))); }
+function kbGo(i,smooth=true){ const b=kbBoard(); if(!b) return; i=Math.max(0,Math.min(KB_COLS.length-1,i)); kbIndex=i; b.scrollTo({left:i*kbColWidth(b),behavior:smooth&&!reducedMotion()?'smooth':'auto'}); kbMarkTab(i); }
+function kbMarkTab(i){ $('kbTabs').querySelectorAll('.kb-tab').forEach((t,ix)=>{ t.classList.toggle('active',ix===i); t.setAttribute('aria-selected',ix===i); }); }
+function renderKbTabs(counts){
+  const box=$('kbTabs'); box.replaceChildren();
+  KB_COLS.forEach(([st,title],i)=>{
+    const t=el('button','kb-tab'); t.type='button'; t.dataset.status=st; t.setAttribute('role','tab');
+    t.append(document.createTextNode(title),el('span','n',String(counts[st]||0)));
+    t.addEventListener('click',()=>kbGo(i));
+    box.append(t);
+  });
+}
+function moveToColumn(p,id,status,targetId,before){
+  const it=p.items.find(i=>i.id===id); if(!it) return false;
+  if(targetId&&targetId!==id) moveInArray(p.items,id,targetId,before);
+  else if(it.status!==status){
+    const from=p.items.indexOf(it); p.items.splice(from,1);
+    let last=-1; p.items.forEach((x,ix)=>{ if(x.status===status) last=ix; });
+    p.items.splice(last>=0?last+1:Math.min(from,p.items.length),0,it);
+  } else return false;
+  if(it.status!==status){ const s=applyStatus(it,p,status); if(s) return spawnMsg(s); }
+}
+function attachKanbanDrag(handle,card,sl,p){
+  handle.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse') return;
+    e.preventDefault();
+    try{ handle.setPointerCapture(e.pointerId); }catch(_){}
+    const b=kbBoard(); if(!b) return;
+    const r=card.getBoundingClientRect(), ox=e.clientX-r.left, oy=e.clientY-r.top;
+    const ghost=card.cloneNode(true); ghost.classList.add('kb-ghost'); ghost.style.width=r.width+'px'; ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px';
+    document.body.append(ghost); card.classList.add('kb-source'); b.classList.add('kb-dragging');
+    let status=null,target=null,before=true,vTimer=null,hTimer=null,lastX=e.clientX,lastY=e.clientY,live=true;
+    const clear=()=>{ document.querySelectorAll('.drop-before,.drop-after,.kb-over,.kb-tab.drop-hover').forEach(n=>n.classList.remove('drop-before','drop-after','kb-over','drop-hover')); };
+    const locate=(x,y)=>{
+      if(!live) return;
+      clear(); status=null; target=null;
+      const under=document.elementFromPoint(x,y); if(!under) return;
+      const tab=under.closest('.kb-tab');
+      if(tab){ status=tab.dataset.status; tab.classList.add('drop-hover'); return; }
+      const col=under.closest('.kanban-col'); if(!col) return;
+      status=col.dataset.status; col.classList.add('kb-over');
+      const c=under.closest('.slide');
+      if(c&&c!==card&&c.dataset.id){ target=c.dataset.id; before=y<c.getBoundingClientRect().top+c.getBoundingClientRect().height/2; c.classList.add(before?'drop-before':'drop-after'); }
+    };
+    const edge=()=>{
+      clearInterval(vTimer);
+      if(lastY<90) vTimer=setInterval(()=>{ window.scrollBy(0,-10); locate(lastX,lastY); },16);
+      else if(lastY>window.innerHeight-140) vTimer=setInterval(()=>{ window.scrollBy(0,10); locate(lastX,lastY); },16);
+      const w=window.innerWidth, dir=lastX<36?-1:lastX>w-36?1:0;
+      if(!dir){ clearTimeout(hTimer); hTimer=null; }
+      else if(!hTimer) hTimer=setTimeout(function step(){
+        b.scrollBy({left:dir*kbColWidth(b),behavior:'smooth'});
+        setTimeout(()=>{ kbMarkTab(kbCurrent(b)); locate(lastX,lastY); },320);
+        if(live) hTimer=setTimeout(step,750);
+      },380);
+    };
+    const move=ev=>{
+      lastX=ev.clientX; lastY=ev.clientY;
+      ghost.style.left=(ev.clientX-ox)+'px'; ghost.style.top=(ev.clientY-oy)+'px';
+      locate(ev.clientX,ev.clientY); edge();
+    };
+    const up=()=>{
+      clearInterval(vTimer); clearTimeout(hTimer); locate(lastX,lastY); live=false;
+      handle.removeEventListener('pointermove',move); handle.removeEventListener('pointerup',up); handle.removeEventListener('pointercancel',up);
+      ghost.remove(); card.classList.remove('kb-source'); b.classList.remove('kb-dragging'); clear();
+      kbIndex=kbCurrent(b);
+      if(status) commit(null,()=>moveToColumn(p,sl.id,status,target,before));
+      requestAnimationFrame(()=>kbGo(kbIndex,false));
     };
     handle.addEventListener('pointermove',move); handle.addEventListener('pointerup',up); handle.addEventListener('pointercancel',up);
   });
@@ -1585,7 +1682,7 @@ function createCard(sl,p,ctx){
   card.dataset.id=sl.id;
   const mobile=isMobile();
   const canDrag=!selectMode&&!mobile, canReorder=!selectMode&&ctx.manual;
-  if(mobile&&!selectMode) attachSwipe(card,sl);
+  if(mobile&&!selectMode&&!ctx.colStatus) attachSwipe(card,sl);
   if(canDrag){
     card.draggable=true;
     card.addEventListener('dragstart',e=>{
@@ -1623,6 +1720,9 @@ function createCard(sl,p,ctx){
   } else if(canReorder&&ui.view==='list'){
     const h=el('span','drag-handle'); h.append(ic('grip','sm')); h.title='Arrastrar para reordenar'; top.append(h);
     if(mobile) attachTouchReorder(h,card,sl,p);
+  } else if(mobile&&ctx.colStatus&&!selectMode){
+    const h=el('span','drag-handle'); h.append(ic('grip','sm')); h.title='Mantén pulsado y arrastra a otra columna'; top.append(h);
+    attachKanbanDrag(h,card,sl,p);
   }
   const cb=el('input','done-check'); cb.type='checkbox'; cb.checked=sl.status==='done';
   cb.title='Marcar como revisada'; cb.setAttribute('aria-label',`Marcar «${sl.title}» como revisada`);
@@ -1794,7 +1894,7 @@ function renderApp(){
       });
     } else {
       list.className='kanban-view';
-      [['pending','Pendiente'],['review','En revisión'],['done','Revisada']].forEach(([status,title])=>{
+      KB_COLS.forEach(([status,title])=>{
         const items=visible.filter(i=>i.status===status);
         const col=el('div','kanban-col'); col.dataset.status=status;
         col.append(el('h3','',`${title} (${items.length})`));
@@ -1815,8 +1915,14 @@ function renderApp(){
         items.forEach(sl=>col.append(createCard(sl,p,{manual,colStatus:status})));
         list.append(col);
       });
+      if(isMobile()){
+        const counts={}; visible.forEach(i=>{ counts[i.status]=(counts[i.status]||0)+1; });
+        renderKbTabs(counts); $('kbTabs').hidden=false;
+        list.scrollLeft=kbIndex*kbColWidth(list); kbMarkTab(kbIndex);
+      }
     }
   }
+  if(!(isMobile()&&!td&&ui.view==='kanban')) $('kbTabs').hidden=true;
   hint=selectMode?'Selecciona varias tarjetas y usa la barra inferior. Esc para terminar.':'';
   $('dragHint').textContent=hint; $('dragHint').hidden=!hint;
   $('searchFilter').placeholder=isMobile()?'Buscar':'Buscar (pulsa / )';
@@ -2380,6 +2486,8 @@ $('sortSelect').addEventListener('change',e=>{ ui.sort=e.target.value; saveUI();
 $('clearFiltersBtn').addEventListener('click',()=>{ ui.search=ui.status=ui.tag=ui.priority=''; saveUI(); syncControls(); renderApp(); });
 $('viewListBtn').addEventListener('click',()=>{ ui.view='list'; saveUI(); renderApp(); });
 $('viewKanbanBtn').addEventListener('click',()=>{ ui.view='kanban'; saveUI(); renderApp(); });
+{ let t=null; $('slides').addEventListener('scroll',()=>{ const b=kbBoard(); if(!b||!isMobile()||b.classList.contains('kb-dragging')) return; clearTimeout(t); t=setTimeout(()=>{ kbIndex=kbCurrent(b); kbMarkTab(kbIndex); },60); },{passive:true}); }
+window.addEventListener('resize',()=>{ if(kbBoard()&&isMobile()) kbGo(kbIndex,false); });
 $('selectModeBtn').addEventListener('click',()=>setSelectMode(!selectMode));
 $('schedBtn').addEventListener('click',()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); });
 
