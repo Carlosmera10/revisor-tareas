@@ -221,13 +221,13 @@ body.selecting .toast-wrap{bottom:110px}
 @keyframes toast-in{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
 
 /* Diálogos */
-dialog{border:1px solid var(--line);border-radius:14px;padding:22px 24px;width:95%;max-width:720px;box-shadow:0 24px 64px rgba(10,16,30,.28);background:var(--panel);color:var(--ink);max-height:90vh;overflow-y:auto}
+dialog{border:1px solid var(--line);border-radius:14px;padding:22px 24px;width:95%;max-width:720px;box-shadow:0 24px 64px rgba(10,16,30,.28);background:var(--panel);color:var(--ink);max-height:90vh;overflow-y:auto;overflow-x:hidden}
 dialog.narrow{max-width:540px}
 dialog::backdrop{background:rgba(18,26,44,.5);backdrop-filter:blur(3px)}
 .modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
 .modal-header h2{font-size:1.2rem;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 .modal-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
-.field{display:grid;gap:6px;margin:16px 0}
+.field{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;margin:16px 0}
 .field>label,.field>.flabel{font-weight:600;font-size:.9rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .grid-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0 4px}
 .grid-fields .field{margin:0}
@@ -244,7 +244,7 @@ dialog::backdrop{background:rgba(18,26,44,.5);backdrop-filter:blur(3px)}
 .st-item{display:flex;gap:6px;align-items:center;background:#f5f7fa;padding:5px 8px;border-radius:8px}
 .st-item.dragging{opacity:.4}
 .st-handle{cursor:grab;color:#a8b0bf;display:flex}
-.st-item input[type=text]{padding:4px 8px;font-size:.92rem;flex:1;border:1px solid transparent;background:transparent}
+.st-item input[type=text]{padding:4px 8px;font-size:.92rem;flex:1;width:0;border:1px solid transparent;background:transparent}
 .st-item input[type=text]:focus{border-color:var(--line-strong);background:#fff}
 .st-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--done)}
 .rec-box{border:1px solid var(--line);border-radius:10px;padding:0 14px;margin:16px 0;background:#fafbfd}
@@ -253,8 +253,11 @@ dialog::backdrop{background:rgba(18,26,44,.5);backdrop-filter:blur(3px)}
 .rec-box summary .chev{transition:transform .15s;color:var(--faint)}
 .rec-box[open] summary .chev{transform:rotate(90deg)}
 .rec-box summary span{font-weight:400;color:var(--muted)}
-.rec-body{padding-bottom:14px;display:grid;gap:14px}
-.rec-body .row label{display:flex;align-items:center;gap:8px}
+.rec-body{padding-bottom:14px;display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.rec-body select,.rec-body input{max-width:100%}
+#recFreq{flex:1 1 170px;min-width:0}
+.rec-body .row label{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;max-width:100%}
+.rec-body .row label:first-child{flex:1 1 220px}
 .inline-num{width:84px}
 .wd-row{display:flex;gap:6px;flex-wrap:wrap}
 .wd-btn{width:36px;height:36px;border-radius:50%;padding:0;background:#fff;color:var(--ink);border:1px solid var(--line-strong)}
@@ -264,7 +267,7 @@ dialog::backdrop{background:rgba(18,26,44,.5);backdrop-filter:blur(3px)}
 .opt-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .opt-line select,.opt-line input{padding:7px 10px}
 .rec-preview{background:var(--accent-soft);color:#22336f;border-radius:8px;padding:8px 10px;font-size:.9rem;margin:0}
-.check-line{display:flex;gap:8px;align-items:flex-start;font-size:.92rem;cursor:pointer}
+.check-line{display:flex;gap:8px;align-items:flex-start;font-size:.92rem;cursor:pointer;min-width:0}
 .check-line input{margin-top:3px}
 .md-controls{display:flex;gap:6px;margin-bottom:8px}
 .md-preview-box{border:1px solid var(--line-strong);border-radius:8px;padding:10px 12px;background:#fff;min-height:120px;display:none}
@@ -279,6 +282,17 @@ textarea.inactive{display:none}
 .set-sec h3{font-size:1rem;display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .set-sec p{margin:6px 0}
 .kbd-list{margin:0;padding-left:18px;font-size:.92rem;line-height:1.9}
+.help-sec{border-top:1px solid var(--line)}
+.help-sec:first-of-type{border-top:0}
+.help-sec summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;padding:13px 2px;font-weight:600}
+.help-sec summary::-webkit-details-marker{display:none}
+.help-sec summary .chev{margin-left:auto;color:var(--faint);transition:transform .15s}
+.help-sec[open] summary .chev{transform:rotate(90deg)}
+.help-sec summary>.ic:first-child{color:var(--accent)}
+.help-body{padding:0 2px 14px 30px;font-size:.93rem;color:#3b465c}
+.help-body ul{margin:0;padding-left:18px}
+.help-body li{margin:4px 0}
+.help-body p{margin:6px 0}
 
 /* Planificador */
 .plan-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0 4px}
@@ -372,6 +386,9 @@ textarea.inactive{display:none}
   dialog{width:100vw;max-width:100vw!important;height:100dvh;max-height:100dvh;margin:0;inset:0;border:0;border-radius:0;padding:calc(14px + env(safe-area-inset-top)) 16px 0}
   dialog .modal-footer{position:sticky;bottom:0;background:#fff;margin:18px -16px 0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:2}
   .grid-fields{grid-template-columns:1fr 1fr}
+  .grid-fields .field{min-width:0}
+  .grid-fields input,.grid-fields select{width:100%}
+  .rec-box{padding:0 12px}
   .plan-opts{grid-template-columns:1fr 1fr}
   .plan-card{padding:14px}
   .plan-title{font-size:1.15rem}
@@ -431,6 +448,7 @@ textarea.inactive{display:none}
   <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></symbol>
   <symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
   <symbol id="i-checks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></symbol>
 </svg>
 
@@ -440,10 +458,10 @@ textarea.inactive{display:none}
     <button type="button" class="nav-item today-item" id="todayBtn"><svg class="ic"><use href="#i-sun"/></svg>Hoy<span class="nav-count" id="todayCount">0</span></button>
     <div class="nav-section">Proyectos <button type="button" id="newProjectBtn" title="Crear proyecto" aria-label="Crear proyecto"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>
     <ul id="projectList"></ul>
-    <p class="side-hint">Arrastra un proyecto para reordenarlo. Suelta una tarea sobre un proyecto para moverla, o sobre «Hoy» para ponerle fecha de hoy.</p>
-    <div class="side-actions">
+        <div class="side-actions">
       <button type="button" class="nav-item" id="openTagsBtn"><svg class="ic"><use href="#i-tag"/></svg>Etiquetas</button>
       <button type="button" class="nav-item" id="openSettingsBtn"><svg class="ic"><use href="#i-sliders"/></svg>Ajustes y avisos</button>
+      <button type="button" class="nav-item" id="openHelpBtn" title="Instrucciones (tecla ?)"><svg class="ic"><use href="#i-help"/></svg>Instrucciones</button>
       <button type="button" class="nav-item install" id="installBtn" hidden><svg class="ic"><use href="#i-monitor-down"/></svg>Instalar app</button>
     </div>
   </aside>
@@ -607,7 +625,7 @@ textarea.inactive{display:none}
     <div class="field"><label for="modProject">Proyecto</label><select id="modProject"></select></div>
   </div>
   <div class="field">
-    <span class="flabel" id="modTagsLabel">Etiquetas <span class="hint" style="font-weight:400;font-size:.8rem">Pulsa para marcar o desmarcar; puedes elegir varias</span></span>
+    <span class="flabel" id="modTagsLabel">Etiquetas</span>
     <div id="modTags" class="chips" role="group" aria-labelledby="modTagsLabel"></div>
   </div>
 
@@ -619,7 +637,7 @@ textarea.inactive{display:none}
           <select id="recFreq">
             <option value="none">No se repite</option>
             <option value="daily">Diaria</option>
-            <option value="weekdays">Días laborables (lunes a viernes)</option>
+            <option value="weekdays">Laborables (lunes a viernes)</option>
             <option value="weekly">Semanal</option>
             <option value="monthly">Mensual</option>
             <option value="yearly">Anual</option>
@@ -629,12 +647,12 @@ textarea.inactive{display:none}
       </div>
       <div id="recDetails" class="rec-body" style="padding:0">
         <div id="recWeekly" class="opt-group">
-          <span class="hint">Días de la semana (si no marcas ninguno, se usa el mismo día que la fecha límite):</span>
+          <span class="hint">Días de la semana</span>
           <div class="wd-row" id="recWdRow"></div>
         </div>
         <div id="recMonthly" class="opt-group">
           <label class="opt-line" id="recYearMonthWrap">Mes <select id="recYearMonth"></select></label>
-          <label class="opt-line"><input type="radio" name="recMonthMode" value="day"> El día <input type="number" id="recMonthDay" class="inline-num" min="1" max="31"> <span class="hint">(si el mes es más corto, se usa su último día)</span></label>
+          <label class="opt-line"><input type="radio" name="recMonthMode" value="day"> El día <input type="number" id="recMonthDay" class="inline-num" min="1" max="31"></label>
           <label class="opt-line"><input type="radio" name="recMonthMode" value="nth"> El
             <select id="recNth"><option value="1">primer</option><option value="2">segundo</option><option value="3">tercer</option><option value="4">cuarto</option><option value="-1">último</option></select>
             <select id="recNthWd"></select></label>
@@ -646,8 +664,8 @@ textarea.inactive{display:none}
           <label class="opt-line"><input type="radio" name="recEnd" value="count"> Después de <input type="number" id="recEndCount" class="inline-num" min="1" max="9999" value="10"> repeticiones</label>
           <label class="opt-line"><input type="radio" name="recEnd" value="until"> El día <input type="date" id="recEndUntil"></label>
         </div>
-        <label class="check-line"><input type="checkbox" id="recFromCompletion"> Calcular la siguiente fecha desde el día en que la complete (en lugar de desde la fecha límite)</label>
-        <label class="opt-line">Al completarla, ocultarla y que vuelva a aparecer
+        <label class="check-line"><input type="checkbox" id="recFromCompletion"> Contar desde el día en que la complete</label>
+        <label class="opt-line">Volver a mostrarla
           <select id="recShowBefore">
             <option value="0">el día que vence</option>
             <option value="1">1 día antes</option>
@@ -657,7 +675,6 @@ textarea.inactive{display:none}
             <option value="14">2 semanas antes</option>
           </select></label>
         <p class="rec-preview" id="recPreview"></p>
-        <p class="hint" style="margin:0">Al marcarla como revisada no se crea ninguna copia: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar, y queda oculta hasta ese día. Las ocultas se ven con «Ver programadas».</p>
       </div>
     </div>
   </details>
@@ -667,7 +684,7 @@ textarea.inactive{display:none}
     <input type="url" id="modLink" placeholder="https://...">
   </div>
   <div class="field">
-    <span class="flabel">Sub-tareas <span class="hint" style="font-weight:400;font-size:.8rem">Arrastra desde el asa o usa las flechas para reordenar</span></span>
+    <span class="flabel">Sub-tareas</span>
     <ul class="st-list" id="modSubtasks"></ul>
     <div class="row" style="gap:6px">
       <input type="text" id="modNewSubtask" placeholder="Añade una sub-tarea y pulsa Intro" style="flex:1" autocomplete="off">
@@ -675,7 +692,7 @@ textarea.inactive{display:none}
     </div>
   </div>
   <div class="field">
-    <span class="flabel">Notas <span class="hint" style="font-weight:400;font-size:.8rem">**negrita** *cursiva* [texto](URL) - lista</span></span>
+    <span class="flabel">Notas</span>
     <div class="md-controls seg" style="width:fit-content">
       <button type="button" id="tabEdit" class="active">Editar</button>
       <button type="button" id="tabPrev">Vista previa</button>
@@ -684,7 +701,7 @@ textarea.inactive{display:none}
     <div id="notesPreview" class="md-preview-box"></div>
   </div>
   <div class="modal-footer">
-    <span class="hint"><kbd>Ctrl</kbd>+<kbd>Intro</kbd> para guardar</span>
+    <span></span>
     <div class="row">
       <button type="button" class="secondary" id="modCancelBtn">Cancelar</button>
       <button type="button" id="modSaveBtn"><svg class="ic sm"><use href="#i-check"/></svg>Guardar</button>
@@ -717,7 +734,6 @@ textarea.inactive{display:none}
     <h2 id="tagHeading"><svg class="ic lg"><use href="#i-tag"/></svg>Etiquetas</h2>
     <button type="button" class="ghost icon" id="tagModalCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
   </div>
-  <p class="hint" style="margin:0 0 16px">Elige nombre y colores. El emoji es opcional: si lo dejas vacío, la etiqueta se muestra con un punto de color. Si eliminas una etiqueta en uso, se quita de sus tareas (puedes deshacerlo).</p>
   <div id="tagsListContainer" style="margin-bottom:16px"></div>
   <button type="button" id="addNewTagBtn" class="secondary" style="width:100%"><svg class="ic sm"><use href="#i-plus"/></svg>Crear etiqueta</button>
   <div class="modal-footer">
@@ -767,7 +783,6 @@ textarea.inactive{display:none}
       <label for="setDefaultHour">Hora del aviso en tareas sin hora</label>
       <input type="time" id="setDefaultHour">
     </div>
-    <p class="hint">Cada tarea tiene su propio campo «Aviso». Los avisos llegan mientras la app esté abierta, aunque esté minimizada. Si estaba cerrada, verás los pendientes al abrirla.</p>
   </section>
   <section class="set-sec">
     <h3><svg class="ic"><use href="#i-save"/></svg>Copias de seguridad</h3>
@@ -782,17 +797,36 @@ textarea.inactive{display:none}
     <p id="installStatus" class="hint"></p>
     <button type="button" id="installBtn2" hidden><svg class="ic sm"><use href="#i-monitor-down"/></svg>Instalar app</button>
   </section>
-  <section class="set-sec">
-    <h3><svg class="ic"><use href="#i-keyboard"/></svg>Atajos de teclado</h3>
-    <ul class="kbd-list">
-      <li><kbd>/</kbd> (en teclado español, <kbd>Mayús</kbd>+<kbd>7</kbd>): ir al buscador</li>
-      <li><kbd>P</kbd>: abrir el planificador; dentro, <kbd>1</kbd>–<kbd>4</kbd> eligen la fecha, <kbd>S</kbd> salta y <kbd>H</kbd> marca como hecha</li>
-      <li><kbd>Ctrl</kbd>+<kbd>Z</kbd>: deshacer el último cambio</li>
-      <li><kbd>Ctrl</kbd>+<kbd>Intro</kbd>: guardar la ficha abierta</li>
-      <li><kbd>Esc</kbd>: cerrar ventanas, limpiar la búsqueda o terminar la selección</li>
-    </ul>
-  </section>
   <div class="modal-footer"><span></span><button type="button" id="settingsDoneBtn">Cerrar</button></div>
+</dialog>
+
+<!-- Instrucciones -->
+<dialog id="helpModal" aria-labelledby="helpHeading">
+  <div class="modal-header">
+    <h2 id="helpHeading"><svg class="ic lg"><use href="#i-help"/></svg>Instrucciones</h2>
+    <button type="button" class="ghost icon" id="helpCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+  <details class="help-sec" open><summary><svg class="ic"><use href="#i-checks"/></svg>Proyectos y tareas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Crea un proyecto con el <strong>+</strong> junto a «Proyectos». Para cambiarle el nombre, pulsa sobre el título.</li><li>Arrastra un proyecto en la barra lateral para reordenarlo.</li><li>Cada tarea pasa por <strong>Pendiente → En revisión → Revisada</strong>.</li><li>Para moverla a otro proyecto, suéltala sobre él en la barra lateral, o usa «Mover o duplicar».</li><li>En la ficha, las etiquetas se marcan y desmarcan pulsándolas; puedes poner varias.</li><li>Las sub-tareas se reordenan arrastrando desde el asa o con las flechas.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado.</li><li>El buscador ignora las tildes. Vista, orden y filtros se recuerdan.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos vencidas, con fecha de hoy o sin fecha.</li><li>Suelta una tarea sobre «Hoy» para ponerle la fecha de hoy.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas una a una para decidir cuándo hacerlas: Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1).</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Abre la ficha y despliega «Repetición».</li><li>Al marcarla como revisada <strong>no se crea ninguna copia</strong>: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar.</li><li>Queda oculta hasta ese día, o hasta los días antes que elijas en «Volver a mostrarla».</li><li>Las ocultas se ven con <strong>«Ver programadas»</strong>; desde su menú puedes «Mostrar ya».</li><li>«Contar desde el día en que la complete»: la siguiente fecha se calcula desde que la terminas, no desde la fecha límite.</li><li>Mensual «el día 31»: si el mes es más corto, se usa su último día.</li><li>Semanal sin días marcados: se usa el mismo día de la semana que la fecha límite.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><p>Las notas admiten formato sencillo; míralo con «Vista previa»:</p><ul><li><code>**negrita**</code> y <code>*cursiva*</code></li><li><code>[texto](https://…)</code> para un enlace</li><li><code>- elemento</code> al principio de línea para una lista</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-menu"/></svg>En el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Desliza una tarjeta <strong>a la derecha</strong> para marcarla como hecha y <strong>a la izquierda</strong> para aplazarla.</li><li>Mantén pulsada el asa para reordenar.</li><li>El botón de los tres puntos de cada tarjeta abre sus acciones; «Más», en la barra inferior, el resto de opciones.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-bell"/></svg>Avisos<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Actívalos en «Ajustes y avisos» → «Activar notificaciones».</li><li>Cada tarea tiene su propio campo «Aviso». Las que no tienen hora usan la «Hora del aviso en tareas sin hora».</li><li>Los avisos llegan mientras la app esté abierta, aunque esté minimizada. Si estaba cerrada, verás los pendientes al abrirla.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-save"/></svg>Copias de seguridad<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Los datos se guardan solo en este navegador. Haz copias con «Exportar» (en el móvil: «Más» → «Exportar copia»).</li><li>«Importar» sustituye todo lo actual por la copia (se puede deshacer).</li><li>La app te recuerda hacer copia cada cierto número de días; se cambia en «Ajustes y avisos».</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-monitor-down"/></svg>Instalar la app<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li><strong>PC (Chrome)</strong>: pulsa «Instalar app» en la barra lateral o el icono de instalar de la barra de direcciones. Si no aparece: menú ⋮ → «Transmitir, guardar y compartir» → «Instalar página como aplicación».</li><li><strong>Android (Chrome)</strong>: menú ⋮ → «Añadir a pantalla de inicio» → «Instalar».</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-keyboard"/></svg>Atajos de teclado<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul class="kbd-list" style="padding-left:18px"><li><kbd>/</kbd> (en teclado español, <kbd>Mayús</kbd>+<kbd>7</kbd>): ir al buscador</li><li><kbd>P</kbd>: abrir el planificador; dentro, <kbd>1</kbd>–<kbd>4</kbd> eligen la fecha, <kbd>S</kbd> salta y <kbd>H</kbd> marca como hecha</li><li><kbd>?</kbd>: abrir estas instrucciones</li><li><kbd>Ctrl</kbd>+<kbd>Z</kbd>: deshacer el último cambio</li><li><kbd>Ctrl</kbd>+<kbd>Intro</kbd>: guardar la ficha abierta</li><li><kbd>Esc</kbd>: cerrar ventanas, limpiar la búsqueda o terminar la selección</li></ul></div></details>
+  <div class="modal-footer"><span></span><button type="button" id="helpDoneBtn">Cerrar</button></div>
 </dialog>
 
 <script>
@@ -1331,6 +1365,7 @@ function openMoreSheet(){
     !isToday()&&(sched||ui.showScheduled)?{label:ui.showScheduled?'Ocultar programadas':'Ver programadas',note:String(sched),icon:'clock',fn:()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); }}:null,
     {label:'Etiquetas',icon:'tag',fn:()=>$('openTagsBtn').click()},
     {label:'Ajustes y avisos',icon:'sliders',fn:()=>$('openSettingsBtn').click()},
+    {label:'Instrucciones',icon:'help',fn:()=>$('openHelpBtn').click()},
     {sec:'Copia de seguridad'},
     {label:'Exportar copia',icon:'download',fn:exportData},
     {label:'Importar copia',icon:'upload',fn:()=>$('importFile').click()},
@@ -1736,7 +1771,7 @@ function renderApp(){
       list.append(h);
       g.items.forEach(({p,it})=>list.append(createCard(it,p,{manual:false,showProject:true})));
     });
-    hint=selectMode?'Selecciona varias tarjetas y usa la barra inferior. Esc para terminar.':'Aquí están las tareas de todos los proyectos con fecha de hoy, vencidas o sin fecha. Arrastra una tarjeta a un proyecto para moverla.';
+    hint='';
     $('schedBtn').hidden=true;
   } else {
     const p=currentProject();
@@ -1749,9 +1784,6 @@ function renderApp(){
     sb.replaceChildren(ic(ui.showScheduled?'eye':'clock','sm'),document.createTextNode(ui.showScheduled?`Ocultar programadas (${schedCount})`:`Ver programadas (${schedCount})`));
     sb.classList.toggle('active',ui.showScheduled);
     $('listHeaderTitle').textContent=ui.view==='kanban'?'Tablero Kanban':'Lista de comprobación';
-    if(selectMode) hint='Selecciona varias tarjetas y usa la barra inferior para cambiarlas a la vez. Esc para terminar.';
-    else if(ui.view==='list') hint=manual?'Arrastra desde el asa para reordenar. Suelta una tarjeta sobre un proyecto de la barra lateral para moverla.':'Para reordenar a mano, elige «Manual (arrastrar)» en «Ordenar».';
-    else hint=manual?'Arrastra las tarjetas entre columnas para cambiar su estado, o dentro de una columna para reordenarlas.':'Arrastra entre columnas para cambiar el estado. Para reordenar dentro de una columna, elige «Manual (arrastrar)».';
     if(ui.view==='list'){
       list.className='list-view';
       if(!visible.length) list.append(p.items.length?emptyState('Nada coincide con los filtros','Prueba a pulsar «Limpiar».'):emptyState('Este proyecto está vacío','Pulsa «Nuevo elemento» para añadir la primera tarea.'));
@@ -1785,8 +1817,8 @@ function renderApp(){
       });
     }
   }
-  if(isMobile()&&!selectMode) hint=(!isToday()&&ui.sort==='manual'&&ui.view==='list'?'Mantén pulsada el asa para reordenar. ':'')+'Desliza una tarjeta a la derecha para marcarla como hecha o a la izquierda para aplazarla.';
-  $('dragHint').textContent=hint;
+  hint=selectMode?'Selecciona varias tarjetas y usa la barra inferior. Esc para terminar.':'';
+  $('dragHint').textContent=hint; $('dragHint').hidden=!hint;
   $('searchFilter').placeholder=isMobile()?'Buscar':'Buscar (pulsa / )';
   const nf=[ui.status,ui.tag,ui.priority].filter(Boolean).length+(ui.sort!=='manual'?1:0);
   $('filtersToggleText').textContent=nf?`Filtros (${nf})`:'Filtros';
@@ -2229,8 +2261,8 @@ function renderSettings(){
   $('notifStatus').textContent={
     unsupported:'Este navegador no admite notificaciones.',
     denied:'Chrome tiene bloqueadas las notificaciones para esta página. Para desbloquearlas, pulsa el icono que hay a la izquierda de la dirección web, luego «Notificaciones» y «Permitir», y recarga la página.',
-    on:'Activadas. Recibirás los avisos de las tareas que tengan «Aviso» configurado.',
-    off:'Desactivadas.'+(file?' Abriendo el archivo directamente desde el disco, Chrome suele bloquearlas; funcionan con la app publicada en la web.':'')
+    on:'Activadas.',
+    off:'Desactivadas.'
   }[st];
   $('notifToggleBtn').textContent=st==='on'?'Desactivar notificaciones':'Activar notificaciones';
   $('notifToggleBtn').disabled=st==='unsupported'||st==='denied';
@@ -2241,9 +2273,9 @@ function renderSettings(){
   $('setBackupInfo').textContent=s.lastBackup?`Última copia: ${relDays(s.lastBackup)} (${new Date(s.lastBackup).toLocaleString('es-ES')}).`:'Todavía no has exportado ninguna copia.';
   let inst;
   if(isStandalone()) inst='Ya la estás usando como aplicación instalada.';
-  else if(file) inst='Para instalarla, ábrela desde la web publicada. Abierta desde el disco no se puede instalar.';
-  else if(deferredPrompt) inst='Pulsa «Instalar app» y confirma en el cuadro de Chrome.';
-  else inst='Si no ves el botón, en Chrome abre el menú de los tres puntos, luego «Transmitir, guardar y compartir» e «Instalar página como aplicación», o pulsa el icono de instalar de la barra de direcciones.';
+  else if(file) inst='Ábrela desde la web publicada para poder instalarla.';
+  else if(deferredPrompt) inst='';
+  else inst='Cómo instalarla: mira «Instrucciones».';
   $('installStatus').textContent=inst;
   $('installBtn2').hidden=!deferredPrompt;
 }
@@ -2263,7 +2295,7 @@ $('bnPlan').addEventListener('click',()=>{ closeDrawer(); closeSheet(); openPlan
 $('bnMore').addEventListener('click',()=>$('sheet').hidden?openMoreSheet():closeSheet());
 $('scrim').addEventListener('click',()=>{ closeDrawer(); closeSheet(); });
 $('filtersToggle').addEventListener('click',()=>{ const on=document.body.classList.toggle('filters-open'); $('filtersToggle').setAttribute('aria-expanded',on?'true':'false'); renderApp(); });
-['openTagsBtn','openSettingsBtn','newProjectBtn'].forEach(id=>$(id).addEventListener('click',closeDrawer));
+['openTagsBtn','openSettingsBtn','openHelpBtn','newProjectBtn'].forEach(id=>$(id).addEventListener('click',closeDrawer));
 mqMobile.addEventListener('change',()=>{ closeDrawer(); closeSheet(); renderApp(); });
 $('planBtn').addEventListener('click',openPlanner);
 $('todayBtn').addEventListener('click',switchToToday);
@@ -2323,6 +2355,8 @@ $('moveMoveBtn').addEventListener('click',()=>{ const ids=moveCtx.ids, t=$('move
 $('moveDupBtn').addEventListener('click',()=>{ const ids=moveCtx.ids, t=$('moveTarget').value, r=$('moveReset').checked; $('moveModal').close(); commit(null,()=>duplicateItems(ids,t,r)); });
 
 $('openSettingsBtn').addEventListener('click',()=>{ renderSettings(); $('settingsModal').showModal(); });
+$('openHelpBtn').addEventListener('click',()=>{ $('helpModal').showModal(); $('helpModal').scrollTop=0; });
+['helpCloseBtn','helpDoneBtn'].forEach(id=>$(id).addEventListener('click',()=>$('helpModal').close()));
 ['settingsCloseBtn','settingsDoneBtn'].forEach(id=>$(id).addEventListener('click',()=>$('settingsModal').close()));
 $('notifToggleBtn').addEventListener('click',()=>{ if(notifState()==='on'){ appState.settings.notifyEnabled=false; save(); renderSettings(); } else enableNotifications(); });
 $('notifTestBtn').addEventListener('click',async()=>{ const ok=await notify('Prueba de notificación','Así te avisaré de tus tareas.',{tag:'test'}); if(!ok) alert('No se ha podido mostrar la notificación. Revisa los permisos de Chrome y del sistema operativo.'); });
@@ -2410,6 +2444,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&(!$('sheet').hidden||document.body.classList.contains('drawer-open'))){ closeSheet(); closeDrawer(); return; }
   if(e.key==='/'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); $('searchFilter').focus(); $('searchFilter').select(); }
   else if(e.key.toLowerCase()==='p'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); openPlanner(); }
+  else if(e.key==='?'&&!typing&&!e.ctrlKey&&!e.metaKey){ e.preventDefault(); $('openHelpBtn').click(); }
   else if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); undo(); }
   else if(e.key==='Escape'){
     if(tg&&tg.id==='searchFilter'){ if(ui.search){ ui.search=''; tg.value=''; saveUI(); renderApp(); } else tg.blur(); }
