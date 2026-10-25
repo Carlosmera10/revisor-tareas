@@ -955,7 +955,7 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado.</li><li>El buscador ignora las tildes. Vista, orden y filtros se recuerdan.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos vencidas, con fecha de hoy o sin fecha.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Abre la ficha y despliega «Repetición».</li><li>Al marcarla como revisada <strong>no se crea ninguna copia</strong>: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar.</li><li>Queda oculta hasta ese día, o hasta los días antes que elijas en «Volver a mostrarla».</li><li>Las ocultas se ven con <strong>«Ver programadas»</strong>; desde su menú puedes «Mostrar ya».</li><li>«Contar desde el día en que la complete»: la siguiente fecha se calcula desde que la terminas, no desde la fecha límite.</li><li>Mensual «el día 31»: si el mes es más corto, se usa su último día.</li><li>Semanal sin días marcados: se usa el mismo día de la semana que la fecha límite.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1447,7 +1447,7 @@ function todayEntries(){
   appState.projects.forEach(p=>p.items.forEach(it=>{
     if(isWaiting(it)){ if(followDue(it)) out.push({p,it}); return; }
     if(isSnoozed(it)) return;
-    if(it.dueDate&&it.dueDate>t) return;
+    if(!it.dueDate||it.dueDate>t) return;
     if(it.status==='done'&&!(it.completedAt&&ymd(new Date(it.completedAt))===t)) return;
     out.push({p,it});
   }));
@@ -1693,7 +1693,7 @@ function renderSidebar(){
   const tb=$('todayBtn');
   tb.classList.toggle('active',isToday());
   const tp=todayPending(); $('todayCount').textContent=tp; $('todayCount').classList.toggle('hot',tp>0&&!isToday());
-  $('todayCount').title=pl(tp,'tarea pendiente para hoy o sin fecha','tareas pendientes para hoy o sin fecha');
+  $('todayCount').title=pl(tp,'tarea pendiente para hoy o vencida','tareas pendientes para hoy o vencidas');
   $('bnTodayCount').textContent=tp&&!isToday()?String(tp):'';
   $('bnToday').classList.toggle('active',isToday());
   $('bnProjects').classList.toggle('active',!isDayView());
@@ -2041,8 +2041,7 @@ function renderApp(){
     if(ui.mode==='today') groups=[
       {title:'Vencidas',icon:'alert-circle',cls:'overdue',items:vis.filter(e=>!isWaiting(e.it)&&e.it.dueDate&&e.it.dueDate<t)},
       {title:'Para hoy',icon:'sun',cls:'',items:vis.filter(e=>!isWaiting(e.it)&&e.it.dueDate===t)},
-      {title:'Para reclamar',icon:'hourglass',cls:'waitgrp',items:vis.filter(e=>isWaiting(e.it))},
-      {title:'Sin fecha',icon:'inbox',cls:'',items:vis.filter(e=>!isWaiting(e.it)&&!e.it.dueDate)}
+      {title:'Para reclamar',icon:'hourglass',cls:'waitgrp',items:vis.filter(e=>isWaiting(e.it))}
     ];
     else if(ui.mode==='tomorrow') groups=[{title:'Para mañana',icon:'sunrise',cls:'',items:vis}];
     else if(ui.mode==='waiting'){
@@ -2062,7 +2061,7 @@ function renderApp(){
     $('listHeaderTitle').textContent='Tareas de todos los proyectos';
     $('countLabel').textContent=pl(vis.length,'tarea','tareas')+(isFiltered()?` (de ${all.length})`:'');
     list.className='list-view';
-    const emptyMsg={today:['No tienes nada para hoy','No hay tareas con fecha de hoy, vencidas ni sin fecha. Usa «Planificar» para repartir el trabajo.'],
+    const emptyMsg={today:['No tienes nada para hoy','No hay tareas con fecha de hoy ni vencidas. Usa «Planificar» para repartir el trabajo.'],
       tomorrow:['No tienes nada para mañana','Ninguna tarea vence mañana.'],
       week:['Semana despejada','No hay tareas vencidas ni con fecha en los próximos 7 días.'],
       waiting:['No esperas a nadie','Cuando una tarea dependa de otra persona, ábrela y rellena «En espera de».']}[ui.mode];
