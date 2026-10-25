@@ -174,7 +174,7 @@ button.toggle.active{background:var(--accent-soft);color:var(--accent);border-co
 .group-title:first-child{margin-top:0}
 .group-title .n{font-weight:500;color:var(--faint)}
 .group-title.overdue{color:var(--urgent)}
-.slide{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--line-strong);border-radius:10px;padding:12px 14px;position:relative;transition:border-color .15s,box-shadow .15s}
+.slide{content-visibility:auto;contain-intrinsic-size:auto 76px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--line-strong);border-radius:10px;padding:12px 14px;position:relative;transition:border-color .15s,box-shadow .15s}
 .slide:hover{border-color:var(--line-strong);box-shadow:0 2px 10px rgba(24,34,58,.05)}
 .slide.review{border-left-color:var(--review)}
 .slide.done{border-left-color:var(--done);background:var(--subtle)}
@@ -1100,12 +1100,12 @@ const nowHM=()=>{const d=new Date(); return `${pad(d.getHours())}:${pad(d.getMin
 const addDays=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
 const daysInMonth=(y,m)=>new Date(y,m+1,0).getDate();
 const startOfDay=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+/* Formateadores reutilizados: crear uno por fecha es lento con muchas tareas */
+const DTF={};
+const dtf=(y,w)=>DTF[y+'|'+w]||(DTF[y+'|'+w]=new Intl.DateTimeFormat('es-ES',Object.assign({day:'numeric',month:'short'},y?{year:'numeric'}:{},w?{weekday:'short'}:{})));
 function fmtDate(s,withWeekday=false){
   const d=parseYMD(s); if(!d) return '';
-  const o={day:'numeric',month:'short'};
-  if(d.getFullYear()!==new Date().getFullYear()) o.year='numeric';
-  if(withWeekday) o.weekday='short';
-  return d.toLocaleDateString('es-ES',o);
+  return dtf(d.getFullYear()!==new Date().getFullYear(),!!withWeekday).format(d);
 }
 const daysSince=iso=>Math.round((startOfDay(new Date())-startOfDay(new Date(iso)))/DAY_MS);
 function relDays(iso){ const n=daysSince(iso); return n<=0?'hoy':n===1?'ayer':`hace ${n} días`; }
