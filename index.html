@@ -393,6 +393,18 @@ textarea.inactive{display:none}
 .plan-end strong{display:block;font-size:1.2rem;margin-bottom:4px}
 
 @media(max-width:900px){#slides.kanban-view{grid-template-columns:1fr}}
+.side-toggle{margin-left:auto;background:transparent;color:var(--nav-muted);width:32px;height:32px;padding:0;border-radius:8px}
+.side-toggle:hover{background:var(--nav-hover);color:#fff}
+.sidebar{transition:width .18s ease,padding .18s ease}
+.proj-emoji{width:18px;text-align:center;font-size:1rem;line-height:1;flex-shrink:0}
+.proj-initial{display:none}
+.plan-cta{position:relative;background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(39,71,184,.28)}
+.plan-cta:hover{background:var(--accent-ink)}
+.plan-badge{position:absolute;top:-7px;right:-7px;min-width:22px;height:22px;padding:0 6px;border-radius:99px;background:var(--high);color:#fff;font-size:.74rem;display:grid;place-items:center;box-shadow:0 0 0 2px var(--paper)}
+.plan-badge:empty{display:none}
+.tb-break,.tb-count{display:none}
+.nav-count:empty{display:none}
+
 /* Elementos solo para móvil (ocultos en escritorio) */
 .bottom-nav,.scrim,.sheet,#filtersToggle,.more-btn{display:none}
 .sheet[hidden],.scrim[hidden]{display:none!important}
@@ -403,6 +415,7 @@ textarea.inactive{display:none}
   .sidebar{position:fixed;left:0;top:0;bottom:0;height:100dvh;width:min(300px,86vw);z-index:400;transform:translateX(-102%);transition:transform .22s ease;padding-top:calc(18px + env(safe-area-inset-top));padding-bottom:calc(14px + env(safe-area-inset-bottom))}
   body.drawer-open .sidebar{transform:none;box-shadow:12px 0 40px rgba(10,16,30,.35)}
   .side-hint{display:none}
+  .side-toggle{display:none}
   #projectList{flex:none}
   #projectList li{padding:11px 10px}
   main{padding:0 12px calc(98px + env(safe-area-inset-bottom));max-width:none}
@@ -501,6 +514,67 @@ textarea.inactive{display:none}
   .arch-acts{max-width:none;justify-content:flex-start}
   .plan-sec{position:sticky;bottom:0;background:var(--panel);padding:10px 0 calc(10px + env(safe-area-inset-bottom))}
 }
+
+/* ===== Escritorio: barra lateral plegable y cabecera compacta ===== */
+@media(min-width:761px){
+  body.side-collapsed{--sidebar-w:76px}
+  body.side-collapsed .sidebar{padding:14px 8px;overflow-x:hidden}
+  body.side-collapsed .nav-label,body.side-collapsed .proj-name,body.side-collapsed .proj-tools,body.side-collapsed .proj-folder{display:none!important}
+  body.side-collapsed .brand{flex-direction:column;gap:8px;padding:2px 0 12px}
+  body.side-collapsed .side-toggle{margin:0}
+  body.side-collapsed .nav-item,body.side-collapsed #projectList li{justify-content:center;position:relative;padding:11px 0;gap:0}
+  body.side-collapsed .nav-item>.ic{width:26px;height:26px}
+  body.side-collapsed .nav-item.active,body.side-collapsed #projectList li.active{box-shadow:inset 3px 0 0 #8fa6ff}
+  body.side-collapsed .proj-emoji{font-size:1.55rem;width:auto}
+  body.side-collapsed .proj-initial{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.1);color:#fff;font-weight:700;font-size:.95rem}
+  body.side-collapsed .nav-count{position:absolute;top:1px;right:3px;margin:0;font-size:.64rem;line-height:16px;padding:0 5px;min-width:18px;text-align:center;background:#2a3655;color:#dfe5f5}
+  body.side-collapsed .nav-count:empty{display:none}
+  body.side-collapsed .nav-count.hot{background:#3b5bd6;color:#fff}
+  body.side-collapsed .nav-section{justify-content:center;padding:14px 0 6px;border-top:1px solid rgba(255,255,255,.08);margin-top:10px}
+  body.side-collapsed .side-actions{align-items:stretch}
+
+  main{max-width:1360px}
+  /* Cabecera en una sola franja: título, fecha y progreso */
+  .page-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,280px) auto;column-gap:22px;align-items:center;padding:14px 0 12px;margin-bottom:14px}
+  .head-row{display:contents}
+  .head-title{min-width:0}
+  #projectHead,#todayHead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  #projectHead[hidden],#todayHead[hidden]{display:none}
+  input.title-input{font-size:1.6rem;width:auto;field-sizing:content;min-width:6ch;max-width:100%}
+  .today-title{font-size:2rem;line-height:1.1}
+  .today-date{margin:0;font-size:1rem}
+  .subline{margin:0}
+  .progress{grid-column:2;grid-row:1;margin:0;gap:10px;font-size:.82rem}
+  #progressText{white-space:nowrap}
+  #percent{min-width:0}
+  .head-actions{grid-column:3;grid-row:1;gap:6px}
+  .head-actions button{font-size:0;gap:0;width:34px;height:34px;padding:0}
+  .head-actions button .ic{width:17px;height:17px}
+  #backupInfo{display:none}
+  .page-head>.banner{grid-column:1/-1}
+
+  /* Añadir + ficha + planificar en una fila */
+  .actionbar{margin-bottom:10px;gap:8px}
+  .qa-field input{padding:9px 12px 9px 40px}
+  #newItemBtn{padding:0;width:42px;height:42px}
+  #newItemBtn .btn-txt{display:none}
+  #planBtn{height:42px;padding:0 18px}
+
+  /* Buscar, filtros y vista en una fila; los filtros se despliegan con «Filtros» */
+  .toolbar{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;padding:7px;margin-bottom:12px}
+  .toolbar .tool-row,.toolbar .tool-row.split,.toolbar .tool-row.split>.row{display:contents}
+  .search-wrap{order:1;flex:1 1 240px;min-width:180px}
+  .search-wrap input{padding-top:7px;padding-bottom:7px}
+  #filtersToggle{display:inline-flex;order:2;padding:7px 12px}
+  .tb-count{display:inline;order:3;margin-left:auto;font-size:.84rem;color:var(--muted);white-space:nowrap}
+  #schedBtn{order:4} #selectModeBtn{order:5} #viewSeg{order:6}
+  .tb-break{order:9;flex-basis:100%;height:0}
+  #statusFilter{order:10} #tagFilter{order:11} #priorityFilter{order:12} .toolbar .lbl{order:13} #sortSelect{order:14} #clearFiltersBtn{order:15}
+  body:not(.filters-open) .toolbar :is(#statusFilter,#tagFilter,#priorityFilter,.lbl,#sortSelect,#clearFiltersBtn){display:none}
+  body.filters-open .tb-break{display:block}
+  .list-head{display:none}
+  #dragHint:empty{display:none}
+}
 @keyframes sheet-in{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
 @media(min-width:761px) and (max-width:900px){main{padding:0 18px 56px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -529,6 +603,7 @@ textarea.inactive{display:none}
   <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
   <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
   <symbol id="i-archive" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></symbol>
+  <symbol id="i-panel-left" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol>
   <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
   <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
@@ -562,19 +637,19 @@ textarea.inactive{display:none}
 
 <div class="app-layout">
   <aside class="sidebar">
-    <div class="brand"><span class="mark"><svg class="ic sm"><use href="#i-checks"/></svg></span>Revisor de tareas</div>
-    <button type="button" class="nav-item today-item" id="todayBtn"><svg class="ic"><use href="#i-sun"/></svg>Hoy<span class="nav-count" id="todayCount">0</span></button>
-    <button type="button" class="nav-item" id="tomorrowBtn"><svg class="ic"><use href="#i-sunrise"/></svg>Mañana<span class="nav-count" id="tomorrowCount">0</span></button>
-    <button type="button" class="nav-item" id="weekBtn"><svg class="ic"><use href="#i-calendar-range"/></svg>Próximos 7 días<span class="nav-count" id="weekCount">0</span></button>
-    <button type="button" class="nav-item" id="waitingBtn"><svg class="ic"><use href="#i-hourglass"/></svg>En espera<span class="nav-count" id="waitingCount">0</span></button>
-    <div class="nav-section">Proyectos <button type="button" id="newProjectBtn" title="Crear proyecto" aria-label="Crear proyecto"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>
+    <div class="brand"><span class="mark"><svg class="ic sm"><use href="#i-checks"/></svg></span><span class="nav-label">Revisor de tareas</span><button type="button" class="side-toggle" id="sideToggle" title="Plegar la barra lateral (tecla [ )" aria-label="Plegar la barra lateral" aria-expanded="true"><svg class="ic"><use href="#i-panel-left"/></svg></button></div>
+    <button type="button" class="nav-item today-item" id="todayBtn" title="Hoy"><svg class="ic"><use href="#i-sun"/></svg><span class="nav-label">Hoy</span><span class="nav-count" id="todayCount">0</span></button>
+    <button type="button" class="nav-item" id="tomorrowBtn" title="Mañana"><svg class="ic"><use href="#i-sunrise"/></svg><span class="nav-label">Mañana</span><span class="nav-count" id="tomorrowCount">0</span></button>
+    <button type="button" class="nav-item" id="weekBtn" title="Próximos 7 días"><svg class="ic"><use href="#i-calendar-range"/></svg><span class="nav-label">Próximos 7 días</span><span class="nav-count" id="weekCount">0</span></button>
+    <button type="button" class="nav-item" id="waitingBtn" title="En espera"><svg class="ic"><use href="#i-hourglass"/></svg><span class="nav-label">En espera</span><span class="nav-count" id="waitingCount">0</span></button>
+    <div class="nav-section"><span class="nav-label">Proyectos</span> <button type="button" id="newProjectBtn" title="Crear proyecto" aria-label="Crear proyecto"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>
     <ul id="projectList"></ul>
         <div class="side-actions">
-      <button type="button" class="nav-item" id="openArchiveBtn"><svg class="ic"><use href="#i-archive"/></svg>Archivo<span class="nav-count" id="archiveCount"></span></button>
-      <button type="button" class="nav-item" id="openTagsBtn"><svg class="ic"><use href="#i-tag"/></svg>Etiquetas</button>
-      <button type="button" class="nav-item" id="openSettingsBtn"><svg class="ic"><use href="#i-sliders"/></svg>Ajustes y avisos</button>
-      <button type="button" class="nav-item" id="openHelpBtn" title="Instrucciones (tecla ?)"><svg class="ic"><use href="#i-help"/></svg>Instrucciones</button>
-      <button type="button" class="nav-item install" id="installBtn" hidden><svg class="ic"><use href="#i-monitor-down"/></svg>Instalar app</button>
+      <button type="button" class="nav-item" id="openArchiveBtn" title="Archivo"><svg class="ic"><use href="#i-archive"/></svg><span class="nav-label">Archivo</span><span class="nav-count" id="archiveCount"></span></button>
+      <button type="button" class="nav-item" id="openTagsBtn" title="Etiquetas"><svg class="ic"><use href="#i-tag"/></svg><span class="nav-label">Etiquetas</span></button>
+      <button type="button" class="nav-item" id="openSettingsBtn" title="Ajustes y avisos"><svg class="ic"><use href="#i-sliders"/></svg><span class="nav-label">Ajustes y avisos</span></button>
+      <button type="button" class="nav-item" id="openHelpBtn" title="Instrucciones (tecla ?)"><svg class="ic"><use href="#i-help"/></svg><span class="nav-label">Instrucciones</span></button>
+      <button type="button" class="nav-item install" id="installBtn" hidden><svg class="ic"><use href="#i-monitor-down"/></svg><span class="nav-label">Instalar app</span></button>
     </div>
   </aside>
 
@@ -628,14 +703,15 @@ textarea.inactive{display:none}
           <button type="button" id="qaAddBtn"><svg class="ic sm"><use href="#i-check"/></svg>Añadir</button>
         </div>
       </div>
-      <button id="newItemBtn" class="big secondary" type="button" title="Abrir la ficha completa (con lo que hayas escrito)"><svg class="ic"><use href="#i-pencil"/></svg>Ficha</button>
-      <button id="planBtn" class="secondary big" type="button" title="Repasar las tareas una a una y decidir cuándo hacerlas (tecla P)"><svg class="ic"><use href="#i-calendar-clock"/></svg>Planificar</button>
+      <button id="newItemBtn" class="big secondary" type="button" title="Abrir la ficha completa (con lo que hayas escrito)"><svg class="ic"><use href="#i-pencil"/></svg><span class="btn-txt">Ficha</span></button>
+      <button id="planBtn" class="big plan-cta" type="button" title="Repasar las tareas una a una y decidir cuándo hacerlas (tecla P)"><svg class="ic"><use href="#i-calendar-clock"/></svg>Planificar<b class="plan-badge" id="planBadge"></b></button>
     </div>
 
     <section class="toolbar" aria-label="Filtros y vista">
       <div class="tool-row">
         <div class="search-wrap"><svg class="ic sm"><use href="#i-search"/></svg><input type="search" id="searchFilter" placeholder="Buscar (pulsa / )" aria-label="Buscar"></div>
         <button type="button" id="filtersToggle" class="secondary toggle" aria-expanded="false"><svg class="ic sm"><use href="#i-filter"/></svg><span id="filtersToggleText">Filtros</span></button>
+        <span class="tb-break" aria-hidden="true"></span>
         <select id="statusFilter" aria-label="Filtrar por estado">
           <option value="">Todos los estados</option>
           <option value="pending">Pendiente</option>
@@ -665,6 +741,7 @@ textarea.inactive{display:none}
         <div class="row" style="gap:8px">
           <button type="button" id="schedBtn" class="secondary small toggle" title="Tareas repetitivas ya hechas, ocultas hasta el día en que vuelven a tocar" hidden></button>
           <button type="button" id="selectModeBtn" class="secondary small toggle"><svg class="ic sm"><use href="#i-square-check"/></svg>Seleccionar varias</button>
+          <span class="tb-count" id="tbCount"></span>
           <div class="seg" id="viewSeg">
             <button type="button" id="viewListBtn" class="active" title="Vista de lista"><svg class="ic sm"><use href="#i-list"/></svg>Lista</button>
             <button type="button" id="viewKanbanBtn" title="Vista Kanban"><svg class="ic sm"><use href="#i-columns"/></svg>Kanban</button>
@@ -995,7 +1072,7 @@ textarea.inactive{display:none}
     <button type="button" class="ghost icon" id="helpCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
   </div>
   <details class="help-sec" open><summary><svg class="ic"><use href="#i-checks"/></svg>Proyectos y tareas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Crea un proyecto con el <strong>+</strong> junto a «Proyectos». Para cambiarle el nombre, pulsa sobre el título.</li><li>Arrastra un proyecto en la barra lateral para reordenarlo.</li><li>Cada tarea pasa por <strong>Pendiente → En revisión → Revisada</strong>.</li><li>Para moverla a otro proyecto, suéltala sobre él en la barra lateral, o usa «Mover o duplicar».</li><li>En la ficha, las etiquetas se marcan y desmarcan pulsándolas; puedes poner varias.</li><li>Las sub-tareas se reordenan arrastrando desde el asa o con las flechas.</li></ul></div></details>
+    <div class="help-body"><ul><li>Crea un proyecto con el <strong>+</strong> junto a «Proyectos». Para cambiarle el nombre, pulsa sobre el título.</li><li>Arrastra un proyecto en la barra lateral para reordenarlo.</li><li>Si el nombre de un proyecto empieza por un emoji (por ejemplo «📊 Productividad»), se usa como su icono. En el ordenador, el botón junto al título de la barra lateral (o la tecla <kbd>[</kbd>) la pliega y deja solo los iconos con sus números.</li><li>Cada tarea pasa por <strong>Pendiente → En revisión → Revisada</strong>.</li><li>Para moverla a otro proyecto, suéltala sobre él en la barra lateral, o usa «Mover o duplicar».</li><li>En la ficha, las etiquetas se marcan y desmarcan pulsándolas; puedes poner varias.</li><li>Las sub-tareas se reordenan arrastrando desde el asa o con las flechas.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-plus"/></svg>Añadir escribiendo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Escribe la tarea en el campo de arriba (en el móvil, con el botón <strong>+</strong>) y pulsa <kbd>Intro</kbd>. Lo que reconozca aparece debajo; pulsa la <strong>×</strong> de una ficha si no quieres que lo interprete.</p><ul><li><strong>Fecha:</strong> hoy, mañana, pasado mañana, el lunes, el próximo viernes, la semana que viene, el mes que viene, fin de semana, fin de mes, en 3 días, dentro de 2 semanas, el día 15, 15/11, 3 de diciembre, 25 oct.</li><li><strong>Hora:</strong> a las 10, a las 9:30, 17h, a las 5 de la tarde, esta tarde, mañana por la mañana, a mediodía. Con hora, la tarea avisa a esa hora.</li><li><strong>Repetición:</strong> cada día, cada lunes y jueves, días laborables, cada semana, cada mes el día 6, el día 6 de cada mes, cada 2 semanas, cada año.</li><li><strong>Proyecto:</strong> <code>#Trabajo</code> (sin el emoji; vale la primera palabra si no hay duda).</li><li><strong>Etiqueta:</strong> <code>@Revisión</code>. Si no existe, se crea.</li><li><strong>Prioridad:</strong> <code>!alta</code>, <code>!urgente</code>, o <code>!!</code> (alta) y <code>!!!</code> (urgente).</li><li>Ejemplo: «Informe provincial mañana a las 10 #Trabajo !alta @Revisión».</li><li><kbd>Mayús</kbd>+<kbd>Intro</kbd> o «Ficha» abren la ficha completa con lo que hayas escrito. Tecla <kbd>Q</kbd> para ir al campo.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1019,7 +1096,7 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-monitor-down"/></svg>Instalar la app<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>PC (Chrome)</strong>: pulsa «Instalar app» en la barra lateral o el icono de instalar de la barra de direcciones. Si no aparece: menú ⋮ → «Transmitir, guardar y compartir» → «Instalar página como aplicación».</li><li><strong>Android (Chrome)</strong>: menú ⋮ → «Añadir a pantalla de inicio» → «Instalar».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-keyboard"/></svg>Atajos de teclado<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul class="kbd-list" style="padding-left:18px"><li><kbd>/</kbd> (en teclado español, <kbd>Mayús</kbd>+<kbd>7</kbd>): ir al buscador</li><li><kbd>P</kbd>: abrir el planificador; dentro, <kbd>1</kbd>–<kbd>4</kbd> eligen la fecha, <kbd>→</kbd> o <kbd>S</kbd> pasa a la siguiente, <kbd>←</kbd> vuelve y <kbd>H</kbd> marca como hecha</li><li><kbd>Q</kbd> o <kbd>N</kbd>: escribir una tarea nueva</li><li><kbd>?</kbd>: abrir estas instrucciones</li><li><kbd>Ctrl</kbd>+<kbd>Z</kbd>: deshacer el último cambio</li><li><kbd>Ctrl</kbd>+<kbd>Intro</kbd>: guardar la ficha abierta</li><li><kbd>Esc</kbd>: cerrar ventanas, limpiar la búsqueda o terminar la selección</li></ul></div></details>
+    <div class="help-body"><ul class="kbd-list" style="padding-left:18px"><li><kbd>/</kbd> (en teclado español, <kbd>Mayús</kbd>+<kbd>7</kbd>): ir al buscador</li><li><kbd>P</kbd>: abrir el planificador; dentro, <kbd>1</kbd>–<kbd>4</kbd> eligen la fecha, <kbd>→</kbd> o <kbd>S</kbd> pasa a la siguiente, <kbd>←</kbd> vuelve y <kbd>H</kbd> marca como hecha</li><li><kbd>Q</kbd> o <kbd>N</kbd>: escribir una tarea nueva</li><li><kbd>[</kbd>: plegar o desplegar la barra lateral (en el ordenador)</li><li><kbd>?</kbd>: abrir estas instrucciones</li><li><kbd>Ctrl</kbd>+<kbd>Z</kbd>: deshacer el último cambio</li><li><kbd>Ctrl</kbd>+<kbd>Intro</kbd>: guardar la ficha abierta</li><li><kbd>Esc</kbd>: cerrar ventanas, limpiar la búsqueda o terminar la selección</li></ul></div></details>
   <div class="modal-footer"><span></span><button type="button" id="helpDoneBtn">Cerrar</button></div>
 </dialog>
 
@@ -1085,6 +1162,12 @@ function newId(){
   const b=crypto.getRandomValues(new Uint8Array(16)); b[6]=(b[6]&15)|64; b[8]=(b[8]&63)|128;
   const h=[...b].map(x=>x.toString(16).padStart(2,'0')).join('');
   return `${h.slice(0,8)}-${h.slice(8,12)}-${h.slice(12,16)}-${h.slice(16,20)}-${h.slice(20)}`;
+}
+/* Emoji inicial del nombre de un proyecto (para mostrarlo como icono) */
+function projEmoji(name){
+  const n=String(name||'').trim(), g=graphemes(n)[0]||'';
+  if(g&&/\p{Extended_Pictographic}|\p{Regional_Indicator}/u.test(g)) return {emoji:g,rest:n.slice(g.length).trim()};
+  return {emoji:'',rest:n};
 }
 function graphemes(s){
   try{ if(window.Intl&&Intl.Segmenter) return [...new Intl.Segmenter('es',{granularity:'grapheme'}).segment(s)].map(x=>x.segment); }catch(e){}
@@ -1236,7 +1319,7 @@ function load(){
   return {version:11,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS),settings:normalizeSettings({}),archive:[]};
 }
 function loadUI(){
-  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false,theme:'auto'};
+  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false,theme:'auto',sideCollapsed:false};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
@@ -1246,6 +1329,7 @@ function loadUI(){
       ['search','status','tag','priority'].forEach(k=>{ if(typeof u[k]==='string') d[k]=u[k]; });
       d.showScheduled=u.showScheduled===true;
       if(['auto','light','dark'].includes(u.theme)) d.theme=u.theme;
+      d.sideCollapsed=u.sideCollapsed===true;
     }
   }catch(e){}
   if(!LABEL[d.status]) d.status='';
@@ -1780,7 +1864,10 @@ function renderSidebar(){
     const act=p.items.filter(i=>!isSnoozed(i)), total=act.length, done=act.filter(i=>i.status==='done').length, sched=p.items.length-total;
     const cnt=el('span','nav-count'+(total&&done===total?' complete':''),`${done}/${total}`);
     cnt.title=`${done} de ${total} completados`+(sched?`; ${pl(sched,'repetitiva programada','repetitivas programadas')} (ocultas)`:'');
-    li.append(ic('folder','sm'),el('span','proj-name',p.name||'Sin título'),cnt);
+    const pe=projEmoji(p.name);
+    li.title=`${p.name||'Sin título'} (${done}/${total})`;
+    if(pe.emoji) li.append(el('span','proj-emoji',pe.emoji)); else li.append(ic('folder','sm proj-folder'),el('span','proj-initial',(pe.rest||'?').charAt(0).toUpperCase()));
+    li.append(el('span','proj-name',pe.rest||p.name||'Sin título'),cnt);
     if(active){
       const tools=el('span','proj-tools');
       const up=btn('','', 'Subir proyecto',e=>{e.stopPropagation(); commit(null,()=>{const a=appState.projects; a.splice(idx-1,0,a.splice(idx,1)[0]);});},'chev-up');
@@ -2230,6 +2317,9 @@ function renderApp(){
   $('searchFilter').placeholder=isMobile()?'Buscar en todo':'Buscar en todo (pulsa / )';
   const nf=[ui.status,ui.tag,ui.priority].filter(Boolean).length+(ui.sort!=='manual'?1:0);
   $('filtersToggleText').textContent=nf?`Filtros (${nf})`:'Filtros';
+  $('tbCount').textContent=$('countLabel').textContent;
+  { const t=todayStr(); let n=0; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status!=='done'&&!isSnoozed(it)&&!isWaiting(it)&&(!it.dueDate||it.dueDate<t)) n++; }));
+    $('planBadge').textContent=n?String(n):''; $('planBadge').title=n?pl(n,'tarea sin fecha o vencida','tareas sin fecha o vencidas'):''; }
   $('filtersToggle').classList.toggle('active',nf>0||document.body.classList.contains('filters-open'));
   renderBulkBar();
   lastOverdueSig=overdueSig();
@@ -3160,6 +3250,12 @@ function applyTheme(){
   const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=t==='dark'?'#0b0e15':'#18223a';
   document.querySelectorAll('#themeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.theme===ui.theme));
 }
+function applySide(){
+  document.body.classList.toggle('side-collapsed',!!ui.sideCollapsed);
+  const b=$('sideToggle'); b.setAttribute('aria-expanded',String(!ui.sideCollapsed));
+  b.title=ui.sideCollapsed?'Desplegar la barra lateral (tecla [ )':'Plegar la barra lateral (tecla [ )'; b.setAttribute('aria-label',b.title);
+}
+function toggleSide(){ ui.sideCollapsed=!ui.sideCollapsed; saveUI(); applySide(); }
 function renderSettings(){
   applyTheme();
   const st=notifState(), file=location.protocol==='file:';
@@ -3285,6 +3381,7 @@ $('moveMoveBtn').addEventListener('click',()=>{ const ids=moveCtx.ids, t=$('move
 $('moveDupBtn').addEventListener('click',()=>{ const ids=moveCtx.ids, t=$('moveTarget').value, r=$('moveReset').checked; $('moveModal').close(); commit(null,()=>duplicateItems(ids,t,r)); });
 
 $('openSettingsBtn').addEventListener('click',()=>{ renderSettings(); $('settingsModal').showModal(); });
+$('sideToggle').addEventListener('click',toggleSide);
 $('themeSeg').addEventListener('click',e=>{ const b=e.target.closest('button[data-theme]'); if(!b) return; ui.theme=b.dataset.theme; saveUI(); applyTheme(); });
 mqDark.addEventListener('change',applyTheme);
 $('openHelpBtn').addEventListener('click',()=>{ $('helpModal').showModal(); $('helpModal').scrollTop=0; });
@@ -3385,6 +3482,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&(!$('sheet').hidden||document.body.classList.contains('drawer-open')||document.body.classList.contains('qa-open'))){ closeSheet(); closeDrawer(); closeQuickAdd(); return; }
   if(e.key==='/'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); $('searchFilter').focus(); $('searchFilter').select(); }
   else if(e.key.toLowerCase()==='p'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); openPlanner(); }
+  else if(e.key==='['&&!typing&&!e.ctrlKey&&!e.metaKey&&!isMobile()){ e.preventDefault(); toggleSide(); }
   else if(e.key==='?'&&!typing&&!e.ctrlKey&&!e.metaKey){ e.preventDefault(); $('openHelpBtn').click(); }
   else if((e.key==='q'||e.key==='Q'||e.key==='n'||e.key==='N')&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); if(isMobile()) openQuickAdd(); else { $('qaInput').focus(); window.scrollTo({top:0}); } }
   else if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); undo(); }
@@ -3410,7 +3508,7 @@ function syncControls(){
   Object.entries(REMINDERS).forEach(([v,l])=>$('modReminder').append(opt(v,l)));
   MONTHS.forEach((m,i)=>$('recYearMonth').append(opt(String(i),m)));
   WD_ORDER.forEach(d=>$('recNthWd').append(opt(String(d),WD_LONG[d])));
-  syncControls(); applyTheme();
+  syncControls(); applyTheme(); applySide();
   renderApp();
   autoArchive();
   if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
