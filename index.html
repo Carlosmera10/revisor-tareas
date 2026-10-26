@@ -248,6 +248,12 @@ body.cal-mode .list-head{display:none}
 .cal-slot.allday{min-height:48px;background:var(--subtle)}
 .cal-slot.today{background:color-mix(in srgb,var(--accent-soft) 45%,var(--panel))}
 .cal-strip,.cal-day,.cal-dayname{display:none}
+.mail-drop{position:fixed;inset:0;z-index:800;background:rgba(18,26,44,.45);backdrop-filter:blur(2px);display:grid;place-items:center;pointer-events:none}
+.mail-drop[hidden]{display:none}
+.mail-drop>div{background:var(--panel);color:var(--ink);border:2px dashed var(--accent);border-radius:16px;padding:28px 40px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 20px 50px rgba(10,16,30,.3)}
+.mail-drop .ic{width:40px;height:40px;color:var(--accent)}
+.mail-drop strong{font-size:1.1rem}
+.mail-drop span{color:var(--muted);font-size:.9rem}
 .arch-sec{margin-bottom:18px}
 .arch-note{margin:0 0 6px;font-size:.88rem;color:var(--muted)}
 .arch-row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--done);border-radius:10px;background:var(--panel);margin-top:8px}
@@ -665,6 +671,7 @@ textarea.inactive{display:none}
   <symbol id="i-panel-left" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol>
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3v18l14-9z"/></symbol>
   <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
   <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
   <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
@@ -855,6 +862,7 @@ textarea.inactive{display:none}
 </div>
 
 <div id="toastWrap" class="toast-wrap" aria-live="polite"></div>
+<div id="mailDrop" class="mail-drop" hidden><div><svg class="ic"><use href="#i-mail"/></svg><strong>Suelta el correo para crear una tarea</strong><span>Correos de Outlook (.msg) o archivos .eml</span></div></div>
 
 <!-- Solo en móvil: barra inferior, velo y hoja de acciones -->
 <nav class="bottom-nav" id="bottomNav" aria-label="Navegación principal">
@@ -1143,6 +1151,8 @@ textarea.inactive{display:none}
     <div class="help-body"><ul><li>Crea un proyecto con el <strong>+</strong> junto a «Proyectos». Para cambiarle el nombre, pulsa sobre el título.</li><li>Arrastra un proyecto en la barra lateral para reordenarlo.</li><li>Si el nombre de un proyecto empieza por un emoji (por ejemplo «📊 Productividad»), se usa como su icono. En el ordenador, el botón junto al título de la barra lateral (o la tecla <kbd>[</kbd>) la pliega y deja solo los iconos con sus números.</li><li>Cada tarea está <strong>En proceso</strong>, <strong>Pausada</strong> o <strong>Finalizada</strong>. Una pausada sigue en su proyecto, pero no sale en Hoy, Mañana, Próximos 7 días ni en el planificador, y no avisa. En la ficha puedes anotar el motivo.</li><li>«En espera de…» es aparte: para cuando dependes de otra persona y quieres reclamarle en una fecha.</li><li>Para moverla a otro proyecto, suéltala sobre él en la barra lateral, o usa «Mover o duplicar».</li><li>En la ficha, las etiquetas se marcan y desmarcan pulsándolas; puedes poner varias.</li><li>Las sub-tareas se reordenan arrastrando desde el asa o con las flechas.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-plus"/></svg>Añadir escribiendo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Escribe la tarea en el campo de arriba (en el móvil, con el botón <strong>+</strong>) y pulsa <kbd>Intro</kbd>. Lo que reconozca aparece debajo; pulsa la <strong>×</strong> de una ficha si no quieres que lo interprete.</p><ul><li><strong>Fecha:</strong> hoy, mañana, pasado mañana, el lunes, el próximo viernes, la semana que viene, el mes que viene, fin de semana, fin de mes, en 3 días, dentro de 2 semanas, el día 15, 15/11, 3 de diciembre, 25 oct.</li><li><strong>Hora:</strong> a las 10, a las 9:30, 17h, a las 5 de la tarde, esta tarde, mañana por la mañana, a mediodía. Con hora, la tarea avisa a esa hora.</li><li><strong>Repetición:</strong> cada día, cada lunes y jueves, días laborables, cada semana, cada mes el día 6, el día 6 de cada mes, cada 2 semanas, cada año.</li><li><strong>Proyecto:</strong> <code>#Trabajo</code> (sin el emoji; vale la primera palabra si no hay duda).</li><li><strong>Etiqueta:</strong> <code>@Revisión</code>. Si no existe, se crea.</li><li><strong>Prioridad:</strong> <code>!alta</code>, <code>!urgente</code>, o <code>!!</code> (alta) y <code>!!!</code> (urgente).</li><li>Ejemplo: «Informe provincial mañana a las 10 #Trabajo !alta @Revisión».</li><li><kbd>Mayús</kbd>+<kbd>Intro</kbd> o «Ficha» abren la ficha completa con lo que hayas escrito. Tecla <kbd>Q</kbd> para ir al campo.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-mail"/></svg>Correos a tareas (ordenador)<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li><strong>Arrastra un correo de Outlook</strong> a la ventana de la app y suéltalo: se abre la ficha con el asunto como título y, en las notas, el remitente, la fecha, los destinatarios, los nombres de los adjuntos y el texto. Elige fecha y proyecto y guarda.</li><li>Si sueltas varios correos a la vez, se crean directamente en el proyecto en el que estás.</li><li>También vale un archivo <strong>.eml</strong> (por ejemplo, un correo guardado desde el nuevo Outlook o desde el navegador).</li><li><strong>Pegar</strong>: copia el texto de un correo (con sus líneas «De:», «Enviado:», «Asunto:», o sin ellas) y pulsa <kbd>Ctrl</kbd>+<kbd>V</kbd> en la app, fuera de cualquier campo, o pégalo en «Añadir tarea». Un texto de una sola línea se queda en «Añadir tarea» como siempre.</li><li>Se quitan los «RE:», «RV:» y «FW:» del asunto. Los adjuntos no se guardan (solo sus nombres) y el texto muy largo se recorta.</li><li>El correo no sale de tu ordenador: todo se lee dentro de la app.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Cuando una tarea dependa de otra persona, pulsa el reloj de arena de la tarjeta (en el móvil, «⋯» → «Poner en espera…») o rellena «En espera de» en la ficha.</li><li>Indica de quién y cuándo reclamar. La tarea sale de Hoy, Mañana, Próximos 7 días y del planificador hasta ese día.</li><li>Ese día vuelve a «Hoy», en «Para reclamar», y recibes un aviso a la «Hora del aviso en tareas sin hora».</li><li>La vista <strong>En espera</strong> de la barra lateral las reúne por persona. Cuando te contesten, «Ya ha respondido».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -3161,6 +3171,180 @@ function renderCalendar(list,words){
   list.append(day);
 }
 
+/* ---- Correos a tareas (ordenador): soltar un .msg/.eml de Outlook o pegar el texto de un correo ---- */
+/* Lector mínimo de archivos compuestos de Microsoft (CFB), el formato de los .msg */
+function cfbOpen(buf){
+  const u8=new Uint8Array(buf), dv=new DataView(buf);
+  const SIG=[0xD0,0xCF,0x11,0xE0,0xA1,0xB1,0x1A,0xE1];
+  if(u8.length<512||SIG.some((b,i)=>u8[i]!==b)) throw new Error('no es un .msg');
+  const secSize=1<<dv.getUint16(30,true), miniSize=1<<dv.getUint16(32,true);
+  if(secSize!==512&&secSize!==4096) throw new Error('.msg dañado');
+  const dirStart=dv.getInt32(48,true), miniCutoff=dv.getUint32(56,true), miniFatStart=dv.getInt32(60,true), difatStart=dv.getInt32(68,true), nDifat=dv.getUint32(72,true);
+  const nSec=Math.floor(u8.length/secSize)-1, perSec=secSize/4;
+  const off=s=>(s+1)*secSize, okSec=s=>s>=0&&s<nSec;
+  // Tabla de asignación (FAT) a partir de la DIFAT
+  const fatSecs=[];
+  for(let i=0;i<109;i++){ const s=dv.getInt32(76+i*4,true); if(s>=0) fatSecs.push(s); }
+  let ds=difatStart, guard=0;
+  while(okSec(ds)&&guard++<Math.max(nDifat,1)+2){ for(let i=0;i<perSec-1;i++){ const s=dv.getInt32(off(ds)+i*4,true); if(s>=0) fatSecs.push(s); } ds=dv.getInt32(off(ds)+(perSec-1)*4,true); }
+  const fat=new Int32Array(fatSecs.length*perSec);
+  fatSecs.forEach((s,k)=>{ if(!okSec(s)) return; for(let i=0;i<perSec;i++) fat[k*perSec+i]=dv.getInt32(off(s)+i*4,true); });
+  const chain=(start,table,limit)=>{ const out=[], seen=new Set(); let s=start; while(s>=0&&s<table.length&&!seen.has(s)&&out.length<limit){ seen.add(s); out.push(s); s=table[s]; } return out; };
+  const readChain=(start,size)=>{ const secs=chain(start,fat,nSec+1), out=new Uint8Array(Math.min(size,secs.length*secSize)); let p=0; for(const s of secs){ if(!okSec(s)||p>=out.length) break; const n=Math.min(secSize,out.length-p); out.set(u8.subarray(off(s),off(s)+n),p); p+=n; } return out; };
+  // Directorio
+  const dirBytes=readChain(dirStart,(nSec+1)*secSize), entries=[];
+  for(let o=0;o+128<=dirBytes.length;o+=128){
+    const v=new DataView(dirBytes.buffer,dirBytes.byteOffset+o,128), nl=Math.min(64,v.getUint16(64,true));
+    let name=''; for(let i=0;i<Math.max(0,nl-2)&&i<64;i+=2){ const c=v.getUint16(i,true); if(!c) break; name+=String.fromCharCode(c); }
+    entries.push({name,type:v.getUint8(66),left:v.getInt32(68,true),right:v.getInt32(72,true),child:v.getInt32(76,true),start:v.getInt32(116,true),size:v.getUint32(120,true)});
+  }
+  const root=entries[0]; if(!root||root.type!==5) throw new Error('.msg dañado');
+  const ministream=readChain(root.start,root.size);
+  const miniFatBytes=okSec(miniFatStart)?readChain(miniFatStart,(nSec+1)*secSize):new Uint8Array(0);
+  const minifat=new Int32Array(Math.floor(miniFatBytes.length/4)); { const v=new DataView(miniFatBytes.buffer,miniFatBytes.byteOffset,miniFatBytes.length); for(let i=0;i<minifat.length;i++) minifat[i]=v.getInt32(i*4,true); }
+  const read=e=>{
+    if(e.size<miniCutoff){ const secs=chain(e.start,minifat,Math.ceil(e.size/miniSize)+1), out=new Uint8Array(e.size); let p=0; for(const s of secs){ const a=s*miniSize; if(a>=ministream.length||p>=e.size) break; const n=Math.min(miniSize,e.size-p); out.set(ministream.subarray(a,a+n),p); p+=n; } return out; }
+    return readChain(e.start,e.size);
+  };
+  const children=idx=>{ const out={}, seen=new Set(), walk=i=>{ if(i<0||i>=entries.length||seen.has(i)) return; seen.add(i); const e=entries[i]; walk(e.left); out[e.name]=Object.assign({idx:i},e); walk(e.right); }; walk(entries[idx]?entries[idx].child:-1); return out; };
+  return {children,read};
+}
+function msgParse(buf){
+  const cf=cfbOpen(buf), top=cf.children(0);
+  // Página de códigos de los textos no Unicode (PR_MESSAGE_CODEPAGE)
+  let ansi='windows-1252';
+  const ps0=top['__properties_version1.0'];
+  if(ps0){ const d=cf.read(ps0), v=new DataView(d.buffer,d.byteOffset,d.length); const cps={}; for(let o=32;o+16<=d.length;o+=16){ if(v.getUint16(o,true)===0x0003) cps[v.getUint16(o+2,true)]=v.getUint32(o+8,true); }
+    const lcid={1041:'shift_jis',2052:'gbk',1042:'euc-kr',1028:'big5',1049:'windows-1251',1032:'windows-1253',1055:'windows-1254',1037:'windows-1255',1025:'windows-1256',1045:'windows-1250',1029:'windows-1250'}[cps[0x3FF1]];
+    const cp=cps[0x3FFD]; ansi=cp?({65001:'utf-8',932:'shift_jis',936:'gbk',949:'euc-kr',950:'big5',28591:'iso-8859-1'}[cp]||('windows-'+cp)):(lcid||ansi); }
+  const dec=b=>{ try{ return new TextDecoder(ansi).decode(b); }catch(e){ return new TextDecoder('windows-1252').decode(b); } };
+  const prop=(kids,id)=>{
+    const h=id.toString(16).toUpperCase().padStart(4,'0');
+    const u=kids[`__substg1.0_${h}001F`]; if(u) return new TextDecoder('utf-16le').decode(cf.read(u)).replace(/\0+$/,'');
+    const a=kids[`__substg1.0_${h}001E`]; if(a) return dec(cf.read(a)).replace(/\0+$/,'');
+    const b=kids[`__substg1.0_${h}0102`]; if(b) return cf.read(b);
+    return '';
+  };
+  let date=null;
+  const ps=top['__properties_version1.0'];
+  if(ps){ const d=cf.read(ps), v=new DataView(d.buffer,d.byteOffset,d.length);
+    const times={}; for(let o=32;o+16<=d.length;o+=16){ const type=v.getUint16(o,true), id=v.getUint16(o+2,true); if(type===0x0040){ const ft=v.getUint32(o+8,true)+v.getUint32(o+12,true)*4294967296; if(ft>0) times[id]=new Date(ft/1e4-11644473600000); } }
+    date=times[0x0E06]||times[0x0039]||times[0x3007]||null; }
+  let body=prop(top,0x1000);
+  if(!body){ const html=prop(top,0x1013); if(html) body=htmlToText(typeof html==='string'?html:new TextDecoder('utf-8').decode(html)); }
+  const email=[prop(top,0x5D01),prop(top,0x0C1F),prop(top,0x0065)].find(x=>typeof x==='string'&&x.includes('@'))||'';
+  const atts=[];
+  Object.keys(top).filter(k=>k.startsWith('__attach_version1.0_')).sort().forEach(k=>{ const kids=cf.children(top[k].idx); const n=prop(kids,0x3707)||prop(kids,0x3704); if(typeof n==='string'&&n.trim()) atts.push(n.trim()); });
+  return {subject:String(prop(top,0x0037)||''),fromName:String(prop(top,0x0C1A)||''),fromEmail:email,to:String(prop(top,0x0E04)||''),cc:String(prop(top,0x0E03)||''),date,body:typeof body==='string'?body:'',attachments:atts};
+}
+function htmlToText(h){
+  const d=new DOMParser().parseFromString(String(h),'text/html');
+  d.querySelectorAll('style,script,head').forEach(n=>n.remove());
+  d.querySelectorAll('br').forEach(n=>n.replaceWith('\n'));
+  d.querySelectorAll('p,div,tr,li,h1,h2,h3,h4').forEach(n=>n.append('\n'));
+  return (d.body?d.body.textContent:'').replace(/ /g,' ');
+}
+/* .eml (MIME) */
+function mimeWords(s){
+  return String(s||'').replace(/\?=\s+=\?/g,'?==?').replace(/=\?([^?]+)\?([BbQq])\?([^?]*)\?=/g,(m,cs,enc,txt)=>{
+    try{ const bytes=enc.toUpperCase()==='B'?Uint8Array.from(atob(txt),c=>c.charCodeAt(0)):qpBytes(txt.replace(/_/g,' ')); return new TextDecoder(cs.toLowerCase()).decode(bytes); }catch(e){ return m; }
+  });
+}
+function qpBytes(s){ const out=[]; s=s.replace(/=\r?\n/g,''); for(let i=0;i<s.length;i++){ if(s[i]==='='&&/^[0-9A-Fa-f]{2}$/.test(s.substr(i+1,2))){ out.push(parseInt(s.substr(i+1,2),16)); i+=2; } else out.push(s.charCodeAt(i)&255); } return new Uint8Array(out); }
+function mimeSplit(raw){
+  const i=raw.search(/\r?\n\r?\n/); const head=i<0?raw:raw.slice(0,i), body=i<0?'':raw.slice(i).replace(/^\r?\n\r?\n/,'');
+  const h={}; head.replace(/\r?\n[ \t]+/g,' ').split(/\r?\n/).forEach(l=>{ const k=l.indexOf(':'); if(k>0){ const n=l.slice(0,k).trim().toLowerCase(); if(!(n in h)) h[n]=l.slice(k+1).trim(); } });
+  return {h,body};
+}
+const mimeParam=(v,p)=>{ const m=String(v||'').match(new RegExp(p+'\\*?=\\s*"?([^";]+)"?','i')); return m?m[1]:''; };
+function mimeDecode(part){
+  const enc=(part.h['content-transfer-encoding']||'').toLowerCase(), cs=mimeParam(part.h['content-type'],'charset')||'utf-8';
+  let bytes;
+  if(enc==='base64'){ try{ bytes=Uint8Array.from(atob(part.body.replace(/\s+/g,'')),c=>c.charCodeAt(0)); }catch(e){ bytes=new Uint8Array(0); } }
+  else if(enc==='quoted-printable') bytes=qpBytes(part.body);
+  else bytes=Uint8Array.from(part.body,c=>c.charCodeAt(0)&255);
+  try{ return new TextDecoder(cs.toLowerCase()).decode(bytes); }catch(e){ return new TextDecoder('utf-8').decode(bytes); }
+}
+function emlParse(buf){
+  const raw=new TextDecoder('latin1').decode(new Uint8Array(buf));
+  const top=mimeSplit(raw); let plain='', html=''; const atts=[];
+  const walk=(part,depth)=>{
+    if(depth>8) return;
+    const ct=(part.h['content-type']||'text/plain').toLowerCase(), disp=part.h['content-disposition']||'';
+    const fname=mimeWords(mimeParam(disp,'filename')||mimeParam(part.h['content-type'],'name'));
+    if(ct.startsWith('multipart/')){ const b=mimeParam(part.h['content-type'],'boundary'); if(!b) return; part.body.split('--'+b).slice(1).forEach(seg=>{ if(seg.startsWith('--')) return; walk(mimeSplit(seg.replace(/^\r?\n/,'')),depth+1); }); return; }
+    if(/attachment/i.test(disp)||(fname&&!ct.startsWith('text/'))){ if(fname) atts.push(fname); return; }
+    if(ct.startsWith('text/plain')&&!plain) plain=mimeDecode(part);
+    else if(ct.startsWith('text/html')&&!html) html=mimeDecode(part);
+  };
+  walk(top,0);
+  const from=mimeWords(top.h['from']||''), m=from.match(/^\s*"?([^"<]*)"?\s*<([^>]+)>/);
+  const d=top.h['date']?new Date(top.h['date']):null;
+  return {subject:mimeWords(top.h['subject']||''),fromName:m?m[1].trim():'',fromEmail:m?m[2].trim():from.trim(),to:mimeWords(top.h['to']||''),cc:mimeWords(top.h['cc']||''),
+    date:d&&!isNaN(d)?d:null,body:plain||(html?htmlToText(html):''),attachments:atts};
+}
+/* Texto pegado: reconoce las cabeceras de Outlook en español o inglés (De, Enviado, Para, CC, Asunto) */
+function textMailParse(text){
+  const t=String(text||'').replace(/\r\n?/g,'\n').trim(); if(!t) return null;
+  const lines=t.split('\n'), H={}, KEYS={from:/^(de|from)$/i,date:/^(enviado(?: el)?|fecha|sent|date)$/i,to:/^(para|to)$/i,cc:/^(cc|con copia)$/i,subject:/^(asunto|subject)$/i};
+  let i=0, seen=0;
+  for(;i<Math.min(lines.length,14);i++){
+    const m=lines[i].match(/^\s*([A-Za-zÁÉÍÓÚáéíóú .]{2,20}):\s*(.*)$/);
+    if(!m){ if(seen&&!lines[i].trim()){ i++; break; } if(seen) break; continue; }
+    const k=Object.keys(KEYS).find(k=>KEYS[k].test(m[1].trim()));
+    if(!k){ if(seen) break; continue; }
+    H[k]=m[2].trim(); seen++;
+  }
+  let subject, body;
+  if(H.subject){ subject=H.subject; body=lines.slice(i).join('\n'); }
+  else { const first=lines.findIndex(l=>l.trim()); subject=lines[first]; body=lines.slice(first+1).join('\n'); }
+  const fm=(H.from||'').match(/^\s*"?([^"<]*)"?\s*<([^>]+)>/);
+  return {subject:subject||'',fromName:fm?fm[1].trim():(H.from||''),fromEmail:fm?fm[2].trim():'',to:H.to||'',cc:H.cc||'',dateText:H.date||'',date:null,body,attachments:[]};
+}
+const looksLikeMail=t=>/^\s*(asunto|subject)\s*:/im.test(t)||/^\s*(de|from)\s*:.+\n[\s\S]*^\s*(para|to|enviado|sent)\s*:/im.test(t);
+const MAIL_MAX=6000;
+function mailTitle(m){ let s=String(m.subject||'').replace(/\s+/g,' ').trim(); let k=0; while(k++<5&&/^(re|rv|fw|fwd|reenv|res|tr|aw|wg)\s*:\s*/i.test(s)) s=s.replace(/^(re|rv|fw|fwd|reenv|res|tr|aw|wg)\s*:\s*/i,''); return s||'Correo sin asunto'; }
+function mailNotes(m){
+  const out=[];
+  const who=m.fromName&&m.fromEmail&&m.fromName!==m.fromEmail?`${m.fromName} <${m.fromEmail}>`:(m.fromName||m.fromEmail);
+  if(who) out.push(`**De:** ${who}`);
+  if(m.date) out.push(`**Fecha:** ${m.date.toLocaleString('es-ES',{weekday:'short',day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}`);
+  else if(m.dateText) out.push(`**Fecha:** ${m.dateText}`);
+  if(m.to) out.push(`**Para:** ${m.to}`);
+  if(m.cc) out.push(`**CC:** ${m.cc}`);
+  if(m.attachments&&m.attachments.length) out.push(`**Adjuntos:** ${m.attachments.join(', ')}`);
+  if(m.subject&&out.length) out.push(`**Asunto:** ${String(m.subject).replace(/\s+/g,' ').trim()}`);
+  let body=String(m.body||'').replace(/\r\n?/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+  if(body.length>MAIL_MAX) body=body.slice(0,MAIL_MAX).replace(/\s+\S*$/,'')+'\n\n… (texto recortado)';
+  const head=out.join('\n');
+  return head?head+(body?'\n\n'+body:''):body;
+}
+/* Un correo: abre la ficha rellena. Varios: se crean directamente en el proyecto actual. */
+function mailsToTasks(mails){
+  mails=mails.filter(Boolean); if(!mails.length) return;
+  if(mails.length===1){
+    if(document.querySelector('dialog[open]')) return;
+    const m=mails[0]; openModal();
+    $('modTitle').value=mailTitle(m); $('modNotes').value=mailNotes(m);
+    showMarkdownEdit(); setTimeout(()=>{ $('modTitle').focus(); $('modTitle').select(); },30);
+    return;
+  }
+  const dst=currentProject(), due=qaDefaultDate();
+  commit(null,()=>{ mails.forEach(m=>dst.items.push(normalizeItem({title:mailTitle(m),notes:mailNotes(m),dueDate:due,status:'pending'}))); return `✅ ${pl(mails.length,'tarea creada','tareas creadas')} a partir de correos en «${dst.name}»`; });
+}
+async function mailFromFile(f){
+  const name=(f.name||'').toLowerCase(), buf=await f.arrayBuffer(), u8=new Uint8Array(buf.slice(0,8));
+  if(name.endsWith('.msg')||(u8[0]===0xD0&&u8[1]===0xCF)) return msgParse(buf);
+  if(name.endsWith('.eml')||/rfc822/.test(f.type||'')) return emlParse(buf);
+  return null;
+}
+async function handleMailFiles(files){
+  const mails=[], bad=[];
+  for(const f of files){ try{ const m=await mailFromFile(f); if(m) mails.push(m); else bad.push(f.name); }catch(e){ bad.push(f.name); } }
+  if(bad.length) showToast(`No he podido leer: ${bad.slice(0,3).join(', ')}${bad.length>3?'…':''}. Arrastra correos de Outlook (.msg) o archivos .eml.`,{icon:'alert-circle',timeout:9000});
+  mailsToTasks(mails);
+}
+
 /* ---- Campo de añadir rápido ---- */
 const qaIgnored=new Set();
 const QA_TAG_COLORS=[['#e8f0fe','#174ea6'],['#fce8e6','#c5221f'],['#e6f4ea','#137333'],['#fef7e0','#8a5a00'],['#f3e8fd','#6a1b9a'],['#e0f7fa','#006064'],['#fde7f3','#9c1d64']];
@@ -3755,6 +3939,36 @@ $('importFile').addEventListener('change',async e=>{
   finally{ e.target.value=''; }
 });
 
+{ let depth=0;
+  const isFileDrag=e=>!drag.kind&&e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
+  const hide=()=>{ depth=0; $('mailDrop').hidden=true; };
+  document.addEventListener('dragenter',e=>{ if(isMobile()||!isFileDrag(e)||document.querySelector('dialog[open]')) return; depth++; $('mailDrop').hidden=false; });
+  document.addEventListener('dragleave',e=>{ if(!isFileDrag(e)) return; depth=Math.max(0,depth-1); if(!depth) $('mailDrop').hidden=true; });
+  document.addEventListener('dragover',e=>{ if(isMobile()||drag.kind||!e.dataTransfer) return; const tg=e.target; if(isFileDrag(e)||(!tg.closest('input,textarea'))){ e.preventDefault(); e.dataTransfer.dropEffect='copy'; } });
+  document.addEventListener('drop',e=>{
+    if(e.defaultPrevented||drag.kind||isMobile()||!e.dataTransfer) { hide(); return; }
+    const files=[...(e.dataTransfer.files||[])];
+    if(files.length){ e.preventDefault(); hide(); if(document.querySelector('dialog[open]')) return; handleMailFiles(files); return; }
+    if(e.target.closest('input,textarea')||document.querySelector('dialog[open]')) { hide(); return; }
+    const txt=e.dataTransfer.getData('text/plain'); hide();
+    if(txt&&txt.trim()){ e.preventDefault(); mailsToTasks([textMailParse(txt)]); }
+  });
+}
+/* Pegar un correo: Ctrl+V fuera de los campos, o en «Añadir tarea» si el texto tiene varias líneas */
+document.addEventListener('paste',e=>{
+  if(isMobile()||document.querySelector('dialog[open]')) return;
+  const tg=e.target, inQa=tg&&tg.id==='qaInput', inField=tg&&(['INPUT','TEXTAREA','SELECT'].includes(tg.tagName)||tg.isContentEditable);
+  if(inField&&!inQa) return;
+  const files=[...((e.clipboardData&&e.clipboardData.files)||[])].filter(f=>/\.(msg|eml)$/i.test(f.name||''));
+  if(files.length){ e.preventDefault(); handleMailFiles(files); return; }
+  const txt=e.clipboardData?e.clipboardData.getData('text/plain'):'';
+  if(!txt||!txt.trim()) return;
+  const multi=/\n\s*\S/.test(txt.trim());
+  if(inQa&&!multi&&!looksLikeMail(txt)) return;
+  if(!inField&&!multi&&!looksLikeMail(txt)){ e.preventDefault(); $('qaInput').focus(); $('qaInput').value=txt.trim(); renderQaChips(); return; }
+  e.preventDefault(); if(inQa){ $('qaInput').value=''; renderQaChips(); }
+  mailsToTasks([textMailParse(txt)]);
+});
 document.addEventListener('keydown',e=>{
   const tg=e.target, typing=tg&&(['INPUT','TEXTAREA','SELECT'].includes(tg.tagName)||tg.isContentEditable);
   if(document.querySelector('dialog[open]')) return;
@@ -3798,7 +4012,7 @@ function syncControls(){
   if(q.get('item')){ const pid=q.get('project'), iid=q.get('item'); history.replaceState(null,'',location.pathname); setTimeout(()=>openItemById(pid,iid),50); }
   setTimeout(tick,1500);
   setInterval(tick,30000);
-  window.__revisor={get state(){return appState;},parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates};
+  window.__revisor={get state(){return appState;},msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates};
 })();
 })();
 </script>
