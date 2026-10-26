@@ -213,6 +213,11 @@ body.cal-mode .list-head{display:none}
 .cal-chip{display:flex;align-items:center;gap:4px;min-width:0;font-size:.78rem;line-height:1.35;padding:2px 6px;border-radius:6px;background:var(--chip);color:var(--ink);border-left:3px solid var(--accent);cursor:grab;user-select:none;-webkit-user-select:none}
 .cal-chip .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .cal-chip .t{font-weight:700;color:var(--muted);flex-shrink:0}
+.cal-chip .od{margin-left:auto;padding-left:4px;font-size:.7rem;font-weight:700;flex-shrink:0;opacity:.85}
+.cal-week .cal-chip,.cal-day .cal-chip{align-items:flex-start}
+.cal-week .cal-chip .n{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.cal-week .cal-chip .ic,.cal-day .cal-chip .ic{margin-top:2px}
+.cal-chip.wait.overdue{background:var(--wait-bg);color:var(--wait-ink)}
 .cal-chip .ic{width:12px;height:12px;flex-shrink:0;opacity:.8}
 .cal-chip:hover{background:var(--hover)}
 .cal-chip.cp-alta{border-left-color:var(--high)}
@@ -1143,7 +1148,7 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado.</li><li>El buscador ignora las tildes y busca en todo: primero en la vista actual y, debajo, en el resto de proyectos (también las repetitivas ocultas) y en el archivo. Vista, orden y filtros se recuerdan.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Calendario</strong>: en el ordenador, vista de mes o de semana (con horas de 8 a 22); en el móvil, la semana arriba y el día elegido por horas. Muestra las tareas en proceso con fecha (las repetitivas, en su próxima fecha y con el icono de repetir) y, en azul, las que están en espera, en su día de reclamar. Arrastra una tarea a otro día u hora para cambiarla (en el móvil, mantenla pulsada); pulsa un hueco vacío para crear una tarea ahí.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Calendario</strong>: en el ordenador, vista de mes o de semana (con horas de 8 a 22); en el móvil, la semana arriba y el día elegido por horas. Muestra las tareas en proceso con fecha (las repetitivas, en su próxima fecha y con el icono de repetir; las vencidas, en el día de hoy, en rojo y con su fecha original) y, en azul, las que están en espera, en su día de reclamar. Arrastra una tarea a otro día u hora para cambiarla (en el móvil, mantenla pulsada); pulsa un hueco vacío para crear una tarea ahí.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Abre la ficha y despliega «Repetición».</li><li>Al marcarla como finalizada <strong>no se crea ninguna copia</strong>: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar.</li><li>Queda oculta hasta ese día, o hasta los días antes que elijas en «Volver a mostrarla».</li><li>Las ocultas se ven con <strong>«Ver programadas»</strong>; desde su menú puedes «Mostrar ya».</li><li>«Contar desde el día en que la complete»: la siguiente fecha se calcula desde que la terminas, no desde la fecha límite.</li><li>Mensual «el día 31»: si el mes es más corto, se usa su último día.</li><li>Semanal sin días marcados: se usa el mismo día de la semana que la fecha límite.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1598,8 +1603,8 @@ function dateBadge(it){
   if(it.dueTime) txt+=', '+it.dueTime;
   let cls='';
   if(it.status!=='done'){ if(isOverdue(it)) cls='overdue'; else if(it.dueDate===t) cls='today'; }
-  const b=badge(cls,cls==='overdue'?'alert-circle':'calendar',txt);
-  if(cls==='overdue') b.title='Vencida';
+  const b=badge(cls,cls==='overdue'?'alert-circle':'calendar',cls==='overdue'?'Vencida · '+txt:txt);
+  if(cls==='overdue') b.title=`Vencida (debía hacerse ${it.dueDate===t?'hoy':'el '+fmtDate(it.dueDate,true)})`;
   return b;
 }
 
@@ -2988,15 +2993,17 @@ function calTitle(){
 }
 /* Tareas en proceso con fecha (las en espera, en su día de reclamar), con los filtros activos */
 function calEntries(from,to,words){
-  const out=[], keep=ui.showScheduled; ui.showScheduled=true;
+  const t=todayStr(), out=[], keep=ui.showScheduled; ui.showScheduled=true;
   appState.projects.forEach(p=>p.items.forEach(it=>{
     if(it.status!=='pending') return;
-    const d=calDateOf(it); if(!d||d<from||d>to) return;
+    let d=calDateOf(it), od=''; if(!d) return;
+    if(d<t){ od=d; d=t; }
+    if(d<from||d>to) return;
     if(!matches(it,words)) return;
-    out.push({p,it,d});
+    out.push({p,it,d,od});
   }));
   ui.showScheduled=keep;
-  out.sort((a,b)=>(a.it.dueTime||'99').localeCompare(b.it.dueTime||'99')||(PRIO_WEIGHT[b.it.priority]-PRIO_WEIGHT[a.it.priority]));
+  out.sort((a,b)=>((a.od?0:1)-(b.od?0:1))||(a.od||'').localeCompare(b.od||'')||(a.it.dueTime||'99').localeCompare(b.it.dueTime||'99')||(PRIO_WEIGHT[b.it.priority]-PRIO_WEIGHT[a.it.priority]));
   return out;
 }
 function calMove(id,date,time){
@@ -3020,13 +3027,15 @@ function openModalAt(date,time=''){
 }
 function calChip(e,opts={}){
   const {it,p}=e, t=todayStr();
-  const c=el('div','cal-chip'+(it.priority!=='normal'?' cp-'+it.priority:'')+(isWaiting(it)?' wait':'')+(!isWaiting(it)&&e.d<t?' overdue':''));
+  const c=el('div','cal-chip'+(it.priority!=='normal'?' cp-'+it.priority:'')+(isWaiting(it)?' wait':'')+(e.od?' overdue':''));
   c.dataset.id=it.id; c.tabIndex=0; c.setAttribute('role','button');
+  if(e.od) c.append(ic('alert-circle','sm'));
   if(isWaiting(it)) c.append(ic('hourglass','sm'));
   if(it.recurrence) c.append(ic('repeat','sm'));
-  if(it.dueTime&&!isWaiting(it)&&!opts.noTime) c.append(el('span','t',it.dueTime));
+  if(it.dueTime&&!isWaiting(it)&&!e.od&&!opts.noTime) c.append(el('span','t',it.dueTime));
   c.append(el('span','n',isWaiting(it)?`${it.title} · ${it.waitingFor}`:it.title));
-  c.title=`${it.title}\n${p.name}`+(it.dueTime?` · ${it.dueTime}`:'')+(isWaiting(it)?`\nEn espera de ${it.waitingFor}`:'')+(it.recurrence?`\n${recSummary(it.recurrence)}`:'');
+  if(e.od) c.append(el('span','od',fmtDate(e.od)));
+  c.title=(e.od?(isWaiting(it)?`Reclamar pendiente desde el ${fmtDate(e.od,true)}\n`:`Vencida el ${fmtDate(e.od,true)}\n`):'')+`${it.title}\n${p.name}`+(it.dueTime?` · ${it.dueTime}`:'')+(isWaiting(it)?`\nEn espera de ${it.waitingFor}`:'')+(it.recurrence?`\n${recSummary(it.recurrence)}`:'');
   const open=ev=>{ ev.stopPropagation(); if(c._dragged) return; openModal(it); };
   c.addEventListener('click',open); c.addEventListener('keydown',ev=>{ if(ev.key==='Enter') open(ev); });
   if(!isMobile()){
@@ -3097,7 +3106,7 @@ function renderCalendar(list,words){
   lastVisibleIds=ents.map(e=>e.it.id);
   $('countLabel').textContent=pl(ents.length,'tarea','tareas');
   const DOW=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  const hourOf=e=>e.it.dueTime&&!isWaiting(e.it)?Math.min(CAL_H1,Math.max(CAL_H0,parseInt(e.it.dueTime,10))):null;
+  const hourOf=e=>e.it.dueTime&&!isWaiting(e.it)&&!e.od?Math.min(CAL_H1,Math.max(CAL_H0,parseInt(e.it.dueTime,10))):null;
 
   if(m==='month'){
     const grid=el('div','cal-month');
