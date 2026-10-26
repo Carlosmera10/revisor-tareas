@@ -3,7 +3,7 @@
 //   solo si no hay conexión usa la copia guardada.
 // - Guarda también la tipografía para que se vea igual sin conexión.
 // - Al pulsar una notificación, abre (o enfoca) la app y la tarea correspondiente.
-const CACHE = "revisor-v12";
+const CACHE = "revisor-v13";
 const FONT_CACHE = "revisor-fonts-1";
 const FILES = ["./", "index.html", "app.webmanifest", "icon-192.png", "icon-512.png"];
 const FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];

@@ -69,7 +69,7 @@ button.done-btn{background:var(--done)}
 button.done-btn:hover{background:#15633f}
 button:disabled{opacity:.4;cursor:not-allowed}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-input[type=text],input[type=search],input[type=url],input[type=date],input[type=time],input[type=number],textarea,select{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px;min-width:0}
+input[type=text],input[type=password],input[type=search],input[type=url],input[type=date],input[type=time],input[type=number],textarea,select{font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--line-strong);border-radius:8px;padding:9px 11px;min-width:0}
 input:disabled,select:disabled{background:var(--disabled-bg);color:var(--faint)}
 input[type=color]{width:44px;height:38px;padding:3px;border:1px solid var(--line-strong);border-radius:8px;background:var(--field);cursor:pointer}
 textarea{width:100%;resize:vertical;min-height:120px;font-family:ui-monospace,Consolas,monospace;font-size:.92rem}
@@ -393,6 +393,14 @@ textarea.inactive{display:none}
 .set-sec:first-of-type{border-top:0}
 .set-sec h3{font-size:1rem;display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .set-sec p{margin:6px 0}
+.sync-help{margin-top:12px}
+.sync-help summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.sync-help ol{margin:8px 0 0;padding-left:20px;font-size:.93rem;color:var(--ink-2)}
+.sync-help li{margin:5px 0}
+p.hint.sync-bad{color:var(--danger)}
+@media(max-width:760px){#syncSec .grid-fields{grid-template-columns:minmax(0,1fr)}}
+body.sync-error #openSettingsBtn{position:relative}
+body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--danger)}
 .kbd-list{margin:0;padding-left:18px;font-size:.92rem;line-height:1.9}
 .help-sec{border-top:1px solid var(--line)}
 .help-sec:first-of-type{border-top:0}
@@ -689,6 +697,7 @@ textarea.inactive{display:none}
   <symbol id="i-chev-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
   <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
   <symbol id="i-save" viewBox="0 0 24 24"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></symbol>
   <symbol id="i-keyboard" viewBox="0 0 24 24"><path d="M10 8h.01"/><path d="M12 12h.01"/><path d="M14 8h.01"/><path d="M16 12h.01"/><path d="M18 8h.01"/><path d="M6 8h.01"/><path d="M7 16h10"/><path d="M8 12h.01"/><rect width="20" height="16" x="2" y="4" rx="2"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
@@ -1087,6 +1096,38 @@ textarea.inactive{display:none}
       <input type="number" id="setBackupDays" min="1" max="60">
     </div>
   </section>
+  <section class="set-sec" id="syncSec">
+    <h3><svg class="ic"><use href="#i-refresh"/></svg>Sincronización</h3>
+    <p id="syncStatus" class="hint"></p>
+    <div class="grid-fields" style="max-width:560px;margin-top:6px">
+      <div class="field"><label for="syncToken">Token de GitHub</label><input type="password" id="syncToken" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+      <div class="field"><label for="syncPass">Contraseña de cifrado</label><input type="password" id="syncPass" autocomplete="off" spellcheck="false"></div>
+      <div class="field"><label for="syncPass2">Repite la contraseña</label><input type="password" id="syncPass2" autocomplete="off" spellcheck="false"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button type="button" id="syncActivateBtn">Activar sincronización</button>
+      <button type="button" id="syncNowBtn" class="secondary" hidden><svg class="ic sm"><use href="#i-refresh"/></svg>Sincronizar ahora</button>
+      <button type="button" id="syncOffBtn" class="secondary danger" hidden>Desactivar</button>
+    </div>
+    <details class="sync-help">
+      <summary>Cómo crear el token de GitHub</summary>
+      <ol>
+        <li>En el ordenador, entra en <strong>github.com</strong> e inicia sesión con tu cuenta.</li>
+        <li>Pulsa tu <strong>foto de perfil</strong> (arriba a la derecha) y elige <strong>Settings</strong>.</li>
+        <li>En el menú de la izquierda, baja hasta el final y pulsa <strong>Developer settings</strong>.</li>
+        <li>Despliega <strong>Personal access tokens</strong> y pulsa <strong>Fine-grained tokens</strong>.</li>
+        <li>Pulsa el botón verde <strong>Generate new token</strong>.</li>
+        <li><strong>Token name</strong>: «Revisor sync». <strong>Expiration</strong>: elige <strong>Custom</strong> y una fecha dentro de un año (anótala: al caducar habrá que crear otro). <strong>Repository access</strong>: «Public repositories (read-only)».</li>
+        <li>En <strong>Permissions</strong>, pulsa <strong>Add permissions</strong> (o despliega <strong>Account permissions</strong>), marca <strong>Gists</strong> y elige <strong>Read and write</strong>. No añadas ningún otro.</li>
+        <li>Pulsa <strong>Generate token</strong> y confirma. Copia el token (empieza por <code>github_pat_</code>): GitHub lo muestra una sola vez.</li>
+        <li>Pégalo arriba, escribe dos veces la contraseña de cifrado y pulsa <strong>Activar sincronización</strong>.</li>
+        <li>En el otro dispositivo repite solo este último paso, con <strong>el mismo token y la misma contraseña</strong>. Pásalos con un gestor de contraseñas, no por correo ni chat.</li>
+      </ol>
+    </details>
+    <div class="row" style="margin-top:14px">
+      <button type="button" id="sendBtn" class="secondary"><svg class="ic sm"><use href="#i-upload"/></svg>Enviar al otro dispositivo</button>
+    </div>
+  </section>
   <section class="set-sec">
     <h3><svg class="ic"><use href="#i-archive"/></svg>Archivo</h3>
     <div class="grid-fields" style="max-width:560px;margin-top:6px">
@@ -1170,7 +1211,9 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-bell"/></svg>Avisos<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Actívalos en «Ajustes y avisos» → «Activar notificaciones».</li><li>Cada tarea tiene su propio campo «Aviso». Las que no tienen hora usan la «Hora del aviso en tareas sin hora».</li><li>Los avisos llegan mientras la app esté abierta, aunque esté minimizada. Si estaba cerrada, verás los pendientes al abrirla.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-save"/></svg>Copias de seguridad<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Los datos se guardan solo en este navegador. Haz copias con «Exportar» (en el móvil: «Más» → «Exportar copia»).</li><li>«Importar» sustituye todo lo actual por la copia (se puede deshacer).</li><li>La app te recuerda hacer copia cada cierto número de días; se cambia en «Ajustes y avisos».</li></ul></div></details>
+    <div class="help-body"><ul><li>Los datos se guardan en este navegador. Haz copias con «Exportar» (en el móvil: «Más» → «Exportar copia»).</li><li>«Importar» te deja elegir entre <strong>fusionar</strong> la copia con lo actual (no se pierde nada; en cada tarea prevalece la versión más reciente) o <strong>sustituir</strong> todo. Las dos se pueden deshacer.</li><li>La app te recuerda hacer copia cada cierto número de días; se cambia en «Ajustes y avisos».</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-refresh"/></svg>Sincronizar el PC y el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>En «Ajustes y avisos» → «Sincronización» pegas un <strong>token de GitHub</strong> y eliges una <strong>contraseña de cifrado</strong>. Ahí mismo está «Cómo crear el token de GitHub», paso a paso.</li><li>Tus tareas se guardan <strong>cifradas</strong> en un Gist secreto de tu cuenta de GitHub. Sin la contraseña no se pueden leer, y el token y la contraseña solo se guardan en el dispositivo donde los escribes.</li><li>Haz lo mismo en el otro dispositivo, con <strong>el mismo token y la misma contraseña</strong>. Si la contraseña se pierde, no se puede recuperar la copia de GitHub (los datos de cada dispositivo siguen intactos).</li><li>Sincroniza al abrir la app, unos segundos después de cada cambio y cada pocos minutos. En cada tarea, proyecto o etiqueta prevalece la versión modificada más tarde, y los borrados también se propagan.</li><li>No se sincronizan los ajustes, el orden de proyectos y tareas ni la interfaz. Sí se sincroniza el archivo.</li><li>Si ves un punto rojo en «Ajustes y avisos», la sincronización está en pausa (token caducado, contraseña incorrecta…): ábrelo para ver el motivo.</li><li>Sin conexión o sin GitHub: «Enviar al otro dispositivo» genera un archivo que se fusiona con «Importar».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-monitor-down"/></svg>Instalar la app<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>PC (Chrome)</strong>: pulsa «Instalar app» en la barra lateral o el icono de instalar de la barra de direcciones. Si no aparece: menú ⋮ → «Transmitir, guardar y compartir» → «Instalar página como aplicación».</li><li><strong>Android (Chrome)</strong>: menú ⋮ → «Añadir a pantalla de inicio» → «Instalar».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-keyboard"/></svg>Atajos de teclado<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1182,6 +1225,9 @@ textarea.inactive{display:none}
 (()=>{'use strict';
 /* ================= Constantes ================= */
 const KEY='revisorGeneral_v9', UI_KEY='revisorGeneral_v9_ui', OLD_KEYS=['revisorGeneral_v8','revisorGeneral_v7','revisorGeneral_v6'];
+/* Almacenamiento: IndexedDB (sin el límite de ~5 MB de localStorage, que comparten otras apps del mismo origen) */
+const IDB_NAME='revisorTareas_db', IDB_STORE='kv', IDB_KEY='state', MIG_KEY='revisorGeneral_v9_idb', SYNC_KEY='revisorGeneral_v9_sync';
+const STATE_VERSION=12, TOMB_DAYS=180;
 const LABEL={pending:'En proceso',paused:'Pausada',done:'Finalizada'};
 const STATUS_ICON={pending:'play',paused:'pause',done:'check-circle'};
 const PRIO_WEIGHT={urgente:3,alta:2,normal:1};
@@ -1315,10 +1361,13 @@ function normalizeRec(r){
     showBefore:clamp(int(r.showBefore,0),0,60)
   };
 }
+/* Fecha de última modificación de datos antiguos (sin updatedAt): la más reciente que se conozca */
+function legacyStamp(...c){ const v=c.filter(validIso).map(x=>new Date(x).toISOString()).sort(); return v.length?v[v.length-1]:''; }
 function normalizeItem(raw){
   const it=raw&&typeof raw==='object'?raw:{};
   const status=it.status==='review'?'paused':LABEL[it.status]?it.status:'pending';
   const dueDate=parseYMD(it.dueDate)?it.dueDate:'';
+  const hist=Array.isArray(it.history)?it.history.filter(validIso):[];
   return {
     id:typeof it.id==='string'&&it.id?it.id:newId(),
     title:String(it.title??'Sin título').trim()||'Sin título',
@@ -1341,7 +1390,8 @@ function normalizeItem(raw){
     followUp:status!=='done'&&typeof it.waitingFor==='string'&&it.waitingFor.trim()&&parseYMD(it.followUp)?it.followUp:'',
     followNotified:typeof it.followNotified==='string'?it.followNotified:'',
     createdAt:validIso(it.createdAt)?it.createdAt:new Date().toISOString(),
-    completedAt:status==='done'?(validIso(it.completedAt)?it.completedAt:new Date().toISOString()):''
+    completedAt:status==='done'?(validIso(it.completedAt)?it.completedAt:new Date().toISOString()):'',
+    updatedAt:validIso(it.updatedAt)?it.updatedAt:legacyStamp(it.createdAt,it.completedAt,...hist)
   };
 }
 function normalizeSettings(s){
@@ -1366,7 +1416,7 @@ function normalizeState(x){
   const tags=(Array.isArray(x.tags)?x.tags:clone(DEFAULT_TAGS))
     .filter(t=>t&&typeof t==='object'&&String(t.name||'').trim())
     .map(t=>{ let id=String(t.id||''); if(!id||seenTag.has(id)) id=newId(); seenTag.add(id);
-      return {id,name:String(t.name).trim(),emoji:String(t.emoji??'').trim(),bg:isHex(t.bg)?t.bg:'#e2e6f0',text:isHex(t.text)?t.text:'#3b465c'}; });
+      return {id,name:String(t.name).trim(),emoji:String(t.emoji??'').trim(),bg:isHex(t.bg)?t.bg:'#e2e6f0',text:isHex(t.text)?t.text:'#3b465c',updatedAt:validIso(t.updatedAt)?t.updatedAt:''}; });
   const seen=new Set();
   const projects=x.projects.filter(p=>p&&typeof p==='object').map(p=>{
     let pid=String(p.id||''); if(!pid||seen.has(pid)) pid=newId(); seen.add(pid);
@@ -1378,7 +1428,7 @@ function normalizeState(x){
       it.tags=[...new Set(it.tags.map(v=>{ const t=tags.find(t=>t.id===v)||tags.find(t=>t.name===v); return t?t.id:''; }).filter(Boolean))];
       return it;
     });
-    return {id:pid,name:String(p.name||'Sin título'),items};
+    return {id:pid,name:String(p.name||'Sin título'),items,updatedAt:validIso(p.updatedAt)?p.updatedAt:''};
   });
   if(!projects.length) return null;
   const archive=(Array.isArray(x.archive)?x.archive:[]).filter(a=>a&&typeof a==='object'&&a.item&&typeof a.item==='object').map(a=>{
@@ -1386,17 +1436,29 @@ function normalizeState(x){
     if(seen.has(it.id)) it.id=newId();
     seen.add(it.id);
     it.tags=[...new Set(it.tags.map(v=>{ const t=tags.find(t=>t.id===v); return t?t.id:''; }).filter(Boolean))];
-    return {item:it,pid:String(a.pid||''),pname:String(a.pname||'Sin título'),archivedAt:validIso(a.archivedAt)?a.archivedAt:new Date().toISOString(),reviewedAt:validIso(a.reviewedAt)?a.reviewedAt:''};
+    const archivedAt=validIso(a.archivedAt)?a.archivedAt:new Date().toISOString(), reviewedAt=validIso(a.reviewedAt)?a.reviewedAt:'';
+    return {item:it,pid:String(a.pid||''),pname:String(a.pname||'Sin título'),archivedAt,reviewedAt,updatedAt:validIso(a.updatedAt)?a.updatedAt:legacyStamp(archivedAt,reviewedAt)};
   });
-  return {version:11,activeId:projects.some(p=>p.id===x.activeId)?x.activeId:projects[0].id,projects,tags,settings:normalizeSettings(x.settings),archive};
+  return {version:STATE_VERSION,activeId:projects.some(p=>p.id===x.activeId)?x.activeId:projects[0].id,projects,tags,settings:normalizeSettings(x.settings),archive,deleted:normalizeDeleted(x.deleted)};
 }
-const blankProject=(n='Nuevo proyecto')=>({id:newId(),name:n,items:[]});
-function load(){
+/* Elementos borrados (para que un borrado se propague entre dispositivos): {clave: fecha ISO}; se olvidan pasados TOMB_DAYS días */
+function normalizeDeleted(d){
+  const out={}; if(!d||typeof d!=='object') return out;
+  const lim=Date.now()-TOMB_DAYS*DAY_MS;
+  Object.keys(d).forEach(k=>{ const v=d[k]; if(k&&validIso(v)&&Date.parse(v)>lim) out[k]=new Date(v).toISOString(); });
+  return out;
+}
+const blankProject=(n='Nuevo proyecto')=>({id:newId(),name:n,items:[],updatedAt:''});
+function blankState(){
+  const p=blankProject('Mi proyecto principal');
+  return {version:STATE_VERSION,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS).map(t=>({...t,updatedAt:''})),settings:normalizeSettings({}),archive:[],deleted:{}};
+}
+/* Datos de versiones anteriores, guardados en localStorage */
+function loadLegacy(){
   for(const k of [KEY,...OLD_KEYS]){
     try{ const raw=localStorage.getItem(k); if(!raw) continue; const st=normalizeState(JSON.parse(raw)); if(st) return st; }catch(e){}
   }
-  const p=blankProject('Mi proyecto principal');
-  return {version:11,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS),settings:normalizeSettings({}),archive:[]};
+  return null;
 }
 function loadUI(){
   const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month'};
@@ -1418,15 +1480,137 @@ function loadUI(){
   if(!PRIO_WEIGHT[d.priority]) d.priority='';
   return d;
 }
-let saveErrorShown=false;
-function save(){
-  try{ localStorage.setItem(KEY,JSON.stringify(appState)); saveErrorShown=false; }
-  catch(e){ if(!saveErrorShown){ saveErrorShown=true; alert('No se han podido guardar los cambios en este navegador (almacenamiento lleno o bloqueado). Exporta una copia de seguridad cuanto antes.'); } }
-}
 function saveUI(){ try{ localStorage.setItem(UI_KEY,JSON.stringify(ui)); }catch(e){} }
 
+/* ================= Almacenamiento (IndexedDB) ================= */
+let idbP=null;
+function idbOpen(){
+  if(idbP) return idbP;
+  idbP=new Promise((res,rej)=>{
+    if(!window.indexedDB){ rej(new Error('sin IndexedDB')); return; }
+    const r=indexedDB.open(IDB_NAME,1);
+    r.onupgradeneeded=()=>{ if(!r.result.objectStoreNames.contains(IDB_STORE)) r.result.createObjectStore(IDB_STORE); };
+    r.onsuccess=()=>{ const db=r.result; db.onversionchange=()=>{ db.close(); idbP=null; }; res(db); };
+    r.onerror=()=>rej(r.error||new Error('error de IndexedDB'));
+    r.onblocked=()=>rej(new Error('IndexedDB bloqueada'));
+  });
+  idbP.catch(()=>{ idbP=null; });
+  return idbP;
+}
+const idbGet=k=>idbOpen().then(db=>new Promise((res,rej)=>{ const q=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }));
+const idbPut=(k,v)=>idbOpen().then(db=>new Promise((res,rej)=>{ const t=db.transaction(IDB_STORE,'readwrite'); t.objectStore(IDB_STORE).put(v,k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); t.onabort=()=>rej(t.error||new Error('operación cancelada')); }));
+
+let storeReady=false, storeMode='idb', persisting=false, persistAgain=false, lastJson='', saveErrorShown=false;
+const bc=('BroadcastChannel' in window)?new BroadcastChannel('revisorTareas_tabs'):null;
+function showSaveError(){
+  if(saveErrorShown) return; saveErrorShown=true;
+  alert('No se han podido guardar los cambios en este navegador (almacenamiento lleno o bloqueado). Exporta una copia de seguridad cuanto antes.');
+}
+/* Guarda en memoria + disco. Los cambios se sellan (updatedAt) y se anotan los borrados antes de guardar. */
+function save(){
+  if(!storeReady) return;
+  const changed=stampChanges(appState);
+  persist();
+  if(changed) scheduleSync();
+}
+function persist(){
+  if(storeMode==='ls'){
+    try{ localStorage.setItem(KEY,JSON.stringify(appState)); saveErrorShown=false; }catch(e){ showSaveError(); }
+    return;
+  }
+  lastJson=JSON.stringify(appState);
+  if(persisting){ persistAgain=true; return; }
+  persisting=true;
+  idbPut(IDB_KEY,lastJson).then(()=>{ saveErrorShown=false; if(bc) bc.postMessage('saved'); }).catch(showSaveError)
+    .finally(()=>{ persisting=false; if(persistAgain){ persistAgain=false; persist(); } });
+}
+/* Carga al arrancar: IndexedDB; si está vacía, migra lo que hubiera en localStorage (sin perder nada) */
+async function bootStore(){
+  let st=null;
+  try{
+    const raw=await idbGet(IDB_KEY);
+    if(raw){
+      try{ st=normalizeState(JSON.parse(raw)); }catch(e){}
+      if(!st) await idbPut('state_ilegible_'+Date.now(),raw);
+      /* Un estado en blanco no vale nada: si hay datos antiguos en localStorage, se migran esos */
+      else if(isPristine(st)){ const leg=loadLegacy(); if(leg&&!isPristine(leg)) st=null; }
+    }
+    if(!st){
+      const leg=loadLegacy();
+      if(leg){
+        const json=JSON.stringify(leg);
+        await idbPut(IDB_KEY,json);
+        const back=await idbGet(IDB_KEY);
+        if(back!==json) throw new Error('la copia en IndexedDB no coincide');
+        try{ localStorage.setItem(MIG_KEY,new Date().toISOString()); }catch(e){}
+        st=leg;
+      }
+    } else {
+      /* Pasado un día desde la migración, se liberan las claves antiguas de localStorage */
+      try{
+        const m=localStorage.getItem(MIG_KEY);
+        if(m&&m!=='hecho'&&Date.now()-Date.parse(m)>DAY_MS){ [KEY,...OLD_KEYS].forEach(k=>localStorage.removeItem(k)); localStorage.setItem(MIG_KEY,'hecho'); }
+      }catch(e){}
+    }
+    storeMode='idb';
+    try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+  }catch(e){
+    storeMode='ls'; st=loadLegacy();
+  }
+  appState=st||blankState();
+  baseSigs=sigsOf(indexState(appState));
+  storeReady=true;
+  if(!st) persist();
+}
+if(bc) bc.onmessage=async()=>{
+  if(!storeReady||storeMode!=='idb') return;
+  try{
+    const raw=await idbGet(IDB_KEY); if(!raw||raw===lastJson) return;
+    const st=normalizeState(JSON.parse(raw)); if(!st) return;
+    lastJson=raw; appState=st; baseSigs=sigsOf(indexState(st)); suppressConfetti=true; renderApp();
+  }catch(e){}
+};
+
+/* ================= Seguimiento de cambios (para sincronizar) ================= */
+/* Cada elemento (tarea, proyecto, etiqueta, entrada del archivo) lleva su updatedAt. Se detectan los cambios
+   comparando con la «firma» que tenía en el último guardado; lo que ya no existe se anota en deleted. */
+const itemSig=it=>JSON.stringify(it,(k,v)=>(k==='updatedAt'||k==='notified'||k==='followNotified')?undefined:v);
+function indexState(st){
+  const m=new Map();
+  st.projects.forEach(p=>{
+    m.set(p.id,{ref:p,sig:'P'+p.name});
+    p.items.forEach(it=>m.set(it.id,{ref:it,sig:'T'+p.id+'|'+itemSig(it)}));
+  });
+  st.tags.forEach(t=>m.set('tag:'+t.id,{ref:t,sig:'G'+JSON.stringify([t.name,t.emoji,t.bg,t.text])}));
+  st.archive.forEach(a=>m.set(a.item.id,{ref:a,sig:'A'+JSON.stringify([a.pid,a.pname,a.archivedAt,a.reviewedAt])+itemSig(a.item)}));
+  return m;
+}
+const sigsOf=idx=>{ const m=new Map(); idx.forEach((e,k)=>m.set(k,e.sig)); return m; };
+let baseSigs=new Map();
+function stampChanges(st){
+  const now=new Date().toISOString(), cur=indexState(st); let changed=false;
+  if(!st.deleted) st.deleted={};
+  cur.forEach((e,k)=>{ if(baseSigs.get(k)!==e.sig){ e.ref.updatedAt=now; delete st.deleted[k]; changed=true; } });
+  baseSigs.forEach((sig,k)=>{ if(!cur.has(k)){ st.deleted[k]=now; changed=true; } });
+  baseSigs=sigsOf(cur);
+  return changed;
+}
+function hash53(s){
+  let h1=0xdeadbeef,h2=0x41c6ce57;
+  for(let i=0;i<s.length;i++){ const c=s.charCodeAt(i); h1=Math.imul(h1^c,2654435761); h2=Math.imul(h2^c,1597334677); }
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
+  h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+  return 4294967296*(2097151&h2)+(h1>>>0);
+}
+/* Huella del contenido sincronizable (sin orden, ajustes ni interfaz) */
+function fingerprint(st){
+  const parts=[]; indexState(st).forEach((e,k)=>parts.push(k+'\u0001'+(e.ref.updatedAt||'')+'\u0001'+e.sig));
+  parts.sort(); Object.keys(st.deleted||{}).sort().forEach(k=>parts.push('D'+k+'\u0001'+st.deleted[k]));
+  return hash53(parts.join('\u0002'));
+}
+
 /* ================= Estado ================= */
-let appState=load();
+let appState=blankState();
 const ui=loadUI();
 let editingItemId=null, tempSubtasks=[], tempTags=[], tempItemTags=[], modalInitial='';
 let recDays=[], recDirty=false, editingRecOcc=1, editingHistory=[];
@@ -1476,6 +1660,7 @@ function undo(quiet=false){
   if(!snap){ if(!quiet) showToast('No hay nada que deshacer',{icon:'undo'}); return false; }
   const st=normalizeState(JSON.parse(snap)); if(!st) return false;
   st.settings=appState.settings;
+  st.deleted=Object.assign({},st.deleted,appState.deleted);
   appState=st; suppressConfetti=true; selected.clear();
   save(); renderApp(); if(!quiet) showToast('Cambio deshecho',{icon:'undo'});
   return true;
@@ -3610,6 +3795,282 @@ function saveTags(){
   });
 }
 
+/* ================= Sincronización (Gist secreto de GitHub, cifrado) ================= */
+const SYNC_FILE='revisor-sync.json', SYNC_DESC='Revisor de Tareas · copia cifrada (no borrar ni editar)', PBKDF2_ITER=600000, AAD='revisor-tareas|1';
+const tsOf=s=>{ const n=Date.parse(s); return isNaN(n)?0:n; };
+function syncErr(kind,msg){ const e=new Error(msg); e.kind=kind; return e; }
+
+/* ---- Fusión elemento a elemento: en cada elemento gana la versión más reciente; los borrados se respetan ---- */
+function recordsOf(st){
+  const m=new Map();
+  st.projects.forEach(p=>p.items.forEach(it=>m.set(it.id,{kind:'t',pid:p.id,item:it,at:it.updatedAt})));
+  st.archive.forEach(a=>m.set(a.item.id,{kind:'a',entry:a,item:a.item,at:a.updatedAt}));
+  return m;
+}
+const recSig=r=>r.kind==='t'?'T'+r.pid+'|'+itemSig(r.item):'A'+JSON.stringify([r.entry.pid,r.entry.pname,r.entry.archivedAt,r.entry.reviewedAt])+itemSig(r.item);
+/* Une dos listas por clave: devuelve, en el orden local y luego los nuevos de GitHub, la versión ganadora de cada una */
+function unionWinners(la,ra,keyOf,atOf,sigOf){
+  const lm=new Map(la.map(x=>[keyOf(x),x])), rm=new Map(ra.map(x=>[keyOf(x),x])), seen=new Set(), out=[];
+  [...la,...ra].forEach(x=>{
+    const k=keyOf(x); if(seen.has(k)) return; seen.add(k);
+    const a=lm.get(k), b=rm.get(k); let w;
+    if(!a) w=b; else if(!b) w=a;
+    else { const ta=tsOf(atOf(a)), tb=tsOf(atOf(b)); w=ta!==tb?(ta>tb?a:b):(sigOf(a)>=sigOf(b)?a:b); } /* empate: elección fija para que todos los dispositivos coincidan */
+    out.push({k,w,local:a,remote:b});
+  });
+  return out;
+}
+function mergeStates(local,remote){
+  const del={};
+  [local.deleted,remote.deleted].forEach(d=>Object.keys(d||{}).forEach(k=>{ if(!del[k]||tsOf(d[k])>tsOf(del[k])) del[k]=d[k]; }));
+  const alive=(key,at)=>{ const t=del[key]; if(t===undefined) return true; if(tsOf(at)>tsOf(t)){ delete del[key]; return true; } return false; };
+  const tags=unionWinners(local.tags,remote.tags,t=>t.id,t=>t.updatedAt,t=>JSON.stringify([t.name,t.emoji,t.bg,t.text]))
+    .filter(x=>alive('tag:'+x.k,x.w.updatedAt)).map(x=>clone(x.w));
+  const projects=unionWinners(local.projects,remote.projects,p=>p.id,p=>p.updatedAt,p=>p.name)
+    .filter(x=>alive(x.k,x.w.updatedAt)).map(x=>({id:x.w.id,name:x.w.name,items:[],updatedAt:x.w.updatedAt}));
+  if(!projects.length) projects.push(blankProject('Mi proyecto principal'));
+  const pMap=new Map(projects.map(p=>[p.id,p])), archive=[];
+  const lr=recordsOf(local), rr=recordsOf(remote);
+  unionWinners([...lr.values()],[...rr.values()],r=>r.item.id,r=>r.at,recSig).forEach(x=>{
+    const w=x.w; if(!alive(x.k,w.at)) return;
+    const item=clone(w.item), mine=lr.get(x.k);
+    if(mine&&w!==mine){ item.notified=mine.item.notified; item.followNotified=mine.item.followNotified; } /* los avisos ya mostrados son de cada dispositivo */
+    if(w.kind==='a'){ const e=clone(w.entry); e.item=item; archive.push(e); }
+    else (pMap.get(w.pid)||projects[0]).items.push(item);
+  });
+  return normalizeState({version:STATE_VERSION,activeId:local.activeId,projects,tags,settings:local.settings,archive,deleted:del});
+}
+/* Un dispositivo recién estrenado (sin datos propios) adopta lo de GitHub tal cual, para no sumar un proyecto vacío */
+function isPristine(st){
+  return st.projects.length===1&&!st.projects[0].items.length&&st.projects[0].name==='Mi proyecto principal'&&!st.archive.length
+    &&!Object.keys(st.deleted).length&&st.tags.every(t=>!t.updatedAt);
+}
+function adoptRemote(remote,local){ const st=clone(remote); st.settings=local.settings; st.activeId=st.projects[0].id; return normalizeState(st); }
+let renderPending=false;
+function applyMerged(st){
+  appState=st; baseSigs=sigsOf(indexState(st)); undoStack.length=0; selected.clear(); suppressConfetti=true;
+  persist();
+  if(drag.kind||document.querySelector('dialog[open]')) renderPending=true; else renderApp();
+}
+
+/* ---- Cifrado: PBKDF2 (600 000 vueltas) + AES-GCM de 256 bits, con la contraseña de Carlos ---- */
+const te=new TextEncoder(), td=new TextDecoder();
+const b64e=u8=>{ let s=''; for(let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000)); return btoa(s); };
+const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const keyCache={id:'',key:null};
+async function deriveKey(pass,salt,iter){
+  const id=pass+'|'+b64e(salt)+'|'+iter;
+  if(keyCache.id===id) return keyCache.key;
+  const base=await crypto.subtle.importKey('raw',te.encode(pass),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+  keyCache.id=id; keyCache.key=key; return key;
+}
+async function pipeBytes(u8,stream){
+  const w=stream.writable.getWriter(); w.write(u8).catch(()=>{}); w.close().catch(()=>{});
+  return new Uint8Array(await new Response(stream.readable).arrayBuffer());
+}
+async function encryptState(st,saltB64){
+  const payload={app:'revisor-tareas',v:1,savedAt:new Date().toISOString(),projects:st.projects,tags:st.tags,archive:st.archive,deleted:st.deleted};
+  let bytes=te.encode(JSON.stringify(payload)), z=0;
+  if(typeof CompressionStream==='function'){ try{ bytes=await pipeBytes(bytes,new CompressionStream('gzip')); z=1; }catch(e){ bytes=te.encode(JSON.stringify(payload)); z=0; } }
+  const salt=saltB64?b64d(saltB64):crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
+  const key=await deriveKey(syncCfg.pass,salt,PBKDF2_ITER);
+  const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:te.encode(AAD)},key,bytes));
+  return JSON.stringify({app:'revisor-tareas',v:1,kdf:'PBKDF2-SHA256',iter:PBKDF2_ITER,salt:b64e(salt),iv:b64e(iv),z,data:b64e(ct)});
+}
+async function decryptEnv(text){
+  const bad=()=>syncErr('format','Los datos guardados en GitHub no tienen el formato esperado.');
+  let env; try{ env=JSON.parse(text); }catch(e){ throw bad(); }
+  if(!env||env.app!=='revisor-tareas'||!env.data||!env.salt||!env.iv) throw bad();
+  if(env.v!==1) throw syncErr('version','Los datos de GitHub los guardó una versión más nueva de la app. Cierra la app y ábrela de nuevo para actualizarla.');
+  const key=await deriveKey(syncCfg.pass,b64d(env.salt),env.iter||PBKDF2_ITER);
+  let plain;
+  try{ plain=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(env.iv),additionalData:te.encode(AAD)},key,b64d(env.data))); }
+  catch(e){ throw syncErr('password','La contraseña de cifrado no coincide con la de los datos guardados en GitHub.'); }
+  if(env.z){
+    if(typeof DecompressionStream!=='function') throw syncErr('version','Este navegador no puede leer los datos comprimidos de GitHub. Actualiza Chrome.');
+    plain=await pipeBytes(plain,new DecompressionStream('gzip'));
+  }
+  let obj; try{ obj=JSON.parse(td.decode(plain)); }catch(e){ throw bad(); }
+  const st=normalizeState({projects:obj.projects,tags:obj.tags,archive:obj.archive,deleted:obj.deleted,settings:{}});
+  if(!st) throw bad();
+  return {st,salt:env.salt};
+}
+
+/* ---- API de GitHub (Gists) ---- */
+async function gh(path,opts={}){
+  let res;
+  try{
+    res=await fetch('https://api.github.com'+path,{method:opts.method||'GET',cache:'no-store',
+      headers:Object.assign({Accept:'application/vnd.github+json',Authorization:'Bearer '+syncCfg.token},opts.body?{'Content-Type':'application/json'}:{}),
+      body:opts.body?JSON.stringify(opts.body):undefined});
+  }catch(e){ throw syncErr('network','No se ha podido conectar con GitHub.'); }
+  if(res.ok) return res;
+  if(res.status===401) throw syncErr('token','El token de GitHub no es válido o ha caducado.');
+  if(res.status===403||res.status===429){
+    if(res.status===429||res.headers.get('x-ratelimit-remaining')==='0') throw syncErr('limit','GitHub ha limitado las peticiones por un rato. Se reintentará solo.');
+    throw syncErr('perm','El token no tiene permiso para los Gists. Créalo de nuevo con «Gists: Read and write».');
+  }
+  if(res.status===404) throw syncErr('notfound','No se encuentra el Gist de sincronización.');
+  throw syncErr('http','GitHub ha respondido con un error ('+res.status+').');
+}
+/* Busca el Gist de la app en la cuenta; si hay varios, el más antiguo (así todos los dispositivos eligen el mismo) */
+async function findGist(){
+  let best=null;
+  for(let page=1;page<=10;page++){
+    const list=await (await gh(`/gists?per_page=100&page=${page}`)).json();
+    list.forEach(g=>{ if(g.files&&g.files[SYNC_FILE]&&(!best||tsOf(g.created_at)<tsOf(best.created_at))) best=g; });
+    if(list.length<100) break;
+  }
+  return best?best.id:'';
+}
+async function readGist(id){
+  const g=await (await gh('/gists/'+encodeURIComponent(id))).json(), f=g.files&&g.files[SYNC_FILE];
+  if(!f) return null;
+  if(f.truncated||typeof f.content!=='string'){
+    let r; try{ r=await fetch(f.raw_url,{cache:'no-store'}); }catch(e){ throw syncErr('network','No se ha podido conectar con GitHub.'); }
+    if(!r.ok) throw syncErr('http','GitHub ha respondido con un error ('+r.status+').');
+    return r.text();
+  }
+  return f.content;
+}
+async function writeGist(id,content){
+  if(id){ await gh('/gists/'+encodeURIComponent(id),{method:'PATCH',body:{files:{[SYNC_FILE]:{content}}}}); return id; }
+  const g=await (await gh('/gists',{method:'POST',body:{description:SYNC_DESC,public:false,files:{[SYNC_FILE]:{content}}}})).json();
+  return g.id;
+}
+
+/* ---- Ajustes de sincronización de este dispositivo (solo en su localStorage) ---- */
+function loadSyncCfg(){
+  try{
+    const c=JSON.parse(localStorage.getItem(SYNC_KEY));
+    if(c&&typeof c==='object'&&c.token&&c.pass) return {token:String(c.token),pass:String(c.pass),gistId:String(c.gistId||''),lastSync:validIso(c.lastSync)?c.lastSync:'',synced:!!c.synced};
+  }catch(e){}
+  return null;
+}
+let syncCfg=loadSyncCfg();
+function saveSyncCfg(){ try{ if(syncCfg) localStorage.setItem(SYNC_KEY,JSON.stringify(syncCfg)); else localStorage.removeItem(SYNC_KEY); }catch(e){} }
+const syncRt={busy:false,pending:false,timer:null,status:'off',err:null,halt:'',toastKind:''};
+
+async function syncCycle(){
+  if(!syncCfg.gistId){ syncCfg.gistId=await findGist(); saveSyncCfg(); }
+  let remote=null, salt='';
+  if(syncCfg.gistId){
+    let text;
+    try{ text=await readGist(syncCfg.gistId); }
+    catch(e){ if(e.kind==='notfound'){ syncCfg.gistId=''; saveSyncCfg(); text=null; } else throw e; }
+    if(text){ const r=await decryptEnv(text); remote=r.st; salt=r.salt; }
+  }
+  /* Desde aquí hasta aplicar la fusión no hay esperas: se usa el estado de este mismo instante */
+  const local=appState, localFp=fingerprint(local), remoteFp=remote?fingerprint(remote):0;
+  const merged=!remote?local:(!syncCfg.synced&&isPristine(local))?adoptRemote(remote,local):mergeStates(local,remote);
+  const mergedFp=fingerprint(merged);
+  if(merged!==local&&mergedFp!==localFp) applyMerged(merged);
+  if(!remote||mergedFp!==remoteFp){
+    const content=await encryptState(merged,salt);
+    syncCfg.gistId=await writeGist(syncCfg.gistId,content);
+  }
+  syncCfg.synced=true;
+}
+async function syncNow(opts={}){
+  if(!syncCfg) return {ok:false};
+  if(syncRt.busy){ syncRt.pending=true; return {ok:false,busy:true}; }
+  if(syncRt.halt&&!opts.force) return {ok:false};
+  syncRt.busy=true; syncRt.halt=''; setSyncStatus('syncing');
+  let res={ok:true};
+  try{
+    const run=()=>syncCycle();
+    if(navigator.locks&&navigator.locks.request) await navigator.locks.request('revisorTareas_sync',run); else await run();
+    syncCfg.lastSync=new Date().toISOString(); saveSyncCfg(); syncRt.err=null; syncRt.toastKind='';
+    setSyncStatus('ok');
+  }catch(e){ res={ok:false,err:e}; handleSyncError(e,opts.quiet); }
+  finally{ syncRt.busy=false; if(syncRt.pending){ syncRt.pending=false; if(!syncRt.halt) scheduleSync(2000); } }
+  return res;
+}
+function scheduleSync(delay=5000){
+  if(!syncCfg||syncRt.halt) return;
+  clearTimeout(syncRt.timer); syncRt.timer=setTimeout(()=>syncNow(),delay);
+}
+function handleSyncError(e,quiet){
+  const known=e&&e.kind, kind=known||'unknown', msg=known?e.message:'Ha ocurrido un error inesperado al sincronizar.';
+  if(!known) console.error(e);
+  syncRt.err={kind,msg};
+  if(['token','password','perm','version','format'].includes(kind)) syncRt.halt=kind;
+  setSyncStatus('error');
+  if(!quiet&&kind!=='network'&&kind!=='limit'&&syncRt.toastKind!==kind){
+    syncRt.toastKind=kind;
+    showToast(msg+(syncRt.halt?' La sincronización está en pausa.':''),{icon:'alert',action:'Abrir ajustes',fn:()=>$('openSettingsBtn').click(),timeout:20000});
+  }
+}
+function setSyncStatus(s){
+  syncRt.status=s;
+  document.body.classList.toggle('sync-error',s==='error'&&!!syncRt.halt);
+  if($('settingsModal')&&$('settingsModal').open) renderSyncSection();
+}
+function renderSyncSection(){
+  const on=!!syncCfg, st=$('syncStatus');
+  let t;
+  if(!on) t='Desactivada en este dispositivo.';
+  else if(syncRt.status==='syncing') t='Sincronizando…';
+  else if(syncRt.status==='error'&&syncRt.err) t=syncRt.err.msg+(syncRt.halt?' Sincronización en pausa: corrígelo y pulsa «Sincronizar ahora».':' Se reintentará.');
+  else t='Activa.'+(syncCfg.lastSync?` Última vez: ${relDays(syncCfg.lastSync)}, a las ${new Date(syncCfg.lastSync).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}.`:'');
+  st.textContent=t; st.classList.toggle('sync-bad',syncRt.status==='error');
+  $('syncActivateBtn').textContent=on?'Guardar cambios':'Activar sincronización';
+  $('syncToken').placeholder=on?'(guardado; escribe uno nuevo para cambiarlo)':'github_pat_…';
+  $('syncPass').placeholder=on?'(guardada; escribe otra para cambiarla)':'';
+  $('syncNowBtn').hidden=!on; $('syncOffBtn').hidden=!on;
+  $('syncNowBtn').disabled=syncRt.busy; $('syncActivateBtn').disabled=syncRt.busy;
+}
+async function activateSync(){
+  const prev=syncCfg, token=$('syncToken').value.trim()||(prev?prev.token:''), p1=$('syncPass').value, p2=$('syncPass2').value;
+  if(!token){ alert('Pega el token de GitHub (empieza por github_pat_).'); $('syncToken').focus(); return; }
+  if(!prev||p1||p2){
+    if(p1.length<8){ alert('La contraseña de cifrado debe tener al menos 8 caracteres.'); $('syncPass').focus(); return; }
+    if(p1!==p2){ alert('Las dos contraseñas no coinciden.'); $('syncPass2').focus(); return; }
+  }
+  const pass=(p1||(prev?prev.pass:'')).normalize('NFC');
+  const sameAccount=prev&&prev.token===token;
+  syncCfg={token,pass,gistId:sameAccount?prev.gistId:'',lastSync:'',synced:sameAccount?prev.synced:false};
+  keyCache.id=''; syncRt.halt='';
+  let r=await syncNow({force:true,quiet:true});
+  if(!r.ok&&r.err&&r.err.kind==='password'&&syncCfg.gistId&&
+     confirm('La contraseña no coincide con la de los datos que ya hay en GitHub.\n\nSi es la primera vez o te equivocaste al crearla, puedes SOBRESCRIBIR esa copia con los datos de ESTE dispositivo (se perderá lo que solo estuviera en esa copia). ¿Sobrescribir?')){
+    try{ syncCfg.synced=true; syncCfg.lastSync=new Date().toISOString(); await writeGist(syncCfg.gistId,await encryptState(appState,'')); saveSyncCfg(); syncRt.err=null; syncRt.halt=''; setSyncStatus('ok'); r={ok:true}; }
+    catch(e){ r={ok:false,err:e}; }
+  }
+  if(r.ok){
+    $('syncToken').value=$('syncPass').value=$('syncPass2').value='';
+    showToast('Sincronización activada',{icon:'check-circle',timeout:4000});
+  } else {
+    syncCfg=prev; saveSyncCfg(); syncRt.err=null; syncRt.halt=''; setSyncStatus(prev?'ok':'off');
+    const e=r.err; alert((e&&e.kind?e.message:'No se ha podido activar la sincronización.')+(e&&e.kind==='token'?'\n\nRevisa que has copiado el token entero.':''));
+  }
+  renderSyncSection();
+}
+function disableSync(){
+  if(!confirm('Se borrarán el token y la contraseña de este dispositivo y dejará de sincronizar.\n\nTus tareas en este dispositivo y la copia cifrada en GitHub no se tocan. ¿Continuar?')) return;
+  clearTimeout(syncRt.timer); syncCfg=null; saveSyncCfg(); syncRt.err=null; syncRt.halt=''; keyCache.id=''; setSyncStatus('off'); renderSyncSection();
+}
+/* Respaldo manual: un archivo con todo, que se fusiona en el otro dispositivo con «Importar» */
+async function sendToOtherDevice(){
+  const name=`revisor-para-enviar-${todayStr()}.json`, json=JSON.stringify(appState,null,2);
+  try{
+    const file=new File([json],name,{type:'application/json'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file],title:'Revisor de Tareas'}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
+  }catch(e){}
+  const blob=new Blob([json],{type:'application/json;charset=utf-8'}), url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=name; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  showToast('Archivo guardado. En el otro dispositivo usa «Importar» y elige fusionar.',{icon:'save',timeout:9000});
+}
+/* Importar fusionando (no se pierde nada de lo actual); lo más reciente de cada tarea prevalece */
+function importMerge(d){
+  const snap=JSON.stringify(appState), before=fingerprint(appState);
+  const m=mergeStates(appState,d);
+  if(fingerprint(m)===before){ showToast('El archivo no aporta nada nuevo',{icon:'check-circle'}); return; }
+  applyMerged(m); undoStack.push(snap); /* tras aplicar, que «Deshacer» devuelva lo de antes */
+  showToast('📥 Datos fusionados',{action:'Deshacer',fn:undo,undo:true,timeout:8000});
+}
+
 /* ================= Notificaciones ================= */
 const notifSupported=()=>'Notification' in window;
 function notifState(){
@@ -3690,6 +4151,7 @@ function tick(){
   checkReminders(); checkBackupNotify(); checkArchiveNotify();
   const busy=drag.kind||document.querySelector('dialog[open]');
   if(busy) return;
+  if(renderPending){ renderPending=false; renderApp(); return; }
   autoArchive();
   if(todayStr()!==lastDay){ lastDay=todayStr(); renderApp(); }
   else if(overdueSig()!==lastOverdueSig) renderApp();
@@ -3734,6 +4196,7 @@ function renderSettings(){
   $('setArchiveDays').value=appState.settings.archiveDays; $('setArchiveReview').value=appState.settings.archiveReview;
   const s=appState.settings;
   $('setBackupInfo').textContent=s.lastBackup?`Última copia: ${relDays(s.lastBackup)} (${new Date(s.lastBackup).toLocaleString('es-ES')}).`:'Todavía no has exportado ninguna copia.';
+  renderSyncSection();
   let inst;
   if(isStandalone()) inst='Ya la estás usando como aplicación instalada.';
   else if(file) inst='Ábrela desde la web publicada para poder instalarla.';
@@ -3856,6 +4319,10 @@ $('setDefaultHour').addEventListener('change',e=>{ if(/^\d{2}:\d{2}$/.test(e.tar
 $('setBackupDays').addEventListener('change',e=>{ appState.settings.backupDays=clamp(parseInt(e.target.value,10)||5,1,60); e.target.value=appState.settings.backupDays; save(); renderBackupBanner(); renderSettings(); });
 $('installBtn').addEventListener('click',promptInstall);
 $('installBtn2').addEventListener('click',promptInstall);
+$('syncActivateBtn').addEventListener('click',activateSync);
+$('syncNowBtn').addEventListener('click',async()=>{ const r=await syncNow({force:true}); renderSyncSection(); if(r.ok) showToast('Sincronizado',{icon:'check-circle',timeout:2500}); });
+$('syncOffBtn').addEventListener('click',disableSync);
+$('sendBtn').addEventListener('click',sendToOtherDevice);
 
 $('newProjectBtn').addEventListener('click',()=>{
   const n=prompt('Nombre del nuevo proyecto:'); if(!n||!n.trim()) return;
@@ -3933,8 +4400,9 @@ $('importFile').addEventListener('change',async e=>{
     const d=normalizeState(JSON.parse(await f.text()));
     if(!d) throw new Error('formato');
     const n=d.projects.reduce((a,p)=>a+p.items.length,0);
-    if(!confirm(`El archivo contiene ${pl(d.projects.length,'proyecto','proyectos')} y ${pl(n,'elemento','elementos')}.\n\nImportar sustituirá todos los proyectos, tareas y etiquetas actuales (podrás deshacerlo). ¿Continuar?`)) return;
-    commit('📥 Datos importados',()=>{ d.settings=appState.settings; appState=d; selected.clear(); suppressConfetti=true; });
+    if(confirm(`El archivo contiene ${pl(d.projects.length,'proyecto','proyectos')} y ${pl(n,'elemento','elementos')}.\n\n«Aceptar» los FUSIONA con lo que ya tienes: no se pierde nada y, en cada tarea, prevalece la versión más reciente.\n«Cancelar» te permite, en su lugar, sustituirlo todo.`)){ importMerge(d); return; }
+    if(!confirm('¿Sustituir todos los proyectos, tareas y etiquetas actuales por los del archivo? (podrás deshacerlo)')) return;
+    commit('📥 Datos importados',()=>{ d.settings=appState.settings; d.deleted=Object.assign({},appState.deleted,d.deleted); appState=d; selected.clear(); suppressConfetti=true; });
   }catch(err){ alert('No se ha podido importar. Comprueba que sea una copia de seguridad JSON exportada desde esta app.'); }
   finally{ e.target.value=''; }
 });
@@ -3986,8 +4454,8 @@ document.addEventListener('keydown',e=>{
 });
 
 window.addEventListener('storage',e=>{
-  if(e.key!==KEY||!e.newValue) return;
-  try{ const st=normalizeState(JSON.parse(e.newValue)); if(!st) return; appState=st; suppressConfetti=true; renderApp(); }catch(err){}
+  if(e.key!==KEY||!e.newValue||storeMode!=='ls') return;
+  try{ const st=normalizeState(JSON.parse(e.newValue)); if(!st) return; appState=st; baseSigs=sigsOf(indexState(st)); suppressConfetti=true; renderApp(); }catch(err){}
 });
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden) tick(); });
 window.addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); deferredPrompt=e; $('installBtn').hidden=false; });
@@ -3997,7 +4465,8 @@ window.addEventListener('appinstalled',()=>{ deferredPrompt=null; $('installBtn'
 function syncControls(){
   $('searchFilter').value=ui.search; $('statusFilter').value=ui.status; $('priorityFilter').value=ui.priority; $('sortSelect').value=ui.sort;
 }
-(function init(){
+(async function init(){
+  await bootStore();
   Object.entries(REMINDERS).forEach(([v,l])=>$('modReminder').append(opt(v,l)));
   MONTHS.forEach((m,i)=>$('recYearMonth').append(opt(String(i),m)));
   WD_ORDER.forEach(d=>$('recNthWd').append(opt(String(d),WD_LONG[d])));
@@ -4012,7 +4481,12 @@ function syncControls(){
   if(q.get('item')){ const pid=q.get('project'), iid=q.get('item'); history.replaceState(null,'',location.pathname); setTimeout(()=>openItemById(pid,iid),50); }
   setTimeout(tick,1500);
   setInterval(tick,30000);
-  window.__revisor={get state(){return appState;},msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates};
+  /* Sincronización: al abrir, al volver a la app, al recuperar la conexión y cada pocos minutos */
+  setTimeout(()=>syncNow(),2500);
+  setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
+  window.addEventListener('online',()=>syncNow());
+  window.__revisor={get state(){return appState;},msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>
