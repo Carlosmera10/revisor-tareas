@@ -206,6 +206,43 @@ body.selecting .slide{cursor:pointer}
 .slide.waiting:not(:hover) .slide-title{color:var(--muted)}
 .group-title.waitgrp{color:var(--warn)}
 button.ghost.icon.on{color:var(--wait-ink);background:var(--wait-bg)}
+.cal-view{display:block}
+body.cal-mode .list-head{display:none}
+.cal-bar{display:flex;align-items:center;gap:6px;margin:0 0 10px;flex-wrap:wrap}
+.cal-bar h2{font-size:1.1rem;margin-left:8px}
+.cal-chip{display:flex;align-items:center;gap:4px;min-width:0;font-size:.78rem;line-height:1.35;padding:2px 6px;border-radius:6px;background:var(--chip);color:var(--ink);border-left:3px solid var(--accent);cursor:grab;user-select:none;-webkit-user-select:none}
+.cal-chip .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.cal-chip .t{font-weight:700;color:var(--muted);flex-shrink:0}
+.cal-chip .ic{width:12px;height:12px;flex-shrink:0;opacity:.8}
+.cal-chip:hover{background:var(--hover)}
+.cal-chip.cp-alta{border-left-color:var(--high)}
+.cal-chip.cp-urgente{border-left-color:var(--urgent)}
+.cal-chip.overdue{color:var(--urgent);background:var(--urgent-soft)}
+.cal-chip.wait{background:var(--wait-bg);color:var(--wait-ink);border-left-color:var(--wait-ink)}
+.cal-chip.dragging{opacity:.35}
+.cal-ghost{position:fixed;z-index:700;pointer-events:none;box-shadow:0 10px 26px rgba(10,16,30,.3);opacity:.95}
+.cal-view .drop{background:var(--accent-soft)!important;outline:2px dashed var(--accent);outline-offset:-2px}
+.cal-month{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.cal-dow{background:var(--subtle);padding:6px 8px;font-size:.76rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.cal-cell{background:var(--panel);min-height:118px;padding:5px;display:flex;flex-direction:column;gap:3px;cursor:pointer;min-width:0}
+.cal-cell.other{background:var(--subtle)}
+.cal-cell.other .cal-num{color:var(--faint)}
+.cal-cell.past:not(.today){background:var(--subtle)}
+.cal-num{font-size:.8rem;font-weight:600;width:24px;height:24px;display:grid;place-items:center;border-radius:99px;color:var(--ink)}
+.cal-cell.today .cal-num{background:var(--accent);color:#fff}
+.cal-more{background:none;color:var(--accent);padding:1px 4px;font-size:.76rem;justify-content:flex-start}
+.cal-more:hover{background:var(--accent-soft)}
+.cal-week{display:grid;grid-template-columns:56px repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.cal-corner,.cal-dayhead,.cal-hlabel,.cal-slot{background:var(--panel)}
+.cal-dayhead{padding:6px;text-align:center;font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;align-items:center}
+.cal-dayhead b{font-size:1.05rem;color:var(--ink);width:30px;height:30px;display:grid;place-items:center;border-radius:99px}
+.cal-dayhead.today b{background:var(--accent);color:#fff}
+.cal-hlabel{font-size:.72rem;color:var(--faint);padding:4px 6px;text-align:right}
+.cal-hlabel.allday{font-weight:600;color:var(--muted);display:flex;align-items:center;justify-content:flex-end;text-align:right;line-height:1.1}
+.cal-slot{min-height:40px;padding:3px;display:flex;flex-direction:column;gap:3px;cursor:pointer;min-width:0}
+.cal-slot.allday{min-height:48px;background:var(--subtle)}
+.cal-slot.today{background:color-mix(in srgb,var(--accent-soft) 45%,var(--panel))}
+.cal-strip,.cal-day,.cal-dayname{display:none}
 .arch-sec{margin-bottom:18px}
 .arch-note{margin:0 0 6px;font-size:.88rem;color:var(--muted)}
 .arch-row{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-left:3px solid var(--done);border-radius:10px;background:var(--panel);margin-top:8px}
@@ -513,6 +550,21 @@ textarea.inactive{display:none}
   .modal-footer>.hint{display:none}
   .modal-footer{justify-content:flex-end}
   .arch-row{flex-direction:column}
+  .cal-bar h2{font-size:1rem;margin-left:4px;flex-basis:100%;order:-1;margin:0 0 2px}
+  .cal-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:0 -12px 8px;padding:6px 12px;position:sticky;z-index:5;background:var(--paper)}
+  .cal-sday{flex-direction:column;gap:0;padding:6px 0;background:var(--panel);color:var(--muted);border:1px solid var(--line);border-radius:10px;font-weight:500;font-size:.72rem}
+  .cal-sday b{font-size:1.05rem;color:var(--ink)}
+  .cal-sday i{font-style:normal;font-size:.66rem;font-weight:700;color:var(--accent);min-height:.9em}
+  .cal-sday.today b{color:var(--accent)}
+  .cal-sday.sel{background:var(--accent);border-color:var(--accent);color:#fff}
+  .cal-sday.sel b,.cal-sday.sel i{color:#fff}
+  .cal-dayname{display:block;font-weight:600;margin:4px 2px 8px}
+  .cal-day{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--line);gap:1px}
+  .cal-row{display:grid;grid-template-columns:52px 1fr;gap:1px}
+  .cal-row .cal-hlabel{display:flex;align-items:flex-start;justify-content:flex-end;padding-top:6px}
+  .cal-row .cal-slot{min-height:44px}
+  .cal-row.allday .cal-slot{min-height:50px;background:var(--subtle)}
+  .cal-chip{font-size:.86rem;padding:6px 8px;touch-action:pan-y}
   .arch-acts{max-width:none;justify-content:flex-start}
   .plan-sec{position:sticky;bottom:0;background:var(--panel);padding:10px 0 calc(10px + env(safe-area-inset-bottom))}
 }
@@ -645,6 +697,7 @@ textarea.inactive{display:none}
     <button type="button" class="nav-item today-item" id="todayBtn" title="Hoy"><svg class="ic"><use href="#i-sun"/></svg><span class="nav-label">Hoy</span><span class="nav-count" id="todayCount">0</span></button>
     <button type="button" class="nav-item" id="tomorrowBtn" title="Mañana"><svg class="ic"><use href="#i-sunrise"/></svg><span class="nav-label">Mañana</span><span class="nav-count" id="tomorrowCount">0</span></button>
     <button type="button" class="nav-item" id="weekBtn" title="Próximos 7 días"><svg class="ic"><use href="#i-calendar-range"/></svg><span class="nav-label">Próximos 7 días</span><span class="nav-count" id="weekCount">0</span></button>
+    <button type="button" class="nav-item" id="calendarBtn" title="Calendario"><svg class="ic"><use href="#i-calendar"/></svg><span class="nav-label">Calendario</span></button>
     <button type="button" class="nav-item" id="waitingBtn" title="En espera"><svg class="ic"><use href="#i-hourglass"/></svg><span class="nav-label">En espera</span><span class="nav-count" id="waitingCount">0</span></button>
     <div class="nav-section"><span class="nav-label">Proyectos</span> <button type="button" id="newProjectBtn" title="Crear proyecto" aria-label="Crear proyecto"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>
     <ul id="projectList"></ul>
@@ -1090,7 +1143,7 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado.</li><li>El buscador ignora las tildes y busca en todo: primero en la vista actual y, debajo, en el resto de proyectos (también las repetitivas ocultas) y en el archivo. Vista, orden y filtros se recuerdan.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Calendario</strong>: en el ordenador, vista de mes o de semana (con horas de 8 a 22); en el móvil, la semana arriba y el día elegido por horas. Muestra las tareas en proceso con fecha (las repetitivas, en su próxima fecha y con el icono de repetir) y, en azul, las que están en espera, en su día de reclamar. Arrastra una tarea a otro día u hora para cambiarla (en el móvil, mantenla pulsada); pulsa un hueco vacío para crear una tarea ahí.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Abre la ficha y despliega «Repetición».</li><li>Al marcarla como finalizada <strong>no se crea ninguna copia</strong>: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar.</li><li>Queda oculta hasta ese día, o hasta los días antes que elijas en «Volver a mostrarla».</li><li>Las ocultas se ven con <strong>«Ver programadas»</strong>; desde su menú puedes «Mostrar ya».</li><li>«Contar desde el día en que la complete»: la siguiente fecha se calcula desde que la terminas, no desde la fecha límite.</li><li>Mensual «el día 31»: si el mes es más corto, se usa su último día.</li><li>Semanal sin días marcados: se usa el mismo día de la semana que la fecha límite.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1331,11 +1384,12 @@ function load(){
   return {version:11,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS),settings:normalizeSettings({}),archive:[]};
 }
 function loadUI(){
-  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false,theme:'auto',sideCollapsed:false};
+  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month'};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
-      if(['project','today','tomorrow','week','waiting'].includes(u.mode)) d.mode=u.mode;
+      if(['project','today','tomorrow','week','waiting','calendar'].includes(u.mode)) d.mode=u.mode;
+      if(['month','week'].includes(u.calView)) d.calView=u.calView;
       if(['list','kanban'].includes(u.view)) d.view=u.view;
       if(['manual','priority','dateAsc','dateDesc'].includes(u.sort)) d.sort=u.sort;
       ['search','status','tag','priority'].forEach(k=>{ if(typeof u[k]==='string') d[k]=u[k]; });
@@ -1375,7 +1429,7 @@ const getTag=id=>appState.tags.find(t=>t.id===id)||null;
 const findProjectOf=id=>appState.projects.find(p=>p.items.some(i=>i.id===id));
 const findItem=id=>{ const p=findProjectOf(id); return p?{p,it:p.items.find(i=>i.id===id)}:null; };
 const isToday=()=>ui.mode==='today';
-const DAY_MODES=['today','tomorrow','week','waiting'];
+const DAY_MODES=['today','tomorrow','week','waiting','calendar'];
 const isDayView=()=>DAY_MODES.includes(ui.mode);
 
 /* ================= Avisos y deshacer ================= */
@@ -1863,6 +1917,7 @@ function renderSidebar(){
   $('tomorrowBtn').classList.toggle('active',ui.mode==='tomorrow');
   $('weekBtn').classList.toggle('active',ui.mode==='week');
   $('waitingBtn').classList.toggle('active',ui.mode==='waiting');
+  $('calendarBtn').classList.toggle('active',ui.mode==='calendar');
   const ap=archivePending().length; $('archiveCount').textContent=ap?String(ap):(appState.archive.length||''); $('archiveCount').classList.toggle('hot',ap>0);
   $('archiveCount').title=ap?pl(ap,'tarea archivada por revisar','tareas archivadas por revisar'):pl(appState.archive.length,'tarea archivada','tareas archivadas');
   const wAll=waitingEntries(), wDue=wAll.filter(e=>followDue(e.it)).length;
@@ -2198,10 +2253,10 @@ function renderHeader(entries){
   $('projectHead').hidden=td; $('todayHead').hidden=!td;
   if(td){
     const long=d=>{ const s=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); return s.charAt(0).toUpperCase()+s.slice(1); };
-    const title={today:'Hoy',tomorrow:'Mañana',week:'Próximos 7 días',waiting:'En espera'}[ui.mode];
+    const title={today:'Hoy',tomorrow:'Mañana',week:'Próximos 7 días',waiting:'En espera',calendar:'Calendario'}[ui.mode];
     $('todayTitle').textContent=title;
     const wn=waitingEntries(), wd=wn.filter(e=>followDue(e.it)).length;
-    $('todayDate').textContent=ui.mode==='waiting'?(wn.length?pl(wn.length,'tarea','tareas')+' pendientes de otras personas'+(wd?`, ${wd} para reclamar`:''):'Tareas que dependen de otras personas'):ui.mode==='today'?long(new Date()):ui.mode==='tomorrow'?long(addDays(new Date(),1)):`Del ${fmtDate(todayStr(),true)} al ${fmtDate(ymd(addDays(new Date(),6)),true)}`;
+    $('todayDate').textContent=ui.mode==='calendar'?'':ui.mode==='waiting'?(wn.length?pl(wn.length,'tarea','tareas')+' pendientes de otras personas'+(wd?`, ${wd} para reclamar`:''):'Tareas que dependen de otras personas'):ui.mode==='today'?long(new Date()):ui.mode==='tomorrow'?long(addDays(new Date(),1)):`Del ${fmtDate(todayStr(),true)} al ${fmtDate(ymd(addDays(new Date(),6)),true)}`;
     document.title=title+' · Revisor de tareas';
   } else {
     const p=currentProject();
@@ -2216,7 +2271,7 @@ function renderHeader(entries){
   $('progressText').textContent=ui.mode==='today'?`${done} de ${total} hechas hoy`:`${done} de ${total} completadas`;
   $('percent').textContent=pct+' %';
   $('bar').style.width=pct+'%';
-  $('progress').parentElement.hidden=ui.mode==='waiting';
+  $('progress').parentElement.hidden=ui.mode==='waiting'||ui.mode==='calendar';
   $('progress').setAttribute('aria-valuenow',pct);
   if(!td){
     const p=currentProject(), ov=p.items.filter(isOverdue).length, sched=p.items.filter(isSnoozed).length;
@@ -2231,6 +2286,7 @@ function renderApp(){
   [...selected].forEach(id=>{ if(!findProjectOf(id)) selected.delete(id); });
   renderSidebar(); renderTagFilter(); renderBackupBanner(); renderArchiveBanner();
   document.body.classList.toggle('today-mode',td);
+  document.body.classList.toggle('cal-mode',ui.mode==='calendar');
 
   const manual=ui.sort==='manual'&&!td;
   const w=searchWords(), s=sorter();
@@ -2240,7 +2296,9 @@ function renderApp(){
   $('viewKanbanBtn').classList.toggle('active',ui.view==='kanban');
   let hint;
 
-  if(td){
+  if(td&&ui.mode==='calendar'){
+    renderHeader([]); renderCalendar(list,w); hint=''; $('schedBtn').hidden=true; document.title=calTitle()+' · Calendario';
+  } else if(td){
     const all=viewEntries(ui.mode);
     renderHeader(all.map(e=>e.it));
     const vis=all.filter(e=>matches(e.it,w));
@@ -2915,12 +2973,191 @@ function clearWaiting(id){
     return `✅ ${who} ha respondido: «${short(f.it.title)}» vuelve a tu lista`; });
 }
 
+/* ---- Calendario: mes o semana en el ordenador; semana + día de 8 a 22 h en el móvil ---- */
+let calAnchor=todayStr(), calSel=todayStr();
+const CAL_H0=8, CAL_H1=22;
+const calWeekStart=d=>{ const x=startOfDay(d); return addDays(x,-((x.getDay()+6)%7)); };
+const calDateOf=it=>isWaiting(it)?(it.followUp||it.dueDate):it.dueDate;
+const capFirst=x=>x.charAt(0).toUpperCase()+x.slice(1);
+function calMode(){ return isMobile()?'day':ui.calView; }
+function calTitle(){
+  const a=parseYMD(calAnchor)||new Date();
+  if(calMode()==='month') return capFirst(new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(a));
+  const ws=calWeekStart(a), we=addDays(ws,6);
+  return `Semana del ${fmtDate(ymd(ws))} al ${fmtDate(ymd(we))}`+(we.getFullYear()!==new Date().getFullYear()?'':` de ${we.getFullYear()}`);
+}
+/* Tareas en proceso con fecha (las en espera, en su día de reclamar), con los filtros activos */
+function calEntries(from,to,words){
+  const out=[], keep=ui.showScheduled; ui.showScheduled=true;
+  appState.projects.forEach(p=>p.items.forEach(it=>{
+    if(it.status!=='pending') return;
+    const d=calDateOf(it); if(!d||d<from||d>to) return;
+    if(!matches(it,words)) return;
+    out.push({p,it,d});
+  }));
+  ui.showScheduled=keep;
+  out.sort((a,b)=>(a.it.dueTime||'99').localeCompare(b.it.dueTime||'99')||(PRIO_WEIGHT[b.it.priority]-PRIO_WEIGHT[a.it.priority]));
+  return out;
+}
+function calMove(id,date,time){
+  commit(null,()=>{
+    const f=findItem(id); if(!f) return false;
+    const it=f.it, w=isWaiting(it)&&it.followUp;
+    if(w){ if(it.followUp===date) return false; it.followUp=date; it.followNotified=''; return `⏳ Reclamar a ${it.waitingFor} el ${fmtDate(date,true)}`; }
+    const sameTime=time===undefined||time===it.dueTime;
+    if(it.dueDate===date&&sameTime) return false;
+    setDue(it,date);
+    if(time!==undefined){ it.dueTime=time; if(!time&&it.reminder!=='none'&&it.reminder!=='d1') it.reminder='none'; it.notified=''; }
+    return `📅 «${short(it.title)}»: ${fmtDate(date,true)}${it.dueTime?' '+it.dueTime:''}`;
+  });
+}
+function openModalAt(date,time=''){
+  openModal();
+  $('modDate').value=date; $('modTime').value=time;
+  $('modTime').disabled=$('modReminder').disabled=false;
+  recToForm(null,date); renderDateChips();
+  modalInitial=formSignature();
+}
+function calChip(e,opts={}){
+  const {it,p}=e, t=todayStr();
+  const c=el('div','cal-chip'+(it.priority!=='normal'?' cp-'+it.priority:'')+(isWaiting(it)?' wait':'')+(!isWaiting(it)&&e.d<t?' overdue':''));
+  c.dataset.id=it.id; c.tabIndex=0; c.setAttribute('role','button');
+  if(isWaiting(it)) c.append(ic('hourglass','sm'));
+  if(it.recurrence) c.append(ic('repeat','sm'));
+  if(it.dueTime&&!isWaiting(it)&&!opts.noTime) c.append(el('span','t',it.dueTime));
+  c.append(el('span','n',isWaiting(it)?`${it.title} · ${it.waitingFor}`:it.title));
+  c.title=`${it.title}\n${p.name}`+(it.dueTime?` · ${it.dueTime}`:'')+(isWaiting(it)?`\nEn espera de ${it.waitingFor}`:'')+(it.recurrence?`\n${recSummary(it.recurrence)}`:'');
+  const open=ev=>{ ev.stopPropagation(); if(c._dragged) return; openModal(it); };
+  c.addEventListener('click',open); c.addEventListener('keydown',ev=>{ if(ev.key==='Enter') open(ev); });
+  if(!isMobile()){
+    c.draggable=true;
+    c.addEventListener('dragstart',ev=>{ drag={kind:'item',id:it.id}; ev.dataTransfer.effectAllowed='move'; ev.dataTransfer.setData('text/plain',it.id); document.body.classList.add('dragging-item'); setTimeout(()=>c.classList.add('dragging'),0); });
+    c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); endDrag(); });
+  } else attachCalTouch(c,it);
+  return c;
+}
+function calDrop(node,date,time){
+  node.dataset.date=date; if(time!==undefined) node.dataset.time=time;
+  node.addEventListener('dragover',ev=>{ if(drag.kind!=='item') return; ev.preventDefault(); node.classList.add('drop'); });
+  node.addEventListener('dragleave',ev=>{ if(node.contains(ev.relatedTarget)) return; node.classList.remove('drop'); });
+  node.addEventListener('drop',ev=>{ if(drag.kind!=='item') return; ev.preventDefault(); const id=drag.id; endDrag(); node.classList.remove('drop'); calMove(id,date,time); });
+}
+/* Móvil: mantener pulsada una tarea y arrastrarla a otra hora o a otro día de la semana */
+function attachCalTouch(c,it){
+  let timer=null, active=false, ghost=null, sx=0, sy=0, target=null;
+  const clear=()=>document.querySelectorAll('.cal-view .drop').forEach(n=>n.classList.remove('drop'));
+  const end=()=>{ clearTimeout(timer); clearInterval(c._scr); c._scr=null; if(!active) return; active=false; ghost&&ghost.remove(); c.classList.remove('dragging'); clear();
+    c._dragged=true; setTimeout(()=>{ c._dragged=false; },300);
+    if(target) calMove(it.id,target.dataset.date,target.dataset.time===undefined?undefined:target.dataset.time); };
+  c.addEventListener('touchstart',ev=>{
+    const t=ev.touches[0]; sx=t.clientX; sy=t.clientY; target=null;
+    timer=setTimeout(()=>{ active=true; c.classList.add('dragging'); if(navigator.vibrate) navigator.vibrate(15);
+      const r=c.getBoundingClientRect(); ghost=c.cloneNode(true); ghost.classList.add('cal-ghost'); ghost.style.width=r.width+'px'; ghost.style.left=r.left+'px'; ghost.style.top=r.top+'px'; document.body.append(ghost); },350);
+  },{passive:true});
+  c.addEventListener('touchmove',ev=>{
+    const t=ev.touches[0];
+    if(!active){ if(Math.hypot(t.clientX-sx,t.clientY-sy)>8) clearTimeout(timer); return; }
+    ev.preventDefault();
+    ghost.style.transform=`translate(${t.clientX-sx}px,${t.clientY-sy}px)`;
+    clearInterval(c._scr); c._scr=null;
+    if(t.clientY<140) c._scr=setInterval(()=>window.scrollBy(0,-12),16); else if(t.clientY>window.innerHeight-120) c._scr=setInterval(()=>window.scrollBy(0,12),16);
+    const under=document.elementFromPoint(t.clientX,t.clientY), n=under&&under.closest('[data-date]');
+    clear(); target=n&&n!==c?n:null; if(target) target.classList.add('drop');
+  },{passive:false});
+  c.addEventListener('touchend',end); c.addEventListener('touchcancel',()=>{ target=null; end(); });
+}
+function calNav(dir){
+  const a=parseYMD(calAnchor)||new Date(), m=calMode();
+  if(dir===0){ calAnchor=calSel=todayStr(); }
+  else if(m==='month') calAnchor=ymd(new Date(a.getFullYear(),a.getMonth()+dir,1));
+  else { calAnchor=ymd(addDays(a,7*dir)); if(m==='day') calSel=ymd(addDays(parseYMD(calSel)||a,7*dir)); }
+  renderApp();
+}
+function renderCalendar(list,words){
+  list.className='cal-view'; list.replaceChildren();
+  const m=calMode(), t=todayStr(), a=parseYMD(calAnchor)||new Date();
+  // Barra: navegación y cambio de vista
+  const bar=el('div','cal-bar');
+  bar.append(btn('','secondary small icon',m==='month'?'Mes anterior':'Semana anterior',()=>calNav(-1),'chev-left'),
+    btn('Hoy','secondary small',null,()=>calNav(0)),
+    btn('','secondary small icon',m==='month'?'Mes siguiente':'Semana siguiente',()=>calNav(1),'chev-right'),
+    el('h2','',calTitle()));
+  if(m!=='day'){
+    const seg=el('div','seg'); seg.style.marginLeft='auto';
+    [['month','Mes'],['week','Semana']].forEach(([v,l])=>{ const b=btn(l,ui.calView===v?'active':'',null,()=>{ ui.calView=v; saveUI(); renderApp(); }); seg.append(b); });
+    bar.append(seg);
+  }
+  list.append(bar);
+  let from,to,days=[];
+  if(m==='month'){ const first=new Date(a.getFullYear(),a.getMonth(),1), ws=calWeekStart(first); const last=new Date(a.getFullYear(),a.getMonth()+1,0); const we=addDays(calWeekStart(last),6); for(let d=ws;d<=we;d=addDays(d,1)) days.push(d); }
+  else { const ws=calWeekStart(a); for(let i=0;i<7;i++) days.push(addDays(ws,i)); }
+  from=ymd(days[0]); to=ymd(days[days.length-1]);
+  const ents=calEntries(from,to,words), byDay={};
+  ents.forEach(e=>{ (byDay[e.d]=byDay[e.d]||[]).push(e); });
+  lastVisibleIds=ents.map(e=>e.it.id);
+  $('countLabel').textContent=pl(ents.length,'tarea','tareas');
+  const DOW=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const hourOf=e=>e.it.dueTime&&!isWaiting(e.it)?Math.min(CAL_H1,Math.max(CAL_H0,parseInt(e.it.dueTime,10))):null;
+
+  if(m==='month'){
+    const grid=el('div','cal-month');
+    DOW.forEach(d=>grid.append(el('div','cal-dow',d)));
+    days.forEach(d=>{
+      const ds=ymd(d), cell=el('div','cal-cell'+(d.getMonth()!==a.getMonth()?' other':'')+(ds===t?' today':'')+(ds<t?' past':''));
+      cell.append(el('span','cal-num',String(d.getDate())));
+      const its=byDay[ds]||[], max=4;
+      its.slice(0,its.length>max?max-1:max).forEach(e=>cell.append(calChip(e)));
+      if(its.length>max){ const more=btn(`+${its.length-max+1} más`,'cal-more',null,ev=>{ ev.stopPropagation(); calAnchor=ds; ui.calView='week'; saveUI(); renderApp(); }); cell.append(more); }
+      cell.title='Pulsa para añadir una tarea este día';
+      cell.addEventListener('click',ev=>{ if(ev.target===cell||ev.target.classList.contains('cal-num')) openModalAt(ds); });
+      calDrop(cell,ds);
+      grid.append(cell);
+    });
+    list.append(grid); return;
+  }
+
+  const hours=[]; for(let h=CAL_H0;h<=CAL_H1;h++) hours.push(h);
+  const hh=h=>String(h).padStart(2,'0')+':00';
+  if(m==='week'){
+    const grid=el('div','cal-week');
+    grid.append(el('div','cal-corner'));
+    days.forEach((d,i)=>{ const ds=ymd(d), h=el('div','cal-dayhead'+(ds===t?' today':'')); h.append(el('span','',DOW[i]),el('b','',String(d.getDate()))); grid.append(h); });
+    grid.append(el('div','cal-hlabel allday','Sin hora'));
+    days.forEach(d=>{ const ds=ymd(d), c=el('div','cal-slot allday'+(ds===t?' today':'')); (byDay[ds]||[]).filter(e=>hourOf(e)===null).forEach(e=>c.append(calChip(e))); c.addEventListener('click',ev=>{ if(ev.target===c) openModalAt(ds); }); calDrop(c,ds,''); grid.append(c); });
+    hours.forEach(h=>{
+      grid.append(el('div','cal-hlabel',hh(h)));
+      days.forEach(d=>{ const ds=ymd(d), c=el('div','cal-slot'+(ds===t?' today':'')); (byDay[ds]||[]).filter(e=>hourOf(e)===h).forEach(e=>c.append(calChip(e))); c.addEventListener('click',ev=>{ if(ev.target===c) openModalAt(ds,hh(h)); }); calDrop(c,ds,hh(h)); grid.append(c); });
+    });
+    list.append(grid); return;
+  }
+
+  // Móvil: tira de la semana y agenda del día elegido
+  if(calSel<from||calSel>to) calSel=from<=t&&t<=to?t:from;
+  const strip=el('div','cal-strip');
+  days.forEach((d,i)=>{ const ds=ymd(d), n=(byDay[ds]||[]).length;
+    const b=btn('','cal-sday'+(ds===calSel?' sel':'')+(ds===t?' today':''),null,()=>{ calSel=ds; renderApp(); });
+    b.append(el('span','',DOW[i].charAt(0)),el('b','',String(d.getDate())),el('i','',n?String(n):''));
+    b.dataset.date=ds; strip.append(b); });
+  list.append(strip);
+  requestAnimationFrame(()=>{ const ph=document.querySelector('.page-head'); strip.style.top=(ph&&getComputedStyle(ph).position==='sticky'?ph.offsetHeight:0)+'px'; });
+  const sel=parseYMD(calSel), its=byDay[calSel]||[];
+  list.append(el('div','cal-dayname',capFirst(new Intl.DateTimeFormat('es-ES',{weekday:'long',day:'numeric',month:'long'}).format(sel))));
+  const day=el('div','cal-day');
+  const ad=el('div','cal-row allday'); ad.append(el('span','cal-hlabel','Sin hora'));
+  const adSlot=el('div','cal-slot'); its.filter(e=>hourOf(e)===null).forEach(e=>adSlot.append(calChip(e))); adSlot.addEventListener('click',ev=>{ if(ev.target===adSlot) openModalAt(calSel); }); calDrop(adSlot,calSel,'');
+  ad.append(adSlot); day.append(ad);
+  hours.forEach(h=>{ const r=el('div','cal-row'); r.append(el('span','cal-hlabel',hh(h)));
+    const sl=el('div','cal-slot'); its.filter(e=>hourOf(e)===h).forEach(e=>sl.append(calChip(e))); sl.addEventListener('click',ev=>{ if(ev.target===sl) openModalAt(calSel,hh(h)); }); calDrop(sl,calSel,hh(h));
+    r.append(sl); day.append(r); });
+  list.append(day);
+}
+
 /* ---- Campo de añadir rápido ---- */
 const qaIgnored=new Set();
 const QA_TAG_COLORS=[['#e8f0fe','#174ea6'],['#fce8e6','#c5221f'],['#e6f4ea','#137333'],['#fef7e0','#8a5a00'],['#f3e8fd','#6a1b9a'],['#e0f7fa','#006064'],['#fde7f3','#9c1d64']];
 const QA_ICON={date:'calendar',time:'clock',proj:'folder',prio:'flag',tag:'tag',newtag:'plus',rec:'repeat'};
 function qaParse(){ return parseQuick($('qaInput').value,qaIgnored); }
-function qaDefaultDate(){ return ui.mode==='today'||ui.mode==='week'?todayStr():ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):''; }
+function qaDefaultDate(){ if(ui.mode==='calendar') return isMobile()?calSel:''; return ui.mode==='today'||ui.mode==='week'?todayStr():ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):''; }
 function renderQaChips(){
   const box=$('qaChips'); box.replaceChildren();
   const v=$('qaInput').value.trim(); if(!v) return;
@@ -3344,6 +3581,7 @@ $('todayBtn').addEventListener('click',switchToToday);
 $('tomorrowBtn').addEventListener('click',()=>switchToView('tomorrow'));
 $('weekBtn').addEventListener('click',()=>switchToView('week'));
 $('waitingBtn').addEventListener('click',()=>switchToView('waiting'));
+$('calendarBtn').addEventListener('click',()=>{ calAnchor=todayStr(); calSel=todayStr(); switchToView('calendar'); });
 ['waitCloseBtn','waitCancelBtn'].forEach(id=>$(id).addEventListener('click',()=>$('waitModal').close()));
 $('waitSaveBtn').addEventListener('click',saveWait);
 $('modStatus').addEventListener('change',()=>{ $('pauseField').hidden=$('modStatus').value!=='paused'; });
