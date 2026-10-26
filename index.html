@@ -176,7 +176,9 @@ button.toggle.active{background:var(--accent-soft);color:var(--accent);border-co
 .group-title.overdue{color:var(--urgent)}
 .slide{content-visibility:auto;contain-intrinsic-size:auto 76px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--line-strong);border-radius:10px;padding:12px 14px;position:relative;transition:border-color .15s,box-shadow .15s}
 .slide:hover{border-color:var(--line-strong);box-shadow:0 2px 10px rgba(24,34,58,.05)}
-.slide.review{border-left-color:var(--review)}
+.slide.paused{border-left-color:var(--review)}
+.badge.paused{background:var(--high-soft);color:var(--warn);cursor:pointer}
+.pause-field[hidden]{display:none}
 .slide.done{border-left-color:var(--done);background:var(--subtle)}
 .slide.done .slide-title{text-decoration:line-through;color:var(--faint)}
 .slide.snoozed{border-style:dashed;border-left-style:solid;opacity:.75}
@@ -604,6 +606,8 @@ textarea.inactive{display:none}
   <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
   <symbol id="i-archive" viewBox="0 0 24 24"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></symbol>
   <symbol id="i-panel-left" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3v18l14-9z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
   <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
   <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
@@ -714,9 +718,9 @@ textarea.inactive{display:none}
         <span class="tb-break" aria-hidden="true"></span>
         <select id="statusFilter" aria-label="Filtrar por estado">
           <option value="">Todos los estados</option>
-          <option value="pending">Pendiente</option>
-          <option value="review">En revisión</option>
-          <option value="done">Revisada</option>
+          <option value="pending">En proceso</option>
+          <option value="paused">Pausada</option>
+          <option value="done">Finalizada</option>
           <option value="waiting">En espera</option>
         </select>
         <select id="tagFilter" aria-label="Filtrar por etiqueta"></select>
@@ -766,9 +770,9 @@ textarea.inactive{display:none}
   <strong id="bulkCount">0 seleccionados</strong>
   <select id="bulkStatus" aria-label="Cambiar estado">
     <option value="">Estado…</option>
-    <option value="pending">Pendiente</option>
-    <option value="review">En revisión</option>
-    <option value="done">Revisada</option>
+    <option value="pending">En proceso</option>
+    <option value="paused">Pausada</option>
+    <option value="done">Finalizada</option>
   </select>
   <select id="bulkDate" aria-label="Cambiar fecha">
     <option value="">Fecha…</option>
@@ -830,6 +834,12 @@ textarea.inactive{display:none}
     <div class="field"><label for="modPriority">Prioridad</label>
       <select id="modPriority"><option value="normal">Normal</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></div>
     <div class="field"><label for="modProject">Proyecto</label><select id="modProject"></select></div>
+    <div class="field"><label for="modStatus">Estado</label>
+      <select id="modStatus"><option value="pending">En proceso</option><option value="paused">Pausada</option><option value="done">Finalizada</option></select></div>
+  </div>
+  <div class="field pause-field" id="pauseField" hidden>
+    <label for="modPauseNote">Motivo de la pausa (opcional)</label>
+    <input type="text" id="modPauseNote" maxlength="120" autocomplete="off" placeholder="Por ejemplo: hasta la reunión del jueves">
   </div>
   <div class="field">
     <span class="flabel" id="modTagsLabel">Etiquetas</span>
@@ -1014,7 +1024,7 @@ textarea.inactive{display:none}
   <section class="set-sec">
     <h3><svg class="ic"><use href="#i-archive"/></svg>Archivo</h3>
     <div class="grid-fields" style="max-width:560px;margin-top:6px">
-      <div class="field"><label for="setArchiveDays">Archivar las revisadas a los (días)</label><input type="number" id="setArchiveDays" min="1" max="90"></div>
+      <div class="field"><label for="setArchiveDays">Archivar las finalizadas a los (días)</label><input type="number" id="setArchiveDays" min="1" max="90"></div>
       <div class="field"><label for="setArchiveReview">Avisarme para revisarlas</label>
         <select id="setArchiveReview"><option value="1">Al mes de archivarlas</option><option value="3">A los tres meses</option><option value="6">A los seis meses</option><option value="0">Nunca</option></select></div>
     </div>
@@ -1072,7 +1082,7 @@ textarea.inactive{display:none}
     <button type="button" class="ghost icon" id="helpCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
   </div>
   <details class="help-sec" open><summary><svg class="ic"><use href="#i-checks"/></svg>Proyectos y tareas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Crea un proyecto con el <strong>+</strong> junto a «Proyectos». Para cambiarle el nombre, pulsa sobre el título.</li><li>Arrastra un proyecto en la barra lateral para reordenarlo.</li><li>Si el nombre de un proyecto empieza por un emoji (por ejemplo «📊 Productividad»), se usa como su icono. En el ordenador, el botón junto al título de la barra lateral (o la tecla <kbd>[</kbd>) la pliega y deja solo los iconos con sus números.</li><li>Cada tarea pasa por <strong>Pendiente → En revisión → Revisada</strong>.</li><li>Para moverla a otro proyecto, suéltala sobre él en la barra lateral, o usa «Mover o duplicar».</li><li>En la ficha, las etiquetas se marcan y desmarcan pulsándolas; puedes poner varias.</li><li>Las sub-tareas se reordenan arrastrando desde el asa o con las flechas.</li></ul></div></details>
+    <div class="help-body"><ul><li>Crea un proyecto con el <strong>+</strong> junto a «Proyectos». Para cambiarle el nombre, pulsa sobre el título.</li><li>Arrastra un proyecto en la barra lateral para reordenarlo.</li><li>Si el nombre de un proyecto empieza por un emoji (por ejemplo «📊 Productividad»), se usa como su icono. En el ordenador, el botón junto al título de la barra lateral (o la tecla <kbd>[</kbd>) la pliega y deja solo los iconos con sus números.</li><li>Cada tarea está <strong>En proceso</strong>, <strong>Pausada</strong> o <strong>Finalizada</strong>. Una pausada sigue en su proyecto, pero no sale en Hoy, Mañana, Próximos 7 días ni en el planificador, y no avisa. En la ficha puedes anotar el motivo.</li><li>«En espera de…» es aparte: para cuando dependes de otra persona y quieres reclamarle en una fecha.</li><li>Para moverla a otro proyecto, suéltala sobre él en la barra lateral, o usa «Mover o duplicar».</li><li>En la ficha, las etiquetas se marcan y desmarcan pulsándolas; puedes poner varias.</li><li>Las sub-tareas se reordenan arrastrando desde el asa o con las flechas.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-plus"/></svg>Añadir escribiendo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Escribe la tarea en el campo de arriba (en el móvil, con el botón <strong>+</strong>) y pulsa <kbd>Intro</kbd>. Lo que reconozca aparece debajo; pulsa la <strong>×</strong> de una ficha si no quieres que lo interprete.</p><ul><li><strong>Fecha:</strong> hoy, mañana, pasado mañana, el lunes, el próximo viernes, la semana que viene, el mes que viene, fin de semana, fin de mes, en 3 días, dentro de 2 semanas, el día 15, 15/11, 3 de diciembre, 25 oct.</li><li><strong>Hora:</strong> a las 10, a las 9:30, 17h, a las 5 de la tarde, esta tarde, mañana por la mañana, a mediodía. Con hora, la tarea avisa a esa hora.</li><li><strong>Repetición:</strong> cada día, cada lunes y jueves, días laborables, cada semana, cada mes el día 6, el día 6 de cada mes, cada 2 semanas, cada año.</li><li><strong>Proyecto:</strong> <code>#Trabajo</code> (sin el emoji; vale la primera palabra si no hay duda).</li><li><strong>Etiqueta:</strong> <code>@Revisión</code>. Si no existe, se crea.</li><li><strong>Prioridad:</strong> <code>!alta</code>, <code>!urgente</code>, o <code>!!</code> (alta) y <code>!!!</code> (urgente).</li><li>Ejemplo: «Informe provincial mañana a las 10 #Trabajo !alta @Revisión».</li><li><kbd>Mayús</kbd>+<kbd>Intro</kbd> o «Ficha» abren la ficha completa con lo que hayas escrito. Tecla <kbd>Q</kbd> para ir al campo.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1082,13 +1092,13 @@ textarea.inactive{display:none}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Abre la ficha y despliega «Repetición».</li><li>Al marcarla como revisada <strong>no se crea ninguna copia</strong>: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar.</li><li>Queda oculta hasta ese día, o hasta los días antes que elijas en «Volver a mostrarla».</li><li>Las ocultas se ven con <strong>«Ver programadas»</strong>; desde su menú puedes «Mostrar ya».</li><li>«Contar desde el día en que la complete»: la siguiente fecha se calcula desde que la terminas, no desde la fecha límite.</li><li>Mensual «el día 31»: si el mes es más corto, se usa su último día.</li><li>Semanal sin días marcados: se usa el mismo día de la semana que la fecha límite.</li></ul></div></details>
+    <div class="help-body"><ul><li>Abre la ficha y despliega «Repetición».</li><li>Al marcarla como finalizada <strong>no se crea ninguna copia</strong>: la misma tarea pasa a su siguiente fecha, con las sub-tareas sin marcar.</li><li>Queda oculta hasta ese día, o hasta los días antes que elijas en «Volver a mostrarla».</li><li>Las ocultas se ven con <strong>«Ver programadas»</strong>; desde su menú puedes «Mostrar ya».</li><li>«Contar desde el día en que la complete»: la siguiente fecha se calcula desde que la terminas, no desde la fecha límite.</li><li>Mensual «el día 31»: si el mes es más corto, se usa su último día.</li><li>Semanal sin días marcados: se usa el mismo día de la semana que la fecha límite.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Las notas admiten formato sencillo; míralo con «Vista previa»:</p><ul><li><code>**negrita**</code> y <code>*cursiva*</code></li><li><code>[texto](https://…)</code> para un enlace</li><li><code>- elemento</code> al principio de línea para una lista</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-menu"/></svg>En el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>En la lista, desliza una tarjeta <strong>a la derecha</strong> para marcarla como hecha y <strong>a la izquierda</strong> para aplazarla.</li><li>Mantén pulsada el asa para reordenar.</li><li><strong>Kanban</strong>: las columnas van una al lado de otra; desliza a los lados o pulsa las pestañas de arriba para cambiar de columna. Para pasar una tarjeta a otra columna, arrástrala desde el asa hasta la pestaña o hasta el borde de la pantalla.</li><li>El botón de los tres puntos de cada tarjeta abre sus acciones; «Más», en la barra inferior, el resto de opciones.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-archive"/></svg>Archivo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Las tareas revisadas se <strong>archivan solas</strong> pasados 7 días (se cambia en «Ajustes y avisos» → «Archivo»). También puedes archivar una ya: icono de archivo en la tarjeta (en el móvil, «⋯» → «Archivar ya»).</li><li>Las repetitivas no se archivan: pasan a su siguiente fecha.</li><li>Pasados tres meses (o uno, o seis, según elijas) te aviso con un aviso en la cabecera y una notificación para que revises las archivadas.</li><li>En el <strong>Archivo</strong> (barra lateral) puedes, por cada tarea: <strong>Copiar</strong> su texto para documentarla, <strong>Conservar</strong> (no vuelve a preguntar), <strong>Volver a abrir</strong> (vuelve a su proyecto como pendiente) o <strong>Eliminar</strong> definitivamente.</li><li>«Descargar como texto» guarda en un archivo .md todas las pendientes de revisar, con sus notas y sub-tareas.</li><li>El archivo va incluido en las copias de seguridad.</li></ul></div></details>
+    <div class="help-body"><ul><li>Las tareas finalizadas se <strong>archivan solas</strong> pasados 7 días (se cambia en «Ajustes y avisos» → «Archivo»). También puedes archivar una ya: icono de archivo en la tarjeta (en el móvil, «⋯» → «Archivar ya»).</li><li>Las repetitivas no se archivan: pasan a su siguiente fecha.</li><li>Pasados tres meses (o uno, o seis, según elijas) te aviso con un aviso en la cabecera y una notificación para que revises las archivadas.</li><li>En el <strong>Archivo</strong> (barra lateral) puedes, por cada tarea: <strong>Copiar</strong> su texto para documentarla, <strong>Conservar</strong> (no vuelve a preguntar), <strong>Volver a abrir</strong> (vuelve a su proyecto como pendiente) o <strong>Eliminar</strong> definitivamente.</li><li>«Descargar como texto» guarda en un archivo .md todas las pendientes de revisar, con sus notas y sub-tareas.</li><li>El archivo va incluido en las copias de seguridad.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-bell"/></svg>Avisos<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Actívalos en «Ajustes y avisos» → «Activar notificaciones».</li><li>Cada tarea tiene su propio campo «Aviso». Las que no tienen hora usan la «Hora del aviso en tareas sin hora».</li><li>Los avisos llegan mientras la app esté abierta, aunque esté minimizada. Si estaba cerrada, verás los pendientes al abrirla.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-save"/></svg>Copias de seguridad<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1104,7 +1114,8 @@ textarea.inactive{display:none}
 (()=>{'use strict';
 /* ================= Constantes ================= */
 const KEY='revisorGeneral_v9', UI_KEY='revisorGeneral_v9_ui', OLD_KEYS=['revisorGeneral_v8','revisorGeneral_v7','revisorGeneral_v6'];
-const LABEL={pending:'Pendiente',review:'En revisión',done:'Revisada'};
+const LABEL={pending:'En proceso',paused:'Pausada',done:'Finalizada'};
+const STATUS_ICON={pending:'play',paused:'pause',done:'check-circle'};
 const PRIO_WEIGHT={urgente:3,alta:2,normal:1};
 const PRIO_LABEL={urgente:'Urgente',alta:'Alta',normal:'Normal'};
 const REMINDERS={none:'Sin aviso',at:'Al vencer',m10:'10 min antes',m30:'30 min antes',h1:'1 hora antes',d1:'1 día antes'};
@@ -1238,7 +1249,7 @@ function normalizeRec(r){
 }
 function normalizeItem(raw){
   const it=raw&&typeof raw==='object'?raw:{};
-  const status=LABEL[it.status]?it.status:'pending';
+  const status=it.status==='review'?'paused':LABEL[it.status]?it.status:'pending';
   const dueDate=parseYMD(it.dueDate)?it.dueDate:'';
   return {
     id:typeof it.id==='string'&&it.id?it.id:newId(),
@@ -1251,7 +1262,8 @@ function normalizeItem(raw){
     link:typeof it.link==='string'?it.link:'',
     notes:typeof it.notes==='string'?it.notes:'',
     status,
-    reopenStatus:it.reopenStatus==='review'?'review':'pending',
+    reopenStatus:it.reopenStatus==='review'||it.reopenStatus==='paused'?'paused':'pending',
+    pauseNote:status==='paused'&&typeof it.pauseNote==='string'?it.pauseNote.trim().slice(0,120):'',
     subtasks:Array.isArray(it.subtasks)?it.subtasks.filter(s=>s&&typeof s==='object').map(s=>({id:typeof s.id==='string'&&s.id?s.id:newId(),title:String(s.title??''),done:!!s.done})):[],
     recurrence:normalizeRec(it.recurrence),
     snoozedUntil:parseYMD(it.snoozedUntil)&&status!=='done'?it.snoozedUntil:'',
@@ -1327,6 +1339,7 @@ function loadUI(){
       if(['list','kanban'].includes(u.view)) d.view=u.view;
       if(['manual','priority','dateAsc','dateDesc'].includes(u.sort)) d.sort=u.sort;
       ['search','status','tag','priority'].forEach(k=>{ if(typeof u[k]==='string') d[k]=u[k]; });
+      if(d.status==='review') d.status='paused';
       d.showScheduled=u.showScheduled===true;
       if(['auto','light','dark'].includes(u.theme)) d.theme=u.theme;
       d.sideCollapsed=u.sideCollapsed===true;
@@ -1477,6 +1490,7 @@ function recSummary(r){
 const isSnoozed=it=>!!it.snoozedUntil&&it.status!=='done'&&todayStr()<it.snoozedUntil;
 /* En espera de alguien: desaparece de Hoy, Mañana, 7 días y el planificador hasta el día de reclamar */
 const isWaiting=it=>!!it.waitingFor&&it.status!=='done';
+const isPaused=it=>it.status==='paused';
 const followDue=it=>isWaiting(it)&&!!it.followUp&&it.followUp<=todayStr();
 const snoozeDateFor=(due,r)=>{ const d=parseYMD(due); if(!d||!r) return ''; const s=ymd(addDays(d,-r.showBefore)); return s>todayStr()?s:''; };
 function reschedule(item){
@@ -1492,7 +1506,8 @@ function applyStatus(item,p,v){
   if(item.status===v) return null;
   if(v==='done'){ item.waitingFor=''; item.followUp=''; }
   if(v==='done'&&item.recurrence){ const r=reschedule(item); if(r) return r; }
-  if(v==='done'){ item.reopenStatus=item.status==='review'?'review':'pending'; item.completedAt=new Date().toISOString(); if(item.recurrence) item.history=[...item.history,item.completedAt].slice(-200); }
+  if(v!=='paused') item.pauseNote='';
+  if(v==='done'){ item.reopenStatus=item.status==='paused'?'paused':'pending'; item.completedAt=new Date().toISOString(); if(item.recurrence) item.history=[...item.history,item.completedAt].slice(-200); }
   else item.completedAt='';
   item.status=v;
   return null;
@@ -1517,7 +1532,7 @@ function setDue(it,d){
 
 /* ================= Fechas en tarjetas ================= */
 function isOverdue(it){
-  if(isWaiting(it)) return false;
+  if(isWaiting(it)||isPaused(it)) return false;
   if(it.status==='done'||!it.dueDate) return false;
   const t=todayStr();
   return it.dueDate<t||(it.dueDate===t&&!!it.dueTime&&it.dueTime<=nowHM());
@@ -1591,7 +1606,7 @@ function todayEntries(){
   const t=todayStr(), out=[];
   appState.projects.forEach(p=>p.items.forEach(it=>{
     if(isWaiting(it)){ if(followDue(it)) out.push({p,it}); return; }
-    if(isSnoozed(it)) return;
+    if(isSnoozed(it)||isPaused(it)) return;
     if(!it.dueDate||it.dueDate>t) return;
     if(it.status==='done'&&!(it.completedAt&&ymd(new Date(it.completedAt))===t)) return;
     out.push({p,it});
@@ -1604,6 +1619,7 @@ const todayPending=()=>todayEntries().filter(e=>e.it.status!=='done').length;
 function rangeEntries(mode){
   const t=todayStr(), tm=ymd(addDays(new Date(),1)), end=ymd(addDays(new Date(),6)), out=[];
   appState.projects.forEach(p=>p.items.forEach(it=>{
+    if(isPaused(it)&&!isWaiting(it)) return;
     const d=effDate(it); if(!d) return;
     if(mode==='tomorrow'){ if(d===tm) out.push({p,it}); return; }
     if(d>end) return;
@@ -1668,7 +1684,7 @@ function openCardSheet(sl){
   openSheet(sl.title,[
     {label:'Editar',icon:'pencil',fn:()=>openModal(sl)},
     {sec:'Estado'},
-    ...Object.entries(LABEL).map(([v,l])=>({label:l,icon:v==='done'?'check-circle':v==='review'?'eye':'clock',tick:sl.status===v,fn:()=>setItemStatus(sl,v)})),
+    ...Object.entries(LABEL).map(([v,l])=>({label:l,icon:STATUS_ICON[v],tick:sl.status===v,fn:()=>setItemStatus(sl,v)})),
     {sec:'Fecha límite'},
     ...dateSheetItems(sl.id),
     {sec:'Más'},
@@ -1758,7 +1774,7 @@ function attachTouchReorder(handle,card,sl,p){
 }
 
 /* Kanban en el móvil: columnas en horizontal y arrastre entre columnas con el asa */
-const KB_COLS=[['pending','Pendiente'],['review','En revisión'],['done','Revisada']];
+const KB_COLS=[['pending','En proceso'],['paused','Pausada'],['done','Finalizada']];
 let kbIndex=0;
 function kbBoard(){ const b=$('slides'); return b.classList.contains('kanban-view')?b:null; }
 function kbColWidth(b){ const c=b.querySelector('.kanban-col'); return c?c.getBoundingClientRect().width+10:b.clientWidth; }
@@ -2031,7 +2047,7 @@ function renderBulkBar(){
 /* ================= Tarjetas ================= */
 function createCard(sl,p,ctx){
   const snz=isSnoozed(sl);
-  const card=el('div','slide'+(sl.status==='done'?' done':sl.status==='review'?' review':'')+(selected.has(sl.id)?' selected':'')+(snz?' snoozed':'')+(isWaiting(sl)?' waiting':''));
+  const card=el('div','slide'+(sl.status==='done'?' done':sl.status==='paused'?' paused':'')+(selected.has(sl.id)?' selected':'')+(snz?' snoozed':'')+(isWaiting(sl)?' waiting':''));
   card.dataset.id=sl.id;
   const mobile=isMobile();
   const canDrag=!selectMode&&!mobile, canReorder=!selectMode&&ctx.manual;
@@ -2078,7 +2094,7 @@ function createCard(sl,p,ctx){
     attachKanbanDrag(h,card,sl,p);
   }
   const cb=el('input','done-check'); cb.type='checkbox'; cb.checked=sl.status==='done';
-  cb.title='Marcar como revisada'; cb.setAttribute('aria-label',`Marcar «${sl.title}» como revisada`);
+  cb.title='Marcar como finalizada'; cb.setAttribute('aria-label',`Marcar «${sl.title}» como finalizada`);
   cb.addEventListener('change',()=>setItemStatus(sl,cb.checked?'done':sl.reopenStatus,card));
 
   const content=el('div','slide-content');
@@ -2091,6 +2107,14 @@ function createCard(sl,p,ctx){
   if(snz){
     const zb=badge('snz','clock','Aparece el '+fmtDate(sl.snoozedUntil,true)); zb.title='Repetitiva ya hecha: está oculta hasta ese día'; badges.append(zb);
     badges.append(btn('Mostrar ya','secondary small','Mostrarla ya en el tablero',e=>{ e.stopPropagation(); commit(null,()=>{ const f=findItem(sl.id); if(f) f.it.snoozedUntil=''; }); }));
+  }
+  if(isPaused(sl)){
+    const pb=badge('paused','pause','Pausada'+(sl.pauseNote?': '+sl.pauseNote:''));
+    pb.title=sl.pauseNote?`Pausada: ${sl.pauseNote}`:'Pausada. Pulsa para anotar el motivo';
+    pb.setAttribute('role','button'); pb.tabIndex=0;
+    const f=e=>{ e.stopPropagation(); openModal(sl); setTimeout(()=>$('modPauseNote').focus(),50); };
+    pb.addEventListener('click',f); pb.addEventListener('keydown',e=>{ if(e.key==='Enter') f(e); });
+    badges.append(pb);
   }
   if(isWaiting(sl)){
     const due=followDue(sl);
@@ -2318,7 +2342,7 @@ function renderApp(){
   const nf=[ui.status,ui.tag,ui.priority].filter(Boolean).length+(ui.sort!=='manual'?1:0);
   $('filtersToggleText').textContent=nf?`Filtros (${nf})`:'Filtros';
   $('tbCount').textContent=$('countLabel').textContent;
-  { const t=todayStr(); let n=0; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status!=='done'&&!isSnoozed(it)&&!isWaiting(it)&&(!it.dueDate||it.dueDate<t)) n++; }));
+  { const t=todayStr(); let n=0; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status==='pending'&&!isSnoozed(it)&&!isWaiting(it)&&(!it.dueDate||it.dueDate<t)) n++; }));
     $('planBadge').textContent=n?String(n):''; $('planBadge').title=n?pl(n,'tarea sin fecha o vencida','tareas sin fecha o vencidas'):''; }
   $('filtersToggle').classList.toggle('active',nf>0||document.body.classList.contains('filters-open'));
   renderBulkBar();
@@ -2400,7 +2424,7 @@ function updateRecUI(){
     else{
       const n=computeNext({dueDate:due,recurrence:{...rec,anchor:due}});
       const z=n?snoozeDateFor(ymd(n),rec):'';
-      prev=n?`${rec.fromCompletion?'Si la completas hoy, la':'Al completarla, la'} siguiente vencerá el ${fmtDate(ymd(n),true)}${z?` y estará oculta hasta el ${fmtDate(z,true)}`:''}.`:'Esta es la última repetición: al completarla quedará como revisada y la serie terminará.';
+      prev=n?`${rec.fromCompletion?'Si la completas hoy, la':'Al completarla, la'} siguiente vencerá el ${fmtDate(ymd(n),true)}${z?` y estará oculta hasta el ${fmtDate(z,true)}`:''}.`:'Esta es la última repetición: al completarla quedará como finalizada y la serie terminará.';
     }
   }
   if(rec&&editingHistory.length) prev+=` Completada ${pl(editingHistory.length,'vez','veces')}; la última, el ${new Date(editingHistory[editingHistory.length-1]).toLocaleDateString('es-ES')}.`;
@@ -2461,7 +2485,7 @@ function showMarkdownPreview(){
 }
 function formSignature(){
   return JSON.stringify([$('modTitle').value,$('modProject').value,[...tempItemTags].sort(),$('modPriority').value,$('modDate').value,$('modTime').value,
-    $('modReminder').value,$('modLink').value,$('modNotes').value,$('modNewSubtask').value,tempSubtasks,recFromForm(),$('modWaitFor').value,$('modFollowUp').value]);
+    $('modReminder').value,$('modLink').value,$('modNotes').value,$('modNewSubtask').value,tempSubtasks,recFromForm(),$('modWaitFor').value,$('modFollowUp').value,$('modStatus').value,$('modPauseNote').value]);
 }
 function openModal(item=null){
   if($('itemModal').open) return;
@@ -2474,15 +2498,17 @@ function openModal(item=null){
     $('modReminder').value=item.reminder; $('modLink').value=item.link; $('modNotes').value=item.notes;
     tempSubtasks=clone(item.subtasks); editingRecOcc=item.recurrence?item.recurrence.occurrence:1; editingHistory=item.history;
     $('modWaitFor').value=item.waitingFor; $('modFollowUp').value=item.followUp;
+    $('modStatus').value=item.status; $('modPauseNote').value=item.pauseNote||'';
     recToForm(item.recurrence,item.dueDate);
   } else {
     editingItemId=null; $('modalTitle').textContent='Nuevo elemento';
-    ['modTitle','modDate','modTime','modLink','modNotes','modWaitFor','modFollowUp'].forEach(id=>$(id).value='');
+    ['modTitle','modDate','modTime','modLink','modNotes','modWaitFor','modFollowUp','modPauseNote'].forEach(id=>$(id).value='');
+    $('modStatus').value='pending';
     if(['today','tomorrow','week'].includes(ui.mode)) $('modDate').value=ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):todayStr();
     tempItemTags=ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
     tempSubtasks=[]; editingRecOcc=1; editingHistory=[]; recToForm(null,$('modDate').value);
   }
-  fillWaitPeople(); $('modNewSubtask').value='';
+  fillWaitPeople(); $('pauseField').hidden=$('modStatus').value!=='paused'; $('modNewSubtask').value='';
   $('recBox').open=!!(item&&item.recurrence);
   $('modTime').disabled=$('modReminder').disabled=!$('modDate').value;
   renderDateChips(); renderTagPicker(); renderTempSubtasks(); showMarkdownEdit(); updateRecUI();
@@ -2508,7 +2534,9 @@ function saveModal(){
   const fields={title,tags:appState.tags.filter(t=>tempItemTags.includes(t.id)).map(t=>t.id),priority:$('modPriority').value,dueDate:due,dueTime:due?$('modTime').value:'',
     reminder:due?$('modReminder').value:'none',link,notes:$('modNotes').value,
     subtasks:clone(tempSubtasks).filter(s=>s.title.trim()),recurrence:rec,
-    waitingFor:$('modWaitFor').value.trim().slice(0,80),followUp:$('modWaitFor').value.trim()?$('modFollowUp').value:''};
+    waitingFor:$('modWaitFor').value.trim().slice(0,80),followUp:$('modWaitFor').value.trim()?$('modFollowUp').value:'',
+    pauseNote:$('modStatus').value==='paused'?$('modPauseNote').value.trim().slice(0,120):''};
+  const newStatus=$('modStatus').value;
   const dst=appState.projects.find(p=>p.id===$('modProject').value)||currentProject(), editing=editingItemId;
   $('itemModal').close();
   commit(null,()=>{
@@ -2523,10 +2551,13 @@ function saveModal(){
       if(!rec) sl.snoozedUntil='';
       else if(wasSnoozed) sl.snoozedUntil=snoozeDateFor(sl.dueDate,rec);
       if(dateChanged&&!wasSnoozed) sl.snoozedUntil='';
+      let spawn=null;
+      if(sl.status!==newStatus) spawn=applyStatus(sl,src,newStatus);
+      if(newStatus==='paused') sl.pauseNote=fields.pauseNote;
       if(dst!==src){ src.items=src.items.filter(i=>i!==sl); dst.items.push(sl); return `✅ Guardado y movido a «${dst.name}»`; }
-      return '✅ Cambios guardados';
+      return spawn?spawnMsg(spawn):'✅ Cambios guardados';
     }
-    dst.items.push(normalizeItem({...fields,status:'pending'}));
+    dst.items.push(normalizeItem({...fields,status:newStatus}));
     return isDayView()||dst.id===appState.activeId?'✅ Elemento creado':`✅ Elemento creado en «${dst.name}»`;
   });
 }
@@ -2698,7 +2729,7 @@ function parseQuick(text,ignored=new Set()){
   return res;
 }
 
-/* ---- Archivo: las revisadas se apartan pasados unos días; se avisa para revisarlas pasados unos meses ---- */
+/* ---- Archivo: las finalizadas se apartan pasados unos días; se avisa para revisarlas pasados unos meses ---- */
 const ARCH_REVIEW_TXT={'1':'un mes','3':'tres meses','6':'seis meses'};
 let archiveRanOn='';
 function archiveItems(ids){
@@ -2712,7 +2743,7 @@ function autoArchive(force=false){
   const days=appState.settings.archiveDays, lim=Date.now()-days*DAY_MS, ids=[];
   appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status==='done'&&it.completedAt&&Date.parse(it.completedAt)<=lim) ids.push(it.id); }));
   if(!ids.length) return;
-  commit(null,()=>{ const n=archiveItems(ids); return n?`📦 ${pl(n,'tarea revisada archivada','tareas revisadas archivadas')} (${n===1?'hecha':'hechas'} hace más de ${pl(days,'día','días')})`:false; });
+  commit(null,()=>{ const n=archiveItems(ids); return n?`📦 ${pl(n,'tarea finalizada archivada','tareas finalizadas archivadas')} (${n===1?'hecha':'hechas'} hace más de ${pl(days,'día','días')})`:false; });
 }
 function archivePending(){
   const m=+appState.settings.archiveReview; if(!m) return [];
@@ -2812,9 +2843,9 @@ function renderArchive(){
   const pend=new Set(archivePending().map(a=>a.item.id));
   const all=[...appState.archive].sort((a,b)=>b.archivedAt.localeCompare(a.archivedAt)).filter(a=>archMatches(a,words));
   $('archSummary').textContent=appState.archive.length
-    ?`${pl(appState.archive.length,'tarea archivada','tareas archivadas')}. Se archivan las revisadas a los ${pl(appState.settings.archiveDays,'día','días')}.`
+    ?`${pl(appState.archive.length,'tarea archivada','tareas archivadas')}. Se archivan las finalizadas a los ${pl(appState.settings.archiveDays,'día','días')}.`
     :'';
-  if(!all.length){ body.append(appState.archive.length?emptyState('Nada coincide con la búsqueda','Prueba con otras palabras.'):emptyState('El archivo está vacío',`Las tareas revisadas se archivan solas a los ${pl(appState.settings.archiveDays,'día','días')}.`)); return; }
+  if(!all.length){ body.append(appState.archive.length?emptyState('Nada coincide con la búsqueda','Prueba con otras palabras.'):emptyState('El archivo está vacío',`Las tareas finalizadas se archivan solas a los ${pl(appState.settings.archiveDays,'día','días')}.`)); return; }
   const p=all.filter(a=>pend.has(a.item.id)), rest=all.filter(a=>!pend.has(a.item.id));
   if(p.length){
     const sec=el('section','arch-sec pending');
@@ -2971,7 +3002,7 @@ function planCandidates(){
   const projs=scope==='all'?appState.projects:[currentProject()];
   const out=[];
   projs.forEach(p=>p.items.forEach(it=>{
-    if(it.status==='done'||isSnoozed(it)||isWaiting(it)) return;
+    if(it.status==='done'||isSnoozed(it)||isWaiting(it)||isPaused(it)) return;
     if(which==='unplanned'&&it.dueDate&&it.dueDate>=t) return;
     out.push({pid:p.id,id:it.id,due:it.dueDate,w:PRIO_WEIGHT[it.priority]});
   }));
@@ -3077,7 +3108,7 @@ function renderPlanner(){
   if(it.priority!=='normal') meta.append(el('span','prio prio-'+it.priority,PRIO_LABEL[it.priority]));
   if(it.dueDate) meta.append(dateBadge(it)); else meta.append(badge('','inbox','Sin fecha'));
   if(it.recurrence) meta.append(badge('rec','repeat',REC_FREQ[it.recurrence.freq]));
-  if(it.status==='review') meta.append(badge('','eye','En revisión'));
+  if(it.status==='paused') meta.append(badge('paused','pause','Pausada'+(it.pauseNote?': '+it.pauseNote:'')));
   appState.tags.filter(t=>it.tags.includes(t.id)).forEach(t=>{ const tb=el('span','tag-badge'); if(t.emoji) tb.append(document.createTextNode(t.emoji+' ')); else tb.append(el('span','tag-dot')); tb.append(document.createTextNode(t.name)); tb.style.backgroundColor=t.bg; tb.style.color=t.text; tb.style.cursor='default'; meta.append(tb); });
   card.append(meta);
   if(it.notes.trim()){ let txt=it.notes; if(txt.length>220) txt=txt.slice(0,220).replace(/\s+\S*$/,'')+'…'; const n=el('div','plan-notes'); n.innerHTML=parseMD(txt); card.append(n); }
@@ -3098,7 +3129,7 @@ function renderPlanner(){
   const left=el('div','row'), right=el('div','row');
   const nd=btn('Quitar fecha','secondary small',null,()=>planAct('none'),'x'); nd.disabled=!it.dueDate;
   left.append(nd);
-  right.append(btn('Hecha','done-btn small','Marcar como revisada (H)',()=>planAct('done'),'check'),btn('Abrir ficha','ghost small',null,()=>{ $('planModal').close(); openModal(it); },'pencil'));
+  right.append(btn('Hecha','done-btn small','Marcar como finalizada (H)',()=>planAct('done'),'check'),btn('Abrir ficha','ghost small',null,()=>{ $('planModal').close(); openModal(it); },'pencil'));
   sec.append(left,right);
   body.append(sec);
 }
@@ -3192,7 +3223,7 @@ function whenText(it){
 function checkReminders(){
   const now=Date.now(), fired=[];
   appState.projects.forEach(p=>p.items.forEach(it=>{
-    if(it.status==='done'||it.reminder==='none'||!it.dueDate||isWaiting(it)) return;
+    if(it.status==='done'||it.reminder==='none'||!it.dueDate||isWaiting(it)||isPaused(it)) return;
     const d=parseYMD(it.dueDate); if(!d) return;
     const [hh,mm]=(it.dueTime||appState.settings.defaultHour).split(':').map(Number);
     const due=new Date(d.getFullYear(),d.getMonth(),d.getDate(),hh,mm).getTime();
@@ -3315,6 +3346,7 @@ $('weekBtn').addEventListener('click',()=>switchToView('week'));
 $('waitingBtn').addEventListener('click',()=>switchToView('waiting'));
 ['waitCloseBtn','waitCancelBtn'].forEach(id=>$(id).addEventListener('click',()=>$('waitModal').close()));
 $('waitSaveBtn').addEventListener('click',saveWait);
+$('modStatus').addEventListener('change',()=>{ $('pauseField').hidden=$('modStatus').value!=='paused'; });
 $('waitClearBtn').addEventListener('click',()=>{ const id=waitCtx&&waitCtx.id; $('waitModal').close(); if(id) clearWaiting(id); });
 $('waitDate').addEventListener('change',renderWaitChips);
 $('waitModal').addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.tagName==='INPUT'){ e.preventDefault(); saveWait(); } });
