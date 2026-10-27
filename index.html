@@ -1255,7 +1255,7 @@ const DEFAULT_TAGS=[
   {id:'t4',name:'Revisión',emoji:'',bg:'#fef7e0',text:'#8a5a00'}
 ];
 /* Los mensajes que empiezan por estos símbolos se muestran con el icono correspondiente */
-const TOAST_ICON={'🗑️':'trash','✅':'check-circle','🔁':'repeat','⏰':'bell','💾':'save','⇄':'move','⧉':'copy','🏷️':'tag','📥':'upload','📁':'folder','↩️':'undo','📲':'monitor-down','📅':'calendar','📦':'archive','⏳':'hourglass'};
+const TOAST_ICON={'🗑️':'trash','✅':'check-circle','🔁':'repeat','⏰':'bell','💾':'save','⇄':'move','⧉':'copy','🏷️':'tag','📥':'upload','📁':'folder','↩️':'undo','📲':'monitor-down','📅':'calendar','📦':'archive','⏳':'hourglass','⏸️':'pause','▶️':'play'};
 
 /* ================= Utilidades ================= */
 const $=id=>document.getElementById(id);
@@ -1769,8 +1769,16 @@ function applyStatus(item,p,v){
 const spawnMsg=s=>s.snoozedUntil
   ?`🔁 Hecha. Volverá a aparecer el ${fmtDate(s.snoozedUntil,true)} (vence el ${fmtDate(s.dueDate,true)})`
   :`🔁 Hecha. Siguiente repetición: vence el ${fmtDate(s.dueDate,true)}`;
+/* Aviso por defecto al cambiar de estado (siempre con «Deshacer»: en «Hoy» la tarea desaparece al instante) */
+function statusMsg(sl,v){
+  const t=`«${short(sl.title)}»`;
+  if(v==='done') return `✅ ${t} hecha`;
+  if(sl.status==='done') return `↩️ ${t} vuelve a ${LABEL[v].toLowerCase()}`;
+  return v==='paused'?`⏸️ ${t} pausada`:`▶️ ${t} en proceso`;
+}
 function setItemStatus(sl,v,card,msg){
   if(sl.status===v) return;
+  if(!msg) msg=statusMsg(sl,v);
   const run=()=>commit(null,()=>{
     const f=findItem(sl.id); if(!f) return false;
     const s=applyStatus(f.it,f.p,v); return s?spawnMsg(s):msg;
@@ -2501,7 +2509,10 @@ function renderApp(){
   } else if(td){
     const all=viewEntries(ui.mode);
     renderHeader(all.map(e=>e.it));
-    const vis=all.filter(e=>matches(e.it,w));
+    /* En «Hoy» las finalizadas desaparecen al momento (siguen contando en «X de Y hechas hoy»);
+       solo se ven si se filtra por «Finalizada» */
+    const pool=ui.mode==='today'&&ui.status!=='done'?all.filter(e=>e.it.status!=='done'):all;
+    const vis=pool.filter(e=>matches(e.it,w));
     if(s) vis.sort((a,b)=>s(a.it,b.it));
     else if(ui.mode!=='today') vis.sort((a,b)=>(PRIO_WEIGHT[b.it.priority]-PRIO_WEIGHT[a.it.priority])||(a.it.dueTime||'99').localeCompare(b.it.dueTime||'99'));
     lastVisibleIds=vis.map(e=>e.it.id);
@@ -2528,13 +2539,14 @@ function renderApp(){
       }
     }
     $('listHeaderTitle').textContent='Tareas de todos los proyectos';
-    $('countLabel').textContent=pl(vis.length,'tarea','tareas')+(isFiltered()?` (de ${all.length})`:'');
+    $('countLabel').textContent=pl(vis.length,'tarea','tareas')+(isFiltered()?` (de ${pool.length})`:'');
     list.className='list-view';
     const emptyMsg={today:['No tienes nada para hoy','No hay tareas con fecha de hoy ni vencidas. Usa «Planificar» para repartir el trabajo.'],
       tomorrow:['No tienes nada para mañana','Ninguna tarea vence mañana.'],
       week:['Semana despejada','No hay tareas vencidas ni con fecha en los próximos 7 días.'],
       waiting:['No esperas a nadie','Cuando una tarea dependa de otra persona, ábrela y rellena «En espera de».']}[ui.mode];
-    if(!vis.length) list.append(all.length?emptyState('Nada coincide en esta vista',searchWords().length?'Mira abajo si aparece en otros proyectos o en el archivo.':'Prueba a pulsar «Limpiar».'):emptyState(...emptyMsg));
+    if(!vis.length&&!pool.length&&all.length) list.append(emptyState('Todo hecho por hoy',`Has terminado ${pl(all.length,'tarea','tareas')} de hoy.`));
+    else if(!vis.length) list.append(pool.length?emptyState('Nada coincide en esta vista',searchWords().length?'Mira abajo si aparece en otros proyectos o en el archivo.':'Prueba a pulsar «Limpiar».'):emptyState(...emptyMsg));
     groups.forEach(g=>{
       if(!g.items.length) return;
       const h=el('div','group-title '+g.cls); h.append(ic(g.icon,'sm'),document.createTextNode(g.title+' '),el('span','n',`(${g.items.length})`));
