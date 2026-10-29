@@ -339,6 +339,64 @@ dialog::backdrop{background:rgba(18,26,44,.5);backdrop-filter:blur(3px)}
 .modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
 .modal-header h2{font-size:1.2rem;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
 .modal-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;border-top:1px solid var(--line);padding-top:16px}
+/* Comentarios de la tarea (en el móvil: sección plegable al final de la ficha; en el PC: panel a la derecha) */
+.cm-pane{position:relative;margin-top:18px;border-top:1px solid var(--line);padding-top:8px}
+.cm-toggle{display:flex;align-items:center;justify-content:flex-start;gap:8px;width:100%;background:transparent;color:var(--ink);font-weight:600;font-size:.95rem;padding:10px 6px;border-radius:10px;border:0}
+.cm-toggle:hover{background:var(--hover)}
+.cm-count{min-width:22px;padding:1px 7px;border-radius:99px;background:var(--chip);color:var(--chip-ink);font-size:.78rem;font-weight:600;text-align:center}
+.cm-count:empty{display:none}
+.cm-chev{margin-left:auto;transition:transform .15s;color:var(--muted)}
+.cm-pane.open .cm-chev{transform:rotate(90deg)}
+.cm-pane:not(.open) .cm-body{display:none}
+.cm-list{list-style:none;margin:0;padding:4px 0;display:flex;flex-direction:column;gap:10px}
+.cm-empty{color:var(--faint);font-size:.88rem;text-align:center;padding:16px 8px}
+.cm-item{background:var(--subtle);border:1px solid var(--subtle-line);border-radius:12px;padding:8px 12px 10px;min-width:0}
+.cm-item.mail{border-left:3px solid var(--accent)}
+.cm-item.editing{border-color:var(--accent-line)}
+.cm-head{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted);min-height:26px}
+.cm-head .ic{color:var(--accent)}
+.cm-when{font-weight:600;color:var(--ink-2)}
+.cm-edited{font-style:italic;color:var(--faint)}
+.cm-tools{margin-left:auto;display:flex;gap:2px}
+.cm-tools button.small.icon{width:26px;height:26px}
+@media(hover:hover){.cm-item:not(:hover):not(:focus-within) .cm-tools{opacity:0}}
+.cm-text{margin-top:2px;font-size:.92rem;line-height:1.45;overflow-wrap:anywhere}
+.cm-subj{font-weight:600;font-size:.92rem;margin-top:2px;overflow-wrap:anywhere}
+.cm-meta{font-size:.8rem;color:var(--muted);margin-top:3px;overflow-wrap:anywhere}
+.cm-meta b{font-weight:600;color:var(--ink-2)}
+.cm-atts{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.cm-att{display:inline-flex;align-items:center;gap:4px;font-size:.76rem;background:var(--chip);color:var(--chip-ink);border-radius:6px;padding:2px 7px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-body-txt{white-space:pre-wrap;font-size:.86rem;line-height:1.45;margin-top:6px;overflow-wrap:anywhere;color:var(--ink-2)}
+.cm-body-txt.clamped{display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.cm-more{background:transparent;border:0;color:var(--accent-ink);font-weight:600;font-size:.82rem;padding:4px 0 0}
+.cm-more:hover{text-decoration:underline;background:transparent}
+.cm-edit textarea,#cmInput{min-height:60px;font-family:inherit;font-size:.92rem;resize:vertical}
+.cm-edit-bar{display:flex;justify-content:flex-end;gap:6px;margin-top:6px}
+.cm-compose{margin-top:10px}
+.cm-compose-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px}
+.cm-drop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--accent-soft);border:2px dashed var(--accent);border-radius:12px;color:var(--accent-ink);font-weight:600;text-align:center;padding:20px;z-index:3;pointer-events:none}
+.cm-drop[hidden]{display:none}
+.badge.cm-badge{cursor:pointer}
+@media(min-width:761px){
+  #itemModal{padding:0;overflow:hidden;max-width:1080px}
+  #itemModal[open]{display:flex;align-items:stretch}
+  #itemModal:not(.cm-open){max-width:772px}
+  .item-main{flex:1 1 auto;min-width:0;overflow-y:auto;overflow-x:hidden;padding:22px 24px}
+  .cm-pane{flex:0 0 360px;width:360px;margin:0;padding:0;border-top:0;border-left:1px solid var(--line);background:var(--subtle);display:flex;flex-direction:column;min-height:0}
+  .cm-toggle{flex:none;border-radius:0;padding:20px 16px 14px;border-bottom:1px solid var(--line);font-size:1rem}
+  .cm-toggle:hover{background:var(--hover)}
+  .cm-pane.open .cm-chev{transform:none}
+  .cm-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+  .cm-list{flex:1 1 auto;min-height:0;overflow-y:auto;padding:14px}
+  .cm-item{background:var(--panel);border-color:var(--line)}
+  .cm-compose{margin:0;padding:12px 14px 14px;border-top:1px solid var(--line);background:var(--panel)}
+  .cm-pane:not(.open){flex-basis:52px;width:52px}
+  .cm-pane:not(.open) .cm-toggle{flex:1 1 auto;flex-direction:column;justify-content:flex-start;align-items:center;gap:12px;padding:22px 0;border-bottom:0}
+  .cm-pane:not(.open) .cm-ttl{writing-mode:vertical-rl;transform:rotate(180deg);font-size:.92rem}
+  .cm-pane:not(.open) .cm-chev{margin:0;order:-2;transform:rotate(180deg)}
+  .cm-pane:not(.open) .cm-toggle>.ic:first-child,.cm-pane:not(.open) .cm-count{order:-1}
+}
+@media(min-width:761px) and (max-width:1100px){.cm-pane.open{flex-basis:300px;width:300px}}
 .field{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;margin:16px 0}
 .field>label,.field>.flabel{font-weight:600;font-size:.9rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .grid-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0 4px}
@@ -680,6 +738,9 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3v18l14-9z"/></symbol>
   <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+  <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+  <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></symbol>
   <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/></symbol>
   <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol>
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
@@ -890,6 +951,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
 
 <!-- Ficha de elemento -->
 <dialog id="itemModal" aria-labelledby="modalTitle">
+ <div class="item-main" id="itemMain">
   <div class="modal-header">
     <h2 id="modalTitle">Nuevo elemento</h2>
     <button type="button" class="ghost icon" id="modalCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
@@ -1003,6 +1065,25 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
       <button type="button" id="modSaveBtn"><svg class="ic sm"><use href="#i-check"/></svg>Guardar</button>
     </div>
   </div>
+ </div>
+ <!-- Comentarios: panel a la derecha en el PC; sección plegable al final de la ficha en el móvil -->
+ <aside id="cmPane" class="cm-pane" aria-label="Comentarios">
+   <button type="button" id="cmToggle" class="cm-toggle" aria-expanded="true" aria-controls="cmBody" title="Mostrar u ocultar los comentarios">
+     <svg class="ic"><use href="#i-message"/></svg><span class="cm-ttl">Comentarios</span><span id="cmCount" class="cm-count"></span><svg class="ic sm cm-chev"><use href="#i-chev-right"/></svg>
+   </button>
+   <div class="cm-body" id="cmBody">
+     <ol id="cmList" class="cm-list" aria-live="polite"></ol>
+     <div class="cm-compose">
+       <textarea id="cmInput" rows="2" placeholder="Escribe un comentario" aria-label="Nuevo comentario"></textarea>
+       <div class="cm-compose-bar">
+         <button type="button" class="ghost small" id="cmMailBtn" title="Añadir un correo (.msg o .eml)"><svg class="ic sm"><use href="#i-mail"/></svg>Correo</button>
+         <input type="file" id="cmFile" accept=".msg,.eml,message/rfc822" multiple hidden>
+         <button type="button" class="small" id="cmSendBtn"><svg class="ic sm"><use href="#i-send"/></svg>Comentar</button>
+       </div>
+     </div>
+   </div>
+   <div class="cm-drop" id="cmDrop" hidden><svg class="ic"><use href="#i-mail"/></svg>Suelta el correo para añadirlo como comentario</div>
+ </aside>
 </dialog>
 
 <!-- Planificador -->
@@ -1194,6 +1275,8 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <div class="help-body"><p>Escribe la tarea en el campo de arriba (en el móvil, con el botón <strong>+</strong>) y pulsa <kbd>Intro</kbd>. Lo que reconozca aparece debajo; pulsa la <strong>×</strong> de una ficha si no quieres que lo interprete.</p><ul><li><strong>Fecha:</strong> hoy, mañana, pasado mañana, el lunes, el próximo viernes, la semana que viene, el mes que viene, fin de semana, fin de mes, en 3 días, dentro de 2 semanas, el día 15, 15/11, 3 de diciembre, 25 oct.</li><li><strong>Hora:</strong> a las 10, a las 9:30, 17h, a las 5 de la tarde, esta tarde, mañana por la mañana, a mediodía. Con hora, la tarea avisa a esa hora.</li><li><strong>Repetición:</strong> cada día, cada lunes y jueves, días laborables, cada semana, cada mes el día 6, el día 6 de cada mes, cada 2 semanas, cada año.</li><li><strong>Proyecto:</strong> <code>#Trabajo</code> (sin el emoji; vale la primera palabra si no hay duda).</li><li><strong>Etiqueta:</strong> <code>@Revisión</code>. Si no existe, se crea.</li><li><strong>Prioridad:</strong> <code>!alta</code>, <code>!urgente</code>, o <code>!!</code> (alta) y <code>!!!</code> (urgente).</li><li>Ejemplo: «Informe provincial mañana a las 10 #Trabajo !alta @Revisión».</li><li><kbd>Mayús</kbd>+<kbd>Intro</kbd> o «Ficha» abren la ficha completa con lo que hayas escrito. Tecla <kbd>Q</kbd> para ir al campo.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-mail"/></svg>Correos a tareas (ordenador)<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Arrastra un correo de Outlook</strong> a la ventana de la app y suéltalo: se abre la ficha con el asunto como título y, en las notas, el remitente, la fecha, los destinatarios, los nombres de los adjuntos y el texto. Elige fecha y proyecto y guarda.</li><li>Si sueltas varios correos a la vez, se crean directamente en el proyecto en el que estás.</li><li>También vale un archivo <strong>.eml</strong> (por ejemplo, un correo guardado desde el nuevo Outlook o desde el navegador).</li><li><strong>Copiar con remitente y fecha</strong>: abre el correo, pulsa «Reenviar», haz clic en el texto, <kbd>Ctrl</kbd>+<kbd>A</kbd> y <kbd>Ctrl</kbd>+<kbd>C</kbd>, descarta el reenvío y pega en la app. El bloque «De / Enviado / Para / Asunto» que añade Outlook se reconoce aunque tu firma vaya delante.</li><li><strong>Pegar</strong>: copia el texto de un correo (con sus líneas «De:», «Enviado:», «Asunto:», o sin ellas) y pulsa <kbd>Ctrl</kbd>+<kbd>V</kbd> en la app, fuera de cualquier campo, o pégalo en «Añadir tarea». Un texto de una sola línea se queda en «Añadir tarea» como siempre.</li><li>Se quitan los «RE:», «RV:» y «FW:» del asunto. Los adjuntos no se guardan (solo sus nombres) y el texto muy largo se recorta.</li><li>El correo no sale de tu ordenador: todo se lee dentro de la app.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-message"/></svg>Comentarios de una tarea<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Cada ficha tiene <strong>Comentarios</strong>, como una conversación: cada uno va aparte, con su fecha y hora, del más antiguo al más reciente. En el ordenador están en un panel a la derecha de la ficha; en el móvil, al final de la ficha.</li><li>Pulsa el título «Comentarios» para desplegar u ocultar el panel. La app recuerda cómo lo dejaste.</li><li>Escribe y pulsa <kbd>Intro</kbd> o «Comentar» (<kbd>Mayús</kbd>+<kbd>Intro</kbd> para cambiar de línea). Se guarda en el momento, sin pulsar «Guardar» en la ficha.</li><li><strong>Correos</strong>: arrastra un correo de Outlook (o un archivo .eml) y suéltalo sobre la ficha abierta, o pulsa «Correo» para elegir el archivo. Queda como un comentario con el asunto, el remitente, los destinatarios, los nombres de los adjuntos y el texto, en la fecha en que se envió.</li><li>También puedes pegar un correo copiado (con sus líneas «De:», «Enviado:», «Asunto:») en el campo de comentario vacío, o con <kbd>Ctrl</kbd>+<kbd>V</kbd> en la ficha, fuera de los campos.</li><li>Con el lápiz editas un comentario (en los correos, su texto, por ejemplo para quitar el historial citado) y con la papelera lo borras.</li><li>Las tarjetas con comentarios muestran su número; púlsalo para abrir la ficha con el panel desplegado. El buscador también busca en los comentarios.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Cuando una tarea dependa de otra persona, pulsa el reloj de arena de la tarjeta (en el móvil, «⋯» → «Poner en espera…») o rellena «En espera de» en la ficha.</li><li>Indica de quién y cuándo reclamar. La tarea sale de Hoy, Mañana, Próximos 7 días y del planificador hasta ese día.</li><li>Ese día vuelve a «Hoy», en «Para reclamar», y recibes un aviso a la «Hora del aviso en tareas sin hora».</li><li>La vista <strong>En espera</strong> de la barra lateral las reúne por persona. Cuando te contesten, «Ya ha respondido».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1363,6 +1446,27 @@ function normalizeRec(r){
 }
 /* Fecha de última modificación de datos antiguos (sin updatedAt): la más reciente que se conozca */
 function legacyStamp(...c){ const v=c.filter(validIso).map(x=>new Date(x).toISOString()).sort(); return v.length?v[v.length-1]:''; }
+/* Comentarios de una tarea: {id, at, text, editedAt, mail:null|{subject,from,to,cc,date,dateText,attachments[]}, updatedAt} */
+const CM_MAX=20000;
+function normalizeComment(c,fallbackAt){
+  if(!c||typeof c!=='object') return null;
+  const s=(v,n)=>typeof v==='string'?v.slice(0,n):'';
+  let mail=null;
+  if(c.mail&&typeof c.mail==='object'){
+    const m=c.mail;
+    mail={subject:s(m.subject,500),from:s(m.from,300),to:s(m.to,2000),cc:s(m.cc,2000),date:validIso(m.date)?new Date(m.date).toISOString():'',dateText:s(m.dateText,100),
+      attachments:Array.isArray(m.attachments)?m.attachments.filter(a=>typeof a==='string'&&a.trim()).map(a=>a.trim().slice(0,200)).slice(0,50):[]};
+  }
+  const text=s(c.text,CM_MAX);
+  if(!text.trim()&&!mail) return null;
+  return {id:typeof c.id==='string'&&c.id?c.id:newId(),at:validIso(c.at)?c.at:(validIso(fallbackAt)?fallbackAt:new Date().toISOString()),
+    text,editedAt:validIso(c.editedAt)?c.editedAt:'',mail,updatedAt:validIso(c.updatedAt)?c.updatedAt:''};
+}
+const byAt=(a,b)=>(Date.parse(a.at)||0)-(Date.parse(b.at)||0);
+function normalizeComments(list,fallbackAt){
+  const seen=new Set();
+  return (Array.isArray(list)?list:[]).map(c=>normalizeComment(c,fallbackAt)).filter(c=>{ if(!c) return false; if(seen.has(c.id)) c.id=newId(); seen.add(c.id); return true; }).sort(byAt).slice(-500);
+}
 function normalizeItem(raw){
   const it=raw&&typeof raw==='object'?raw:{};
   const status=it.status==='review'?'paused':LABEL[it.status]?it.status:'pending';
@@ -1382,6 +1486,7 @@ function normalizeItem(raw){
     reopenStatus:it.reopenStatus==='review'||it.reopenStatus==='paused'?'paused':'pending',
     pauseNote:status==='paused'&&typeof it.pauseNote==='string'?it.pauseNote.trim().slice(0,120):'',
     subtasks:Array.isArray(it.subtasks)?it.subtasks.filter(s=>s&&typeof s==='object').map(s=>({id:typeof s.id==='string'&&s.id?s.id:newId(),title:String(s.title??''),done:!!s.done})):[],
+    comments:normalizeComments(it.comments,it.createdAt),
     recurrence:normalizeRec(it.recurrence),
     snoozedUntil:parseYMD(it.snoozedUntil)&&status!=='done'?it.snoozedUntil:'',
     history:Array.isArray(it.history)?it.history.filter(validIso).slice(-200):[],
@@ -1417,14 +1522,15 @@ function normalizeState(x){
     .filter(t=>t&&typeof t==='object'&&String(t.name||'').trim())
     .map(t=>{ let id=String(t.id||''); if(!id||seenTag.has(id)) id=newId(); seenTag.add(id);
       return {id,name:String(t.name).trim(),emoji:String(t.emoji??'').trim(),bg:isHex(t.bg)?t.bg:'#e2e6f0',text:isHex(t.text)?t.text:'#3b465c',updatedAt:validIso(t.updatedAt)?t.updatedAt:''}; });
-  const seen=new Set();
+  const seen=new Set(), seenCm=new Set();
+  const uniqCm=it=>it.comments.forEach(c=>{ if(seenCm.has(c.id)) c.id=newId(); seenCm.add(c.id); });
   const projects=x.projects.filter(p=>p&&typeof p==='object').map(p=>{
     let pid=String(p.id||''); if(!pid||seen.has(pid)) pid=newId(); seen.add(pid);
     const rawItems=Array.isArray(p.items)?p.items:Array.isArray(p.slides)?p.slides:[];
     const items=rawItems.map(raw=>{
       const it=normalizeItem(raw);
       if(seen.has(it.id)) it.id=newId();
-      seen.add(it.id);
+      seen.add(it.id); uniqCm(it);
       it.tags=[...new Set(it.tags.map(v=>{ const t=tags.find(t=>t.id===v)||tags.find(t=>t.name===v); return t?t.id:''; }).filter(Boolean))];
       return it;
     });
@@ -1434,7 +1540,7 @@ function normalizeState(x){
   const archive=(Array.isArray(x.archive)?x.archive:[]).filter(a=>a&&typeof a==='object'&&a.item&&typeof a.item==='object').map(a=>{
     const it=normalizeItem({...a.item,status:'done'});
     if(seen.has(it.id)) it.id=newId();
-    seen.add(it.id);
+    seen.add(it.id); uniqCm(it);
     it.tags=[...new Set(it.tags.map(v=>{ const t=tags.find(t=>t.id===v); return t?t.id:''; }).filter(Boolean))];
     const archivedAt=validIso(a.archivedAt)?a.archivedAt:new Date().toISOString(), reviewedAt=validIso(a.reviewedAt)?a.reviewedAt:'';
     return {item:it,pid:String(a.pid||''),pname:String(a.pname||'Sin título'),archivedAt,reviewedAt,updatedAt:validIso(a.updatedAt)?a.updatedAt:legacyStamp(archivedAt,reviewedAt)};
@@ -1461,7 +1567,7 @@ function loadLegacy(){
   return null;
 }
 function loadUI(){
-  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month'};
+  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
@@ -1474,6 +1580,7 @@ function loadUI(){
       d.showScheduled=u.showScheduled===true;
       if(['auto','light','dark'].includes(u.theme)) d.theme=u.theme;
       d.sideCollapsed=u.sideCollapsed===true;
+      d.cmOpen=u.cmOpen!==false;
     }
   }catch(e){}
   if(!LABEL[d.status]) d.status='';
@@ -1579,12 +1686,14 @@ function indexState(st){
   const m=new Map();
   st.projects.forEach(p=>{
     m.set(p.id,{ref:p,sig:'P'+p.name});
-    p.items.forEach(it=>m.set(it.id,{ref:it,sig:'T'+p.id+'|'+itemSig(it)}));
+    p.items.forEach(it=>{ m.set(it.id,{ref:it,sig:'T'+p.id+'|'+itemSig(it)}); indexComments(m,it); });
   });
   st.tags.forEach(t=>m.set('tag:'+t.id,{ref:t,sig:'G'+JSON.stringify([t.name,t.emoji,t.bg,t.text])}));
-  st.archive.forEach(a=>m.set(a.item.id,{ref:a,sig:'A'+JSON.stringify([a.pid,a.pname,a.archivedAt,a.reviewedAt])+itemSig(a.item)}));
+  st.archive.forEach(a=>{ m.set(a.item.id,{ref:a,sig:'A'+JSON.stringify([a.pid,a.pname,a.archivedAt,a.reviewedAt])+itemSig(a.item)}); indexComments(m,a.item); });
   return m;
 }
+/* Cada comentario lleva su propio updatedAt y su borrado se anota (cm:id): así se fusionan uno a uno entre dispositivos */
+function indexComments(m,it){ (it.comments||[]).forEach(c=>m.set('cm:'+c.id,{ref:c,sig:'C'+itemSig(c)})); }
 const sigsOf=idx=>{ const m=new Map(); idx.forEach((e,k)=>m.set(k,e.sig)); return m; };
 let baseSigs=new Map();
 function stampChanges(st){
@@ -1612,7 +1721,7 @@ function fingerprint(st){
 /* ================= Estado ================= */
 let appState=blankState();
 const ui=loadUI();
-let editingItemId=null, tempSubtasks=[], tempTags=[], tempItemTags=[], modalInitial='';
+let editingItemId=null, tempSubtasks=[], tempTags=[], tempItemTags=[], tempComments=[], cmEditId=null, modalInitial='';
 let recDays=[], recDirty=false, editingRecOcc=1, editingHistory=[];
 let drag={kind:null,id:null};
 let stDragIdx=null;
@@ -1838,6 +1947,7 @@ function duplicateItems(ids,targetId,reset){
   const set=new Set(ids), copies=[];
   appState.projects.forEach(p=>p.items.filter(i=>set.has(i.id)).forEach(i=>{
     const c=clone(i); c.id=newId(); c.subtasks.forEach(s=>s.id=newId());
+    c.comments=reset?[]:c.comments.map(x=>({...x,id:newId()}));
     c.notified=''; c.history=[]; c.snoozedUntil=''; c.createdAt=new Date().toISOString();
     if(p===dst) c.title+=' (copia)';
     if(reset){ c.status='pending'; c.reopenStatus='pending'; c.completedAt=''; c.subtasks.forEach(s=>s.done=false); }
@@ -2233,7 +2343,7 @@ function matches(sl,words){
   if(ui.tag==='__none'){ if(sl.tags.length) return false; } else if(ui.tag&&!sl.tags.includes(ui.tag)) return false;
   if(words.length){
     const tagNames=sl.tags.map(getTag).filter(Boolean).map(t=>t.name);
-    const hay=norm([sl.title,sl.notes,...tagNames,...sl.subtasks.map(s=>s.title)].join('\n'));
+    const hay=norm([sl.title,sl.notes,...tagNames,...sl.subtasks.map(s=>s.title),...sl.comments.map(cmHay)].join('\n'));
     if(!words.every(w=>hay.includes(w))) return false;
   }
   return true;
@@ -2394,6 +2504,13 @@ function createCard(sl,p,ctx){
     badges.append(wb);
   }
   if(sl.reminder!=='none'&&sl.dueDate&&sl.status!=='done'&&!isWaiting(sl)){ const rm=badge('','bell',REMINDERS[sl.reminder]); rm.title='Aviso: '+REMINDERS[sl.reminder]; badges.append(rm); }
+  if(sl.comments.length){
+    const cmb=badge('cm-badge','message',String(sl.comments.length)); cmb.title=pl(sl.comments.length,'comentario','comentarios')+'. Pulsa para verlos';
+    cmb.setAttribute('role','button'); cmb.tabIndex=0; cmb.setAttribute('aria-label',cmb.title);
+    const f=e=>{ e.stopPropagation(); if(selectMode){ toggleSel(sl.id); return; } openCommentsOf(sl); };
+    cmb.addEventListener('click',f); cmb.addEventListener('keydown',e=>{ if(e.key==='Enter') f(e); });
+    badges.append(cmb);
+  }
   appState.tags.filter(t=>sl.tags.includes(t.id)).forEach(tag=>{
     const tb=el('span','tag-badge');
     if(tag.emoji) tb.append(document.createTextNode(tag.emoji+' ')); else tb.append(el('span','tag-dot'));
@@ -2495,6 +2612,7 @@ function renderHeader(entries){
   }
 }
 function renderApp(){
+  if($('itemModal').open) renderComments();
   const td=isDayView();
   [...selected].forEach(id=>{ if(!findProjectOf(id)) selected.delete(id); });
   renderSidebar(); renderTagFilter(); renderBackupBanner(); renderArchiveBanner();
@@ -2764,7 +2882,7 @@ function showMarkdownPreview(){
 }
 function formSignature(){
   return JSON.stringify([$('modTitle').value,$('modProject').value,[...tempItemTags].sort(),$('modPriority').value,$('modDate').value,$('modTime').value,
-    $('modReminder').value,$('modLink').value,$('modNotes').value,$('modNewSubtask').value,tempSubtasks,recFromForm(),$('modWaitFor').value,$('modFollowUp').value,$('modStatus').value,$('modPauseNote').value]);
+    $('modReminder').value,$('modLink').value,$('modNotes').value,$('modNewSubtask').value,tempSubtasks,recFromForm(),$('modWaitFor').value,$('modFollowUp').value,$('modStatus').value,$('modPauseNote').value,$('cmInput').value.trim(),editingItemId?0:tempComments]);
 }
 function openModal(item=null){
   if($('itemModal').open) return;
@@ -2787,11 +2905,14 @@ function openModal(item=null){
     tempItemTags=ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
     tempSubtasks=[]; editingRecOcc=1; editingHistory=[]; recToForm(null,$('modDate').value);
   }
+  tempComments=[]; cmEditId=null; cmExpanded.clear(); $('cmInput').value=''; $('cmDrop').hidden=true;
+  placeCmPane(); applyCmOpen();
   fillWaitPeople(); $('pauseField').hidden=$('modStatus').value!=='paused'; $('modNewSubtask').value='';
   $('recBox').open=!!(item&&item.recurrence);
   $('modTime').disabled=$('modReminder').disabled=!$('modDate').value;
   renderDateChips(); renderTagPicker(); renderTempSubtasks(); showMarkdownEdit(); updateRecUI();
   $('itemModal').showModal();
+  $('itemMain').scrollTop=0; renderComments('end');
   modalInitial=formSignature();
   setTimeout(()=>$('modTitle').focus(),0);
 }
@@ -2806,6 +2927,8 @@ function saveModal(){
   if(link&&!safeUrl(link)){ alert('El enlace debe empezar por http://, https:// o mailto:'); $('modLink').focus(); return; }
   const pending=$('modNewSubtask').value.trim();
   if(pending){ tempSubtasks.push({id:newId(),title:pending,done:false}); $('modNewSubtask').value=''; }
+  const cmPend=$('cmInput').value.trim()?cmNew($('cmInput').value):null; $('cmInput').value='';
+  const newComments=[...tempComments,...(cmPend?[cmPend]:[])];
   const rec=recFromForm();
   let due=$('modDate').value;
   if(rec&&!due) due=ymd(firstOccurrence(rec));
@@ -2821,12 +2944,13 @@ function saveModal(){
   commit(null,()=>{
     if(editing){
       const src=findProjectOf(editing), sl=src&&src.items.find(i=>i.id===editing);
-      if(!sl){ dst.items.push(normalizeItem({...fields,status:'pending'})); return '✅ El elemento ya no existía (¿otra pestaña?); se ha creado de nuevo'; }
+      if(!sl){ dst.items.push(normalizeItem({...fields,status:'pending',comments:newComments})); return '✅ El elemento ya no existía (¿otra pestaña?); se ha creado de nuevo'; }
       if(sl.dueDate!==fields.dueDate||sl.dueTime!==fields.dueTime||sl.reminder!==fields.reminder) sl.notified='';
       if(sl.followUp!==fields.followUp) sl.followNotified='';
       if(sl.status==='done'){ fields.waitingFor=''; fields.followUp=''; }
       const wasSnoozed=!!sl.snoozedUntil, dateChanged=sl.dueDate!==fields.dueDate;
       Object.assign(sl,fields);
+      if(cmPend){ sl.comments.push(cmPend); sl.comments.sort(byAt); }
       if(!rec) sl.snoozedUntil='';
       else if(wasSnoozed) sl.snoozedUntil=snoozeDateFor(sl.dueDate,rec);
       if(dateChanged&&!wasSnoozed) sl.snoozedUntil='';
@@ -2836,7 +2960,7 @@ function saveModal(){
       if(dst!==src){ src.items=src.items.filter(i=>i!==sl); dst.items.push(sl); return `✅ Guardado y movido a «${dst.name}»`; }
       return spawn?spawnMsg(spawn):'✅ Cambios guardados';
     }
-    dst.items.push(normalizeItem({...fields,status:newStatus}));
+    dst.items.push(normalizeItem({...fields,status:newStatus,comments:newComments}));
     return isDayView()||dst.id===appState.activeId?'✅ Elemento creado':`✅ Elemento creado en «${dst.name}»`;
   });
 }
@@ -3058,6 +3182,15 @@ function archiveMd(entries){
       if(it.link) out.push(`- Enlace: ${it.link}`);
       if(it.subtasks.length){ out.push('','Sub-tareas:'); it.subtasks.forEach(st=>out.push(`- [${st.done?'x':' '}] ${st.title}`)); }
       if(it.notes.trim()) out.push('','Notas:','',it.notes.trim());
+      if(it.comments.length){
+        out.push('','Comentarios:','');
+        it.comments.forEach(c=>{
+          const d=new Date(c.at), when=isNaN(d)?'':d.toLocaleString('es-ES',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+          out.push(`- **${when}**`+(c.mail?` · Correo: ${c.mail.subject||'(Sin asunto)'}`:''));
+          if(c.mail){ if(c.mail.from) out.push(`  De: ${c.mail.from}`); if(c.mail.to) out.push(`  Para: ${c.mail.to}`); if(c.mail.attachments.length) out.push(`  Adjuntos: ${c.mail.attachments.join(', ')}`); }
+          if(c.text.trim()) c.text.trim().split('\n').forEach(l=>out.push('  '+l));
+        });
+      }
       out.push('');
     });
   });
@@ -3090,7 +3223,7 @@ function archReopen(id){
 function archMatches(a,words){
   if(!words.length) return true;
   const it=a.item, tg=it.tags.map(getTag).filter(Boolean).map(t=>t.name);
-  const hay=norm([it.title,it.notes,a.pname,...tg,...it.subtasks.map(x=>x.title)].join('\n'));
+  const hay=norm([it.title,it.notes,a.pname,...tg,...it.subtasks.map(x=>x.title),...it.comments.map(cmHay)].join('\n'));
   return words.every(w=>hay.includes(w));
 }
 function archRow(a,pending){
@@ -3510,6 +3643,12 @@ function textMailParse(text){
 const looksLikeMail=t=>/^\s*(asunto|subject)\s*:/im.test(t)||/^\s*(de|from)\s*:.+\n[\s\S]*^\s*(para|to|enviado|sent)\s*:/im.test(t);
 const MAIL_MAX=6000;
 function mailTitle(m){ let s=String(m.subject||'').replace(/\s+/g,' ').trim(); let k=0; while(k++<5&&/^(re|rv|fw|fwd|reenv|res|tr|aw|wg)\s*:\s*/i.test(s)) s=s.replace(/^(re|rv|fw|fwd|reenv|res|tr|aw|wg)\s*:\s*/i,''); return s||'Correo sin asunto'; }
+/* Texto del correo, limpio y recortado */
+function mailBody(m){
+  let body=String(m.body||'').replace(/\r\n?/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+  if(body.length>MAIL_MAX) body=body.slice(0,MAIL_MAX).replace(/\s+\S*$/,'')+'\n\n… (texto recortado)';
+  return body;
+}
 function mailNotes(m){
   const out=[];
   const who=m.fromName&&m.fromEmail&&m.fromName!==m.fromEmail?`${m.fromName} <${m.fromEmail}>`:(m.fromName||m.fromEmail);
@@ -3520,8 +3659,7 @@ function mailNotes(m){
   if(m.cc) out.push(`**CC:** ${m.cc}`);
   if(m.attachments&&m.attachments.length) out.push(`**Adjuntos:** ${m.attachments.join(', ')}`);
   if(m.subject&&out.length) out.push(`**Asunto:** ${String(m.subject).replace(/\s+/g,' ').trim()}`);
-  let body=String(m.body||'').replace(/\r\n?/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
-  if(body.length>MAIL_MAX) body=body.slice(0,MAIL_MAX).replace(/\s+\S*$/,'')+'\n\n… (texto recortado)';
+  const body=mailBody(m);
   const head=out.join('\n');
   return head?head+(body?'\n\n'+body:''):body;
 }
@@ -3550,6 +3688,140 @@ async function handleMailFiles(files){
   if(bad.length) showToast(`No he podido leer: ${bad.slice(0,3).join(', ')}${bad.length>3?'…':''}. Arrastra correos de Outlook (.msg) o archivos .eml.`,{icon:'alert-circle',timeout:9000});
   mailsToTasks(mails);
 }
+
+/* ================= Comentarios de la tarea ================= */
+/* En una tarea ya guardada, cada comentario se guarda al momento (commit); en una nueva, se guardan con la ficha. */
+const CM_HM=new Intl.DateTimeFormat('es-ES',{hour:'2-digit',minute:'2-digit'});
+const CM_FULL=new Intl.DateTimeFormat('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const cmExpanded=new Set(); let cmEditDraft='';
+function cmWhen(iso){
+  const d=new Date(iso); if(isNaN(d)) return '';
+  const n=daysSince(iso), hm=CM_HM.format(d);
+  return n===0?'Hoy, '+hm:n===1?'Ayer, '+hm:fmtDate(ymd(d),true)+', '+hm;
+}
+const cmHay=c=>c.text+(c.mail?'\n'+c.mail.subject+'\n'+c.mail.from:'');
+function cmCurrent(){ if(!editingItemId) return tempComments; const f=findItem(editingItemId); return f?f.it.comments:null; }
+/* Aplica un cambio a la lista de comentarios de la ficha abierta. fn devuelve false para cancelar. */
+function cmMutate(fn,scrollTo){
+  if(!editingItemId){ if(fn(tempComments)===false) return false; tempComments.sort(byAt); renderComments(scrollTo); return true; }
+  const id=editingItemId;
+  const ok=commit(null,()=>{ const f=findItem(id); if(!f) return false; if(fn(f.it.comments)===false) return false; f.it.comments.sort(byAt); });
+  if(!ok&&!findItem(id)) alert('Esta tarea ya no existe (¿se ha borrado en otro dispositivo?). Cierra la ficha.');
+  renderComments(ok?scrollTo:undefined);
+  return ok;
+}
+function cmNew(text){ return {id:newId(),at:new Date().toISOString(),text:String(text).trim().slice(0,CM_MAX),editedAt:'',mail:null,updatedAt:''}; }
+function mailToComment(m){
+  const who=m.fromName&&m.fromEmail&&m.fromName!==m.fromEmail?`${m.fromName} <${m.fromEmail}>`:(m.fromName||m.fromEmail||'');
+  const sent=m.date instanceof Date&&!isNaN(m.date)&&m.date.getTime()<=Date.now()+DAY_MS?m.date.toISOString():'';
+  return normalizeComment({id:newId(),at:sent||new Date().toISOString(),text:mailBody(m),
+    mail:{subject:String(m.subject||'').replace(/\s+/g,' ').trim(),from:who,to:m.to||'',cc:m.cc||'',date:sent,dateText:sent?'':(m.dateText||''),attachments:m.attachments||[]}});
+}
+function addComment(){
+  const inp=$('cmInput'), v=inp.value;
+  if(!v.trim()){ inp.focus(); return; }
+  const c=cmNew(v);
+  if(cmMutate(list=>{ list.push(c); },c.id)) inp.value='';
+  inp.focus();
+}
+function addMailComments(mails){
+  const cs=mails.filter(Boolean).map(mailToComment).filter(Boolean); if(!cs.length) return;
+  if(!ui.cmOpen) setCmOpen(true);
+  cmMutate(list=>{ list.push(...cs); },cs[cs.length-1].id);
+}
+async function addMailCommentFiles(files){
+  const mails=[], bad=[];
+  for(const f of files){ try{ const m=await mailFromFile(f); if(m) mails.push(m); else bad.push(f.name); }catch(e){ bad.push(f.name); } }
+  if(bad.length) alert(`No he podido leer: ${bad.slice(0,3).join(', ')}${bad.length>3?'…':''}.\nArrastra correos de Outlook (.msg) o archivos .eml.`);
+  addMailComments(mails);
+}
+function deleteComment(c){
+  if(!confirm(c.mail?`¿Borrar el correo «${short(c.mail.subject||'Sin asunto',60)}» de los comentarios?`:'¿Borrar este comentario?')) return;
+  cmExpanded.delete(c.id); if(cmEditId===c.id) cmEditId=null;
+  cmMutate(list=>{ const i=list.findIndex(x=>x.id===c.id); if(i<0) return false; list.splice(i,1); });
+}
+function startCmEdit(c){
+  cmEditId=c.id; cmEditDraft=c.text; renderComments();
+  const ta=$('cmList').querySelector('.cm-edit textarea'); if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length,ta.value.length); }
+}
+function cancelCmEdit(){ cmEditId=null; renderComments(); }
+function saveCmEdit(){
+  const id=cmEditId; if(!id) return;
+  const list=cmCurrent()||[], c=list.find(x=>x.id===id);
+  if(!c){ cmEditId=null; renderComments(); return; }
+  const v=cmEditDraft.trim();
+  if(v===c.text.trim()){ cancelCmEdit(); return; }
+  if(!v&&!c.mail){ cmEditId=null; deleteComment(c); renderComments(); return; }
+  cmEditId=null;
+  cmMutate(l=>{ const x=l.find(y=>y.id===id); if(!x) return false; x.text=v.slice(0,CM_MAX); x.editedAt=new Date().toISOString(); });
+}
+function cmItem(c){
+  const editing=cmEditId===c.id;
+  const li=el('li','cm-item'+(c.mail?' mail':'')+(editing?' editing':'')); li.dataset.id=c.id;
+  const head=el('div','cm-head');
+  if(c.mail) head.append(ic('mail','sm'));
+  const w=el('time','cm-when',cmWhen(c.at)); w.dateTime=c.at;
+  const d=new Date(c.at); w.title=(c.mail?'Enviado el ':'')+(isNaN(d)?'':CM_FULL.format(d));
+  head.append(w);
+  if(c.editedAt){ const e=el('span','cm-edited','· editado'); const de=new Date(c.editedAt); e.title='Editado el '+(isNaN(de)?'':CM_FULL.format(de)); head.append(e); }
+  if(!editing){
+    const tools=el('div','cm-tools');
+    tools.append(btn('','ghost small icon',c.mail?'Editar el texto del correo':'Editar el comentario',()=>startCmEdit(c),'pencil'),
+      btn('','ghost danger small icon','Borrar',()=>deleteComment(c),'trash'));
+    head.append(tools);
+  }
+  li.append(head);
+  if(c.mail){
+    const m=c.mail;
+    li.append(el('div','cm-subj',m.subject||'(Sin asunto)'));
+    [['De',m.from],['Enviado',m.dateText],['Para',m.to],['CC',m.cc]].forEach(([k,v])=>{ if(!v) return; const r=el('div','cm-meta'); r.append(el('b','',k+': '),document.createTextNode(v)); li.append(r); });
+    if(m.attachments.length){ const a=el('div','cm-atts'); m.attachments.forEach(n=>{ const t=el('span','cm-att'); t.title=n; t.append(ic('paperclip','sm'),document.createTextNode(n)); a.append(t); }); li.append(a); }
+  }
+  if(editing){
+    const box=el('div','cm-edit'), ta=el('textarea'); ta.value=cmEditDraft; ta.rows=Math.min(12,Math.max(3,cmEditDraft.split('\n').length+1)); ta.setAttribute('aria-label','Texto del comentario');
+    ta.addEventListener('input',()=>{ cmEditDraft=ta.value; });
+    ta.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ e.preventDefault(); e.stopPropagation(); cancelCmEdit(); }
+      else if(e.key==='Enter'&&(e.ctrlKey||e.metaKey||(!e.shiftKey&&!isMobile()&&!c.mail))){ e.preventDefault(); e.stopPropagation(); saveCmEdit(); }
+    });
+    const bar=el('div','cm-edit-bar');
+    bar.append(btn('Cancelar','secondary small',null,cancelCmEdit),btn('Guardar','small',null,saveCmEdit,'check'));
+    box.append(ta,bar); li.append(box);
+  } else if(c.text.trim()){
+    if(c.mail){
+      const long=c.text.length>420||c.text.split('\n').length>6, open=cmExpanded.has(c.id);
+      const b=el('div','cm-body-txt'+(long&&!open?' clamped':''),c.text); li.append(b);
+      if(long){ const more=btn(open?'Ver menos':'Ver todo','cm-more',null,()=>{ open?cmExpanded.delete(c.id):cmExpanded.add(c.id); renderComments(); }); more.setAttribute('aria-expanded',open?'true':'false'); li.append(more); }
+    } else { const t=el('div','cm-text'); t.innerHTML=parseMD(c.text); li.append(t); }
+  }
+  return li;
+}
+/* scrollTo: 'end' (al abrir: lo último a la vista en el panel), el id de un comentario, o nada (se queda donde estaba) */
+function renderComments(scrollTo){
+  const list=cmCurrent()||[], ul=$('cmList'), top=ul.scrollTop;
+  $('cmCount').textContent=list.length?String(list.length):'';
+  if(cmEditId&&!list.some(c=>c.id===cmEditId)) cmEditId=null;
+  ul.replaceChildren();
+  if(!list.length) ul.append(el('li','cm-empty','Sin comentarios'));
+  list.forEach(c=>ul.append(cmItem(c)));
+  if(scrollTo==='end'){ if(!isMobile()) ul.scrollTop=ul.scrollHeight; }
+  else if(scrollTo){ const t=ul.querySelector(`[data-id="${CSS.escape(scrollTo)}"]`); if(t) t.scrollIntoView({block:'nearest'}); }
+  else ul.scrollTop=top;
+}
+function applyCmOpen(){
+  const o=!!ui.cmOpen;
+  $('cmPane').classList.toggle('open',o); $('itemModal').classList.toggle('cm-open',o);
+  $('cmToggle').setAttribute('aria-expanded',o?'true':'false');
+  $('cmToggle').title=o?'Ocultar los comentarios':'Mostrar los comentarios';
+}
+function setCmOpen(v){ ui.cmOpen=!!v; saveUI(); applyCmOpen(); if(v) renderComments('end'); }
+/* En el móvil, los comentarios van al final de la ficha (antes de los botones); en el PC, a la derecha */
+function placeCmPane(){
+  const pane=$('cmPane'), main=$('itemMain');
+  if(isMobile()){ const foot=main.querySelector('.modal-footer'); if(pane.parentNode!==main) main.insertBefore(pane,foot); }
+  else if(pane.parentNode!==$('itemModal')) $('itemModal').append(pane);
+}
+function openCommentsOf(sl){ if(!ui.cmOpen){ ui.cmOpen=true; saveUI(); } openModal(sl); if(!isMobile()) setTimeout(()=>$('cmInput').focus(),30); else setTimeout(()=>$('cmPane').scrollIntoView({block:'start'}),60); }
 
 /* ---- Campo de añadir rápido ---- */
 const qaIgnored=new Set();
@@ -3856,6 +4128,9 @@ function mergeStates(local,remote){
     const w=x.w; if(!alive(x.k,w.at)) return;
     const item=clone(w.item), mine=lr.get(x.k);
     if(mine&&w!==mine){ item.notified=mine.item.notified; item.followNotified=mine.item.followNotified; } /* los avisos ya mostrados son de cada dispositivo */
+    /* Comentarios: se unen los de las dos versiones (en cada uno gana el más reciente) y se respetan los borrados */
+    const cl=x.local?x.local.item.comments||[]:[], cr=x.remote?x.remote.item.comments||[]:[];
+    item.comments=unionWinners(cl,cr,c=>c.id,c=>c.updatedAt,c=>itemSig(c)).filter(y=>alive('cm:'+y.k,y.w.updatedAt)).map(y=>clone(y.w)).sort(byAt);
     if(w.kind==='a'){ const e=clone(w.entry); e.item=item; archive.push(e); }
     else (pMap.get(w.pid)||projects[0]).items.push(item);
   });
@@ -3872,6 +4147,7 @@ function applyMerged(st){
   appState=st; baseSigs=sigsOf(indexState(st)); undoStack.length=0; selected.clear(); suppressConfetti=true;
   persist();
   if(drag.kind||document.querySelector('dialog[open]')) renderPending=true; else renderApp();
+  if($('itemModal').open) renderComments();
 }
 
 /* ---- Cifrado: PBKDF2 (600 000 vueltas) + AES-GCM de 256 bits, con la contraseña de Carlos ---- */
@@ -4292,6 +4568,56 @@ $('modAddSubtaskBtn').addEventListener('click',()=>{
   const v=$('modNewSubtask').value.trim(); if(!v) return;
   tempSubtasks.push({id:newId(),title:v,done:false}); $('modNewSubtask').value=''; renderTempSubtasks(); $('modNewSubtask').focus();
 });
+/* Comentarios */
+$('cmToggle').addEventListener('click',()=>setCmOpen(!ui.cmOpen));
+$('cmSendBtn').addEventListener('click',addComment);
+$('cmMailBtn').addEventListener('click',()=>$('cmFile').click());
+$('cmFile').addEventListener('change',e=>{ const fs=[...(e.target.files||[])]; e.target.value=''; if(fs.length) addMailCommentFiles(fs); });
+$('cmInput').addEventListener('keydown',e=>{
+  if(e.key!=='Enter') return;
+  if(e.ctrlKey||e.metaKey||(!e.shiftKey&&!isMobile())){ e.preventDefault(); e.stopPropagation(); addComment(); }
+  else e.stopPropagation();
+});
+$('cmInput').addEventListener('paste',e=>{
+  const cd=e.clipboardData; if(!cd) return;
+  const files=[...(cd.files||[])].filter(f=>/\.(msg|eml)$/i.test(f.name||''));
+  if(files.length){ e.preventDefault(); addMailCommentFiles(files); return; }
+  const txt=cd.getData('text/plain')||'';
+  if(!$('cmInput').value.trim()&&/\n\s*\S/.test(txt.trim())&&looksLikeMail(txt)){ e.preventDefault(); addMailComments([textMailParse(txt)]); }
+});
+/* Pegar en la ficha, fuera de los campos: un correo se añade como comentario */
+$('itemModal').addEventListener('paste',e=>{
+  const tg=e.target; if(tg&&(['INPUT','TEXTAREA','SELECT'].includes(tg.tagName)||tg.isContentEditable)) return;
+  const cd=e.clipboardData; if(!cd) return;
+  const files=[...(cd.files||[])].filter(f=>/\.(msg|eml)$/i.test(f.name||''));
+  if(files.length){ e.preventDefault(); addMailCommentFiles(files); return; }
+  const txt=cd.getData('text/plain')||''; if(!txt.trim()) return;
+  e.preventDefault();
+  if(looksLikeMail(txt)) addMailComments([textMailParse(txt)]);
+  else { if(!ui.cmOpen) setCmOpen(true); const i=$('cmInput'); i.value=(i.value?i.value+'\n':'')+txt.trim(); i.focus(); }
+});
+/* Soltar correos (.msg / .eml) sobre la ficha abierta: se añaden como comentarios */
+{ let depth=0;
+  const dlg=$('itemModal'), isFiles=e=>!drag.kind&&stDragIdx===null&&e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
+  const off=()=>{ depth=0; $('cmDrop').hidden=true; };
+  dlg.addEventListener('dragenter',e=>{ if(!isFiles(e)) return; depth++; if(!ui.cmOpen) setCmOpen(true); $('cmDrop').hidden=false; });
+  dlg.addEventListener('dragleave',e=>{ if(!isFiles(e)) return; depth=Math.max(0,depth-1); if(!depth) $('cmDrop').hidden=true; });
+  dlg.addEventListener('dragover',e=>{ if(!isFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect='copy'; });
+  dlg.addEventListener('drop',e=>{
+    if(drag.kind||stDragIdx!==null||!e.dataTransfer) return;
+    const files=[...(e.dataTransfer.files||[])];
+    if(files.length){ e.preventDefault(); off(); addMailCommentFiles(files); return; }
+    off();
+    /* Texto soltado sobre el panel (no sobre un campo): un correo se añade; otro texto pasa al campo de comentario */
+    if(!e.target.closest('#cmPane')||e.target.closest('input,textarea')) return;
+    const txt=e.dataTransfer.getData('text/plain')||''; if(!txt.trim()) return;
+    e.preventDefault();
+    if(looksLikeMail(txt)) addMailComments([textMailParse(txt)]);
+    else { const i=$('cmInput'); i.value=(i.value?i.value+'\n':'')+txt.trim(); i.focus(); }
+  });
+  dlg.addEventListener('close',off);
+}
+matchMedia('(max-width:760px)').addEventListener('change',()=>{ if($('itemModal').open){ placeCmPane(); renderComments(); } });
 $('tabEdit').addEventListener('click',showMarkdownEdit);
 $('tabPrev').addEventListener('click',showMarkdownPreview);
 $('modDate').addEventListener('input',syncDateDependents);
