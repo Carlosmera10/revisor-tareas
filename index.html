@@ -1756,10 +1756,12 @@ function reschedule(item){
   item.snoozedUntil=snoozeDateFor(item.dueDate,item.recurrence);
   return item;
 }
-function applyStatus(item,p,v){
+/* keepPos: en el Kanban la posición la decide el arrastre; en el resto, la recién finalizada pasa a la última del proyecto */
+function applyStatus(item,p,v,keepPos){
   if(item.status===v) return null;
   if(v==='done'){ item.waitingFor=''; item.followUp=''; }
   if(v==='done'&&item.recurrence){ const r=reschedule(item); if(r) return r; }
+  if(v==='done'&&!keepPos&&p){ const ix=p.items.indexOf(item); if(ix>=0&&ix<p.items.length-1){ p.items.splice(ix,1); p.items.push(item); } }
   if(v!=='paused') item.pauseNote='';
   if(v==='done'){ item.reopenStatus=item.status==='paused'?'paused':'pending'; item.completedAt=new Date().toISOString(); if(item.recurrence) item.history=[...item.history,item.completedAt].slice(-200); }
   else item.completedAt='';
@@ -2060,7 +2062,7 @@ function moveToColumn(p,id,status,targetId,before){
     let last=-1; p.items.forEach((x,ix)=>{ if(x.status===status) last=ix; });
     p.items.splice(last>=0?last+1:Math.min(from,p.items.length),0,it);
   } else return false;
-  if(it.status!==status){ const s=applyStatus(it,p,status); if(s) return spawnMsg(s); }
+  if(it.status!==status){ const s=applyStatus(it,p,status,true); if(s) return spawnMsg(s); }
 }
 function attachKanbanDrag(handle,card,sl,p){
   handle.addEventListener('pointerdown',e=>{
@@ -2245,10 +2247,12 @@ function sorter(){
   return null;
 }
 const searchWords=()=>norm(ui.search).split(/\s+/).filter(Boolean);
+/* Las finalizadas siempre al final, sea cual sea el orden (respeta el orden dentro de cada bloque) */
+function doneLast(arr,get=x=>x){ const a=[],b=[]; arr.forEach(x=>(get(x).status==='done'?b:a).push(x)); return a.concat(b); }
 function getVisibleItems(p){
   const w=searchWords(), items=p.items.filter(sl=>matches(sl,w)), s=sorter();
   if(s) items.sort(s);
-  return items;
+  return doneLast(items);
 }
 
 /* Buscador en todo: con texto en «Buscar», debajo de la vista salen las coincidencias del resto de proyectos y del archivo */
@@ -2267,6 +2271,7 @@ function renderSearchMore(words){
     const s=sorter();
     groups.forEach(({p,its})=>{
       if(s) its.sort(s);
+      its.splice(0,its.length,...doneLast(its));
       const gh=el('div','group-title'); gh.append(ic('folder','sm'),document.createTextNode((p.name||'Sin título')+' '),el('span','n',`(${its.length})`));
       gh.style.cursor='pointer'; gh.title='Ir al proyecto'; gh.addEventListener('click',()=>switchToProject(p.id));
       box.append(gh);
@@ -2337,7 +2342,7 @@ function createCard(sl,p,ctx){
       const before=isBefore(e,card), dragId=drag.id, colStatus=ctx.colStatus; endDrag();
       commit(null,()=>{
         moveInArray(p.items,dragId,sl.id,before);
-        if(colStatus){ const it=p.items.find(i=>i.id===dragId); if(it&&it.status!==colStatus){ const s=applyStatus(it,p,colStatus); if(s) return spawnMsg(s); } }
+        if(colStatus){ const it=p.items.find(i=>i.id===dragId); if(it&&it.status!==colStatus){ const s=applyStatus(it,p,colStatus,true); if(s) return spawnMsg(s); } }
       });
     });
   }
@@ -2551,7 +2556,7 @@ function renderApp(){
       if(!g.items.length) return;
       const h=el('div','group-title '+g.cls); h.append(ic(g.icon,'sm'),document.createTextNode(g.title+' '),el('span','n',`(${g.items.length})`));
       list.append(h);
-      g.items.forEach(({p,it})=>list.append(createCard(it,p,{manual:false,showProject:true})));
+      doneLast(g.items,e=>e.it).forEach(({p,it})=>list.append(createCard(it,p,{manual:false,showProject:true})));
     });
     hint='';
     $('schedBtn').hidden=true;
@@ -2571,7 +2576,11 @@ function renderApp(){
       if(!visible.length) list.append(p.items.length?emptyState('Nada coincide en este proyecto',searchWords().length?'Mira abajo si aparece en otros proyectos o en el archivo.':'Prueba a pulsar «Limpiar».'):emptyState('Este proyecto está vacío','Pulsa «Nuevo elemento» para añadir la primera tarea.'));
       visible.forEach((sl,i)=>{
         const ctx={manual};
-        if(manual&&!selectMode){ ctx.touchUp=visible[i-1]?visible[i-1].id:''; ctx.touchDown=visible[i+1]?visible[i+1].id:''; }
+        if(manual&&!selectMode){
+          /* Subir/Bajar solo dentro de su bloque: las finalizadas no se mezclan con el resto */
+          const same=n=>n&&(n.status==='done')===(sl.status==='done');
+          ctx.touchUp=same(visible[i-1])?visible[i-1].id:''; ctx.touchDown=same(visible[i+1])?visible[i+1].id:'';
+        }
         list.append(createCard(sl,p,ctx));
       });
     } else {
@@ -2590,7 +2599,7 @@ function renderApp(){
             const from=p.items.indexOf(it); p.items.splice(from,1);
             let last=-1; p.items.forEach((x,ix)=>{ if(x.status===status) last=ix; });
             p.items.splice(last>=0?last+1:Math.min(from,p.items.length),0,it);
-            const s2=applyStatus(it,p,status); return s2?spawnMsg(s2):undefined;
+            const s2=applyStatus(it,p,status,true); return s2?spawnMsg(s2):undefined;
           });
         });
         if(!items.length) col.append(el('div','col-empty',p.items.length?'Suelta aquí':'Sin elementos'));
