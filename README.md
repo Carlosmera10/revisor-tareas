@@ -16,6 +16,7 @@ Gestor personal de proyectos y tareas, instalable como app (PWA) en el PC (Chrom
 - **Archivo**: las finalizadas se archivan solas y la app recuerda revisarlas pasados 1, 3 o 6 meses.
 - **Correos a tareas (solo PC)**: soltar un `.msg` de Outlook o un `.eml`, o pegar un correo, crea la tarea.
 - **Buscador en todo**, selección múltiple, mover y duplicar, deshacer (`Ctrl+Z`), modo oscuro y barra lateral plegable.
+- **Enviar a Habitica** desde la ficha, con dificultad, plazo y recordatorios para la app móvil.
 - **Avisos** con la app abierta (también minimizada). Con la app cerrada no es posible en Android sin un servidor de envío.
 
 ## Instalación
@@ -48,6 +49,15 @@ Cómo funciona:
 - Si algo falla (token caducado o sin permiso, contraseña incorrecta…), aparece un aviso y un punto rojo en «Ajustes y avisos»; la sincronización queda en pausa hasta que lo corrijas y pulses «Sincronizar ahora».
 - El Gist conserva el historial de versiones: si borras algo por error y ya se ha propagado, se puede recuperar desde la página del Gist en GitHub.
 - **Respaldo manual**: «Enviar al otro dispositivo» genera un archivo; en el otro, «Importar» ofrece **fusionarlo** con lo que ya hay (o sustituirlo todo).
+
+## Enviar a Habitica
+
+En la ficha, el botón **Habitica** guarda la tarea y crea (o actualiza) un To-Do en Habitica con el título, el plazo, la dificultad y los recordatorios que elijas. Las notas solo se copian si marcas «Copiar las notas».
+
+- **Conexión**: «Ajustes y avisos» → «Habitica», con el ID de usuario y el token de API. Se guardan **solo en el `localStorage` de cada dispositivo** (`revisorGeneral_v9_habitica`) y no entran en las copias ni en la sincronización.
+- **Dificultad**: se propone según la prioridad (Normal → Fácil, Alta → Intermedia, Urgente → Difícil).
+- **Recordatorios**: solo los hace sonar la app móvil de Habitica. La de Android no recibe un envío del servidor: los programa al arrancar con la tarea ya descargada, así que tras enviar hay que abrirla, cerrarla del todo y abrirla otra vez (o abrir el To-Do y guardarlo).
+- **Sin enlace continuo**: completar o cambiar la tarea aquí no cambia Habitica hasta pulsar de nuevo el botón.
 
 ## Publicación
 

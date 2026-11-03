@@ -271,6 +271,12 @@ body.cal-mode .list-head{display:none}
 .arch-hit:hover{background:var(--hover)}
 .arch-hit small{color:var(--muted);font-weight:400}
 .wait-task{margin:0 0 6px;font-weight:600;font-size:1.02rem;overflow-wrap:anywhere}
+#modHabBtn{margin-right:auto}
+#modHabBtn.on{color:var(--accent);border-color:var(--accent)}
+.hab-rems{display:grid;gap:8px;margin-top:8px}
+.hab-rem{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,8.5rem) auto;gap:8px;align-items:center}
+.hab-rem input{min-width:0}
+.hab-msg{margin:12px 0 0;color:var(--danger);font-size:.92rem}
 #waitModal .modal-footer{justify-content:space-between}
 .badge.proj{background:transparent;color:var(--muted);padding:0;cursor:pointer;font-weight:500}
 .badge.proj:hover{color:var(--accent);text-decoration:underline}
@@ -626,6 +632,8 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   .plan-opt kbd{display:none}
   .modal-footer>.hint{display:none}
   .modal-footer{justify-content:flex-end}
+  #itemModal .modal-footer{gap:6px}
+  #modHabBtn{padding-inline:9px}
   .arch-row{flex-direction:column}
   .cal-bar h2{font-size:1rem;margin-left:4px;flex-basis:100%;order:-1;margin:0 0 2px}
   .cal-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:0 -12px 8px;padding:6px 12px;position:sticky;z-index:5;background:var(--paper)}
@@ -1059,7 +1067,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <div id="notesPreview" class="md-preview-box"></div>
   </div>
   <div class="modal-footer">
-    <span></span>
+    <button type="button" class="secondary" id="modHabBtn"><svg class="ic sm"><use href="#i-send"/></svg>Habitica</button>
     <div class="row">
       <button type="button" class="secondary" id="modCancelBtn">Cancelar</button>
       <button type="button" id="modSaveBtn"><svg class="ic sm"><use href="#i-check"/></svg>Guardar</button>
@@ -1209,6 +1217,30 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
       <button type="button" id="sendBtn" class="secondary"><svg class="ic sm"><use href="#i-upload"/></svg>Enviar al otro dispositivo</button>
     </div>
   </section>
+  <section class="set-sec" id="habSec">
+    <h3><svg class="ic"><use href="#i-send"/></svg>Habitica</h3>
+    <p id="habStatus" class="hint"></p>
+    <div class="grid-fields" style="max-width:560px;margin-top:6px">
+      <div class="field"><label for="habUser">ID de usuario</label><input type="text" id="habUser" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+      <div class="field"><label for="habToken">Token de API</label><input type="password" id="habToken" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    </div>
+    <p id="habSetMsg" class="hab-msg" role="alert" hidden></p>
+    <div class="row" style="margin-top:12px">
+      <button type="button" id="habConnectBtn">Conectar</button>
+      <button type="button" id="habOffBtn" class="secondary danger" hidden>Desconectar</button>
+    </div>
+    <details class="sync-help">
+      <summary>Dónde están el ID de usuario y el token</summary>
+      <ol>
+        <li>En el ordenador, entra en <strong>habitica.com</strong> e inicia sesión.</li>
+        <li>Pulsa el <strong>icono de usuario</strong> (arriba a la derecha) y elige <strong>Ajustes</strong>.</li>
+        <li>Abre la pestaña <strong>Información del sitio web</strong>.</li>
+        <li>En el apartado <strong>Usuario</strong>, copia tu <strong>ID de usuario</strong> y pégalo arriba.</li>
+        <li>En el apartado <strong>API</strong>, en la fila <strong>Token de API</strong>, pulsa <strong>Saber más</strong>, copia el token y pégalo arriba. Es como una contraseña: no lo compartas.</li>
+        <li>Pulsa <strong>Conectar</strong>. Repite estos dos últimos pasos en el otro dispositivo: los datos se guardan solo en cada uno.</li>
+      </ol>
+    </details>
+  </section>
   <section class="set-sec">
     <h3><svg class="ic"><use href="#i-archive"/></svg>Archivo</h3>
     <div class="grid-fields" style="max-width:560px;margin-top:6px">
@@ -1263,6 +1295,34 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
 </dialog>
 <datalist id="waitPeople"></datalist>
 
+<!-- Enviar a Habitica -->
+<dialog id="habModal" class="narrow" aria-labelledby="habHeading">
+  <div class="modal-header">
+    <h2 id="habHeading"><svg class="ic lg"><use href="#i-send"/></svg><span id="habHeadTxt">Enviar a Habitica</span></h2>
+    <button type="button" class="ghost icon" id="habCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+  <p class="wait-task" id="habTask"></p>
+  <p class="hint" id="habDue"></p>
+  <div class="field">
+    <label for="habDiff">Dificultad</label>
+    <select id="habDiff"><option value="0.1">Intranscendente</option><option value="1">Fácil</option><option value="1.5">Intermedia</option><option value="2">Difícil</option></select>
+  </div>
+  <div class="field">
+    <span class="flabel" id="habRemLbl">Recordatorios</span>
+    <div class="chips" id="habChips" role="group" aria-labelledby="habRemLbl"></div>
+    <div class="hab-rems" id="habRems"></div>
+  </div>
+  <label class="check-line" id="habNotesLine"><input type="checkbox" id="habNotes"> Copiar las notas</label>
+  <p id="habMsg" class="hab-msg" role="alert" hidden></p>
+  <div class="modal-footer">
+    <span></span>
+    <div class="row">
+      <button type="button" class="secondary" id="habCancelBtn">Cancelar</button>
+      <button type="button" id="habSendBtn"><svg class="ic sm"><use href="#i-send"/></svg><span id="habSendLbl">Enviar</span></button>
+    </div>
+  </div>
+</dialog>
+
 <!-- Instrucciones -->
 <dialog id="helpModal" aria-labelledby="helpHeading">
   <div class="modal-header">
@@ -1297,6 +1357,8 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <div class="help-body"><ul><li>Los datos se guardan en este navegador. Haz copias con «Exportar» (en el móvil: «Más» → «Exportar copia»).</li><li>«Importar» te deja elegir entre <strong>fusionar</strong> la copia con lo actual (no se pierde nada; en cada tarea prevalece la versión más reciente) o <strong>sustituir</strong> todo. Las dos se pueden deshacer.</li><li>La app te recuerda hacer copia cada cierto número de días; se cambia en «Ajustes y avisos».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-refresh"/></svg>Sincronizar el PC y el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>En «Ajustes y avisos» → «Sincronización» pegas un <strong>token de GitHub</strong> y eliges una <strong>contraseña de cifrado</strong>. Ahí mismo está «Cómo crear el token de GitHub», paso a paso.</li><li>Tus tareas se guardan <strong>cifradas</strong> en un Gist secreto de tu cuenta de GitHub. Sin la contraseña no se pueden leer, y el token y la contraseña solo se guardan en el dispositivo donde los escribes.</li><li>Haz lo mismo en el otro dispositivo, con <strong>el mismo token y la misma contraseña</strong>. Si la contraseña se pierde, no se puede recuperar la copia de GitHub (los datos de cada dispositivo siguen intactos).</li><li>Sincroniza al abrir la app, unos segundos después de cada cambio y cada pocos minutos. En cada tarea, proyecto o etiqueta prevalece la versión modificada más tarde, y los borrados también se propagan.</li><li>No se sincronizan los ajustes, el orden de proyectos y tareas ni la interfaz. Sí se sincroniza el archivo.</li><li>Si ves un punto rojo en «Ajustes y avisos», la sincronización está en pausa (token caducado, contraseña incorrecta…): ábrelo para ver el motivo.</li><li>Sin conexión o sin GitHub: «Enviar al otro dispositivo» genera un archivo que se fusiona con «Importar».</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-send"/></svg>Enviar a Habitica<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Conecta tu cuenta en «Ajustes y avisos» → «Habitica». Ahí mismo está dónde encontrar el ID de usuario y el token. Se guardan solo en cada dispositivo.</li><li>En la ficha, pulsa <strong>Habitica</strong>: se guarda la tarea y eliges la dificultad y los recordatorios. Se crea como To-Do con el título y el plazo; las notas solo si marcas «Copiar las notas». Si ya estaba enviada, el mismo botón la actualiza.</li><li><strong>Para que el móvil avise</strong>: la app de Habitica programa los recordatorios al arrancar con la tarea ya descargada. Tras enviar, ábrela en el móvil hasta que aparezca la tarea, ciérrala del todo (deslizándola desde las apps recientes) y ábrela otra vez. También vale abrir el To-Do en Habitica y guardarlo.</li><li>Los recordatorios de la tarea solo suenan en el móvil donde esté la app de Habitica; la web de Habitica no los muestra.</li><li>Una tarea repetitiva se envía con su próxima fecha. Cuando pase a la siguiente, pulsa de nuevo Habitica. Si el To-Do ya no existe o está completado, se crea otro.</li><li>Enviar no enlaza las dos apps: completar o cambiar la tarea aquí no cambia nada en Habitica hasta que la actualices.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-monitor-down"/></svg>Instalar la app<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>PC (Chrome)</strong>: pulsa «Instalar app» en la barra lateral o el icono de instalar de la barra de direcciones. Si no aparece: menú ⋮ → «Transmitir, guardar y compartir» → «Instalar página como aplicación».</li><li><strong>Android (Chrome)</strong>: menú ⋮ → «Añadir a pantalla de inicio» → «Instalar».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-keyboard"/></svg>Atajos de teclado<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1317,6 +1379,7 @@ const PRIO_WEIGHT={urgente:3,alta:2,normal:1};
 const PRIO_LABEL={urgente:'Urgente',alta:'Alta',normal:'Normal'};
 const REMINDERS={none:'Sin aviso',at:'Al vencer',m10:'10 min antes',m30:'30 min antes',h1:'1 hora antes',d1:'1 día antes'};
 const REM_OFFSET={none:0,at:0,m10:6e5,m30:18e5,h1:36e5,d1:864e5};
+const HAB_KEY='revisorGeneral_v9_habitica', HAB_API='https://habitica.com/api/v3', HAB_DIFF=['0.1','1','1.5','2'], HAB_PRIO={normal:'1',alta:'1.5',urgente:'2'};
 const REC_FREQ={daily:'Diaria',weekdays:'Laborables',weekly:'Semanal',monthly:'Mensual',yearly:'Anual'};
 const DAY_MS=864e5;
 const WD_LONG=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
@@ -1467,6 +1530,12 @@ function normalizeComments(list,fallbackAt){
   const seen=new Set();
   return (Array.isArray(list)?list:[]).map(c=>normalizeComment(c,fallbackAt)).filter(c=>{ if(!c) return false; if(seen.has(c.id)) c.id=newId(); seen.add(c.id); return true; }).sort(byAt).slice(-500);
 }
+function normalizeHab(h){
+  if(!h||typeof h!=='object'||typeof h.id!=='string'||!h.id) return null;
+  const rems=(Array.isArray(h.rems)?h.rems:[]).filter(r=>r&&typeof r==='object'&&parseYMD(r.d)&&/^\d{2}:\d{2}$/.test(r.t||''))
+    .map(r=>({id:typeof r.id==='string'&&r.id?r.id:newUuid(),d:r.d,t:r.t}));
+  return {id:h.id,at:validIso(h.at)?h.at:'',diff:HAB_DIFF.includes(String(h.diff))?String(h.diff):'1',rems};
+}
 function normalizeItem(raw){
   const it=raw&&typeof raw==='object'?raw:{};
   const status=it.status==='review'?'paused':LABEL[it.status]?it.status:'pending';
@@ -1487,6 +1556,7 @@ function normalizeItem(raw){
     pauseNote:status==='paused'&&typeof it.pauseNote==='string'?it.pauseNote.trim().slice(0,120):'',
     subtasks:Array.isArray(it.subtasks)?it.subtasks.filter(s=>s&&typeof s==='object').map(s=>({id:typeof s.id==='string'&&s.id?s.id:newId(),title:String(s.title??''),done:!!s.done})):[],
     comments:normalizeComments(it.comments,it.createdAt),
+    habitica:normalizeHab(it.habitica),
     recurrence:normalizeRec(it.recurrence),
     snoozedUntil:parseYMD(it.snoozedUntil)&&status!=='done'?it.snoozedUntil:'',
     history:Array.isArray(it.history)?it.history.filter(validIso).slice(-200):[],
@@ -1948,7 +2018,7 @@ function duplicateItems(ids,targetId,reset){
   appState.projects.forEach(p=>p.items.filter(i=>set.has(i.id)).forEach(i=>{
     const c=clone(i); c.id=newId(); c.subtasks.forEach(s=>s.id=newId());
     c.comments=reset?[]:c.comments.map(x=>({...x,id:newId()}));
-    c.notified=''; c.history=[]; c.snoozedUntil=''; c.createdAt=new Date().toISOString();
+    c.notified=''; c.history=[]; c.snoozedUntil=''; c.habitica=null; c.createdAt=new Date().toISOString();
     if(p===dst) c.title+=' (copia)';
     if(reset){ c.status='pending'; c.reopenStatus='pending'; c.completedAt=''; c.subtasks.forEach(s=>s.done=false); }
     copies.push(c);
@@ -2910,6 +2980,9 @@ function openModal(item=null){
   fillWaitPeople(); $('pauseField').hidden=$('modStatus').value!=='paused'; $('modNewSubtask').value='';
   $('recBox').open=!!(item&&item.recurrence);
   $('modTime').disabled=$('modReminder').disabled=!$('modDate').value;
+  const habOn=!!(item&&item.habitica); $('modHabBtn').classList.toggle('on',habOn);
+  $('modHabBtn').querySelector('use').setAttribute('href',habOn?'#i-check':'#i-send');
+  $('modHabBtn').title=habOn?'Enviada a Habitica. Pulsa para actualizarla':'Guardar y enviar a Habitica';
   renderDateChips(); renderTagPicker(); renderTempSubtasks(); showMarkdownEdit(); updateRecUI();
   $('itemModal').showModal();
   $('itemMain').scrollTop=0; renderComments('end');
@@ -2940,11 +3013,12 @@ function saveModal(){
     pauseNote:$('modStatus').value==='paused'?$('modPauseNote').value.trim().slice(0,120):''};
   const newStatus=$('modStatus').value;
   const dst=appState.projects.find(p=>p.id===$('modProject').value)||currentProject(), editing=editingItemId;
+  const savedId=editing||newId();
   $('itemModal').close();
   commit(null,()=>{
     if(editing){
       const src=findProjectOf(editing), sl=src&&src.items.find(i=>i.id===editing);
-      if(!sl){ dst.items.push(normalizeItem({...fields,status:'pending',comments:newComments})); return '✅ El elemento ya no existía (¿otra pestaña?); se ha creado de nuevo'; }
+      if(!sl){ dst.items.push(normalizeItem({...fields,id:savedId,status:'pending',comments:newComments})); return '✅ El elemento ya no existía (¿otra pestaña?); se ha creado de nuevo'; }
       if(sl.dueDate!==fields.dueDate||sl.dueTime!==fields.dueTime||sl.reminder!==fields.reminder) sl.notified='';
       if(sl.followUp!==fields.followUp) sl.followNotified='';
       if(sl.status==='done'){ fields.waitingFor=''; fields.followUp=''; }
@@ -2960,9 +3034,10 @@ function saveModal(){
       if(dst!==src){ src.items=src.items.filter(i=>i!==sl); dst.items.push(sl); return `✅ Guardado y movido a «${dst.name}»`; }
       return spawn?spawnMsg(spawn):'✅ Cambios guardados';
     }
-    dst.items.push(normalizeItem({...fields,status:newStatus,comments:newComments}));
+    dst.items.push(normalizeItem({...fields,id:savedId,status:newStatus,comments:newComments}));
     return isDayView()||dst.id===appState.activeId?'✅ Elemento creado':`✅ Elemento creado en «${dst.name}»`;
   });
+  return savedId;
 }
 
 /* ================= Añadir rápido (lenguaje natural en español) ================= */
@@ -3325,6 +3400,134 @@ function saveWait(){
 function clearWaiting(id){
   commit(null,()=>{ const f=findItem(id); if(!f||!f.it.waitingFor) return false; const who=f.it.waitingFor; f.it.waitingFor=''; f.it.followUp=''; f.it.followNotified='';
     return `✅ ${who} ha respondido: «${short(f.it.title)}» vuelve a tu lista`; });
+}
+
+/* ---- Habitica: crea o actualiza un To-Do por la API. El ID y el token se quedan en este dispositivo ---- */
+let habCtx=null;
+function newUuid(){ return crypto.randomUUID?crypto.randomUUID():'10000000-1000-4000-8000-100000000000'.replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)); }
+function habCfg(){ try{ const c=JSON.parse(localStorage.getItem(HAB_KEY)); return c&&c.user&&c.token?c:null; }catch(e){ return null; } }
+function habCfgSave(c){ try{ if(c) localStorage.setItem(HAB_KEY,JSON.stringify(c)); else localStorage.removeItem(HAB_KEY); }catch(e){} }
+class HabError extends Error{ constructor(status,msg){ super(msg); this.status=status; } }
+async function habApi(cfg,method,path,body){
+  let res;
+  try{
+    res=await fetch(HAB_API+path,{method,signal:AbortSignal.timeout(20000),headers:{'Content-Type':'application/json','x-api-user':cfg.user,'x-api-key':cfg.token,'x-client':cfg.user+'-RevisorTareas'},body:body?JSON.stringify(body):undefined});
+  }catch(e){ throw new HabError(0,'No se ha podido conectar con Habitica. Comprueba la conexión; algunas redes de trabajo la bloquean.'); }
+  let data=null; try{ data=await res.json(); }catch(e){}
+  if(res.ok&&data&&data.success!==false) return data.data;
+  if(res.status===401) throw new HabError(401,'Habitica no acepta el ID de usuario o el token. Revísalos en «Ajustes y avisos» → «Habitica».');
+  if(res.status===429) throw new HabError(429,'Demasiadas peticiones seguidas. Espera un minuto y vuelve a intentarlo.');
+  throw new HabError(res.status,`Habitica ha respondido con un error (${res.status})`+(data&&data.message?`: ${data.message}`:'.'));
+}
+/* La app de Android lee la hora del recordatorio como hora local, ignorando la zona: se envía la hora de reloj tal cual, con Z.
+   El plazo es un instante: se envía a mediodía local para que caiga en el mismo día en cualquier cliente. */
+function habPayload(it,{diff,rems,notes},isNew){
+  const p={text:it.title,priority:Number(diff),reminders:rems.map(r=>{ const t=`${r.d}T${r.t}:00.000Z`; return {id:r.id,startDate:t,time:t}; })};
+  if(isNew) p.type='todo';
+  const due=parseYMD(it.dueDate);
+  if(due){ due.setHours(12,0,0,0); p.date=due.toISOString(); } else if(!isNew) p.date=null;
+  if(notes) p.notes=it.notes;
+  return p;
+}
+const habRemTs=r=>{ const d=parseYMD(r.d); if(!d||!/^\d{2}:\d{2}$/.test(r.t||'')) return NaN; const [h,m]=r.t.split(':').map(Number); return new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,m).getTime(); };
+function habRemSlot(it,key){
+  const base=habRemTs({d:it.dueDate,t:it.dueTime||appState.settings.defaultHour});
+  if(isNaN(base)) return null;
+  const at=new Date(base-REM_OFFSET[key]);
+  return {d:ymd(at),t:`${pad(at.getHours())}:${pad(at.getMinutes())}`};
+}
+const habFree=s=>!!s&&habRemTs(s)>Date.now();
+function habDefaultRems(it){
+  if(it.habitica) return it.habitica.rems.filter(habFree).map(r=>({...r}));
+  const s=habRemSlot(it,it.reminder!=='none'?it.reminder:'at');
+  return habFree(s)?[{id:newUuid(),...s}]:[];
+}
+function habMsg(t){ $('habMsg').textContent=t||''; $('habMsg').hidden=!t; }
+function renderHabRems(){
+  const it=habCtx.it, chips=$('habChips'), box=$('habRems'); chips.replaceChildren(); box.replaceChildren();
+  Object.keys(REM_OFFSET).filter(k=>k!=='none').forEach(k=>{
+    const s=habRemSlot(it,k); if(!habFree(s)) return;
+    const i=habCtx.rems.findIndex(r=>r.d===s.d&&r.t===s.t);
+    const b=btn(REMINDERS[k],'chip',null,()=>{ if(i>=0) habCtx.rems.splice(i,1); else habCtx.rems.push({id:newUuid(),...s}); renderHabRems(); });
+    b.classList.toggle('on',i>=0); b.setAttribute('aria-pressed',String(i>=0)); chips.append(b);
+  });
+  chips.append(btn('Otro','chip',null,()=>{
+    const day=it.dueDate&&it.dueDate>todayStr()?it.dueDate:ymd(addDays(startOfDay(new Date()),1));
+    habCtx.rems.push({id:newUuid(),d:day,t:appState.settings.defaultHour}); renderHabRems();
+  },'plus'));
+  habCtx.rems.forEach((r,i)=>{
+    const row=el('div','hab-rem'), d=el('input'), t=el('input');
+    d.type='date'; d.value=r.d; d.setAttribute('aria-label','Fecha del recordatorio'); d.addEventListener('change',()=>{ r.d=d.value; renderHabRems(); });
+    t.type='time'; t.value=r.t; t.setAttribute('aria-label','Hora del recordatorio'); t.addEventListener('change',()=>{ r.t=t.value; renderHabRems(); });
+    row.append(d,t,btn('','ghost danger small icon','Quitar recordatorio',()=>{ habCtx.rems.splice(i,1); renderHabRems(); },'x'));
+    box.append(row);
+  });
+}
+function openHabSettings(){
+  renderSettings(); $('settingsModal').showModal();
+  $('habSec').scrollIntoView({block:'start'}); setTimeout(()=>$('habUser').focus(),0);
+}
+function openHabModal(id){
+  if(document.querySelector('dialog[open]')) return;
+  const f=findItem(id); if(!f) return;
+  if(!habCfg()){ openHabSettings(); return; }
+  const it=f.it, sent=it.habitica;
+  habCtx={id,it,rems:habDefaultRems(it)};
+  $('habHeadTxt').textContent=sent?'Actualizar en Habitica':'Enviar a Habitica';
+  $('habSendLbl').textContent=sent?'Actualizar':'Enviar';
+  $('habTask').textContent=it.title;
+  $('habDue').textContent=(it.dueDate?'Plazo: '+fmtDate(it.dueDate,true):'Sin plazo')+(sent&&sent.at?` · Enviada el ${fmtDate(ymd(new Date(sent.at)),true)}`:'');
+  $('habDiff').value=sent?sent.diff:HAB_PRIO[it.priority];
+  $('habNotes').checked=false; $('habNotesLine').hidden=!it.notes.trim();
+  $('habSendBtn').disabled=false; habMsg('');
+  renderHabRems();
+  $('habModal').showModal();
+}
+async function sendHab(){
+  const ctx=habCtx, cfg=habCfg(), f=ctx&&findItem(ctx.id);
+  if(!f){ habMsg('La tarea ya no existe.'); return; }
+  if(!cfg){ $('habModal').close(); openHabSettings(); return; }
+  const rems=ctx.rems.filter(r=>r.d||r.t);
+  if(rems.some(r=>isNaN(habRemTs(r)))){ habMsg('Completa la fecha y la hora de cada recordatorio.'); return; }
+  if(rems.some(r=>habRemTs(r)<=Date.now())){ habMsg('Hay un recordatorio con una fecha que ya ha pasado.'); return; }
+  const opt={diff:$('habDiff').value,rems,notes:$('habNotes').checked&&!$('habNotesLine').hidden}, oldId=f.it.habitica&&f.it.habitica.id;
+  $('habSendBtn').disabled=true; $('habSendLbl').textContent=oldId?'Actualizando…':'Enviando…'; habMsg('');
+  try{
+    let task=null;
+    if(oldId){
+      try{ task=await habApi(cfg,'PUT','/tasks/'+encodeURIComponent(oldId),habPayload(f.it,opt,false)); }
+      catch(e){ if(e.status!==404) throw e; }
+    }
+    const created=!task||task.completed===true;
+    if(created) task=await habApi(cfg,'POST','/tasks/user',habPayload(f.it,opt,true));
+    const taskId=task&&(task.id||task._id);
+    if(!taskId) throw new HabError(0,'Habitica no ha devuelto la tarea creada.');
+    $('habModal').close();
+    commit(null,()=>{ const g=findItem(ctx.id); if(!g) return false; g.it.habitica=normalizeHab({id:taskId,at:new Date().toISOString(),diff:opt.diff,rems}); return ''; });
+    const verb=created?'Enviada a Habitica':'Actualizada en Habitica';
+    showToast(rems.length?`${verb}. Para que avise: abre Habitica en el móvil, ciérrala del todo y ábrela otra vez`:verb,{icon:'send',timeout:rems.length?14000:6000});
+  }catch(e){
+    habMsg(e.message||'No se ha podido enviar a Habitica.');
+    $('habSendBtn').disabled=false; $('habSendLbl').textContent=oldId?'Actualizar':'Enviar';
+  }
+}
+function renderHabSection(){
+  const c=habCfg();
+  $('habStatus').textContent=c?`Conectada${c.name?' como '+c.name:''}.`:'Sin conectar.';
+  $('habUser').value=c?c.user:''; $('habToken').value=c?c.token:'';
+  $('habOffBtn').hidden=!c; $('habSetMsg').hidden=true; $('habConnectBtn').disabled=false; $('habConnectBtn').textContent='Conectar';
+}
+async function connectHab(){
+  const user=$('habUser').value.trim(), token=$('habToken').value.trim(), msg=t=>{ $('habSetMsg').textContent=t; $('habSetMsg').hidden=!t; };
+  const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if(!uuid.test(user)){ msg('El ID de usuario no tiene el formato correcto.'); $('habUser').focus(); return; }
+  if(!uuid.test(token)){ msg('El token no tiene el formato correcto.'); $('habToken').focus(); return; }
+  msg(''); $('habConnectBtn').disabled=true; $('habConnectBtn').textContent='Conectando…';
+  try{
+    const u=await habApi({user,token},'GET','/user?userFields=profile.name');
+    habCfgSave({user,token,name:u&&u.profile&&u.profile.name||''});
+    renderHabSection(); showToast('Habitica conectada',{icon:'send'});
+  }catch(e){ msg(e.message); $('habConnectBtn').disabled=false; $('habConnectBtn').textContent='Conectar'; }
 }
 
 /* ---- Calendario: mes o semana en el ordenador; semana + día de 8 a 22 h en el móvil ---- */
@@ -4494,6 +4697,7 @@ function renderSettings(){
   const s=appState.settings;
   $('setBackupInfo').textContent=s.lastBackup?`Última copia: ${relDays(s.lastBackup)} (${new Date(s.lastBackup).toLocaleString('es-ES')}).`:'Todavía no has exportado ninguna copia.';
   renderSyncSection();
+  renderHabSection();
   let inst;
   if(isStandalone()) inst='Ya la estás usando como aplicación instalada.';
   else if(file) inst='Ábrela desde la web publicada para poder instalarla.';
@@ -4537,6 +4741,11 @@ $('waitingBtn').addEventListener('click',()=>switchToView('waiting'));
 $('calendarBtn').addEventListener('click',()=>{ calAnchor=todayStr(); calSel=todayStr(); switchToView('calendar'); });
 ['waitCloseBtn','waitCancelBtn'].forEach(id=>$(id).addEventListener('click',()=>$('waitModal').close()));
 $('waitSaveBtn').addEventListener('click',saveWait);
+$('modHabBtn').addEventListener('click',()=>{ const id=saveModal(); if(id) openHabModal(id); });
+['habCloseBtn','habCancelBtn'].forEach(id=>$(id).addEventListener('click',()=>$('habModal').close()));
+$('habSendBtn').addEventListener('click',sendHab);
+$('habConnectBtn').addEventListener('click',connectHab);
+$('habOffBtn').addEventListener('click',()=>{ habCfgSave(null); renderHabSection(); });
 $('modStatus').addEventListener('change',()=>{ $('pauseField').hidden=$('modStatus').value!=='paused'; });
 $('waitClearBtn').addEventListener('click',()=>{ const id=waitCtx&&waitCtx.id; $('waitModal').close(); if(id) clearWaiting(id); });
 $('waitDate').addEventListener('change',renderWaitChips);
@@ -4833,7 +5042,7 @@ function syncControls(){
   setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
   window.addEventListener('online',()=>syncNow());
-  window.__revisor={get state(){return appState;},msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
+  window.__revisor={get state(){return appState;},habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>
