@@ -707,9 +707,9 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   #filtersToggle{display:inline-flex;order:2;padding:7px 12px}
   .tb-count{display:inline;order:3;margin-left:auto;font-size:.84rem;color:var(--muted);white-space:nowrap}
   #schedBtn{order:4} #selectModeBtn{order:5} #viewSeg{order:6}
-  .tb-break{order:9;flex-basis:100%;height:0}
-  #statusFilter{order:10} #tagFilter{order:11} #priorityFilter{order:12} .toolbar .lbl{order:13} #sortSelect{order:14} #clearFiltersBtn{order:15}
-  body:not(.filters-open) .toolbar :is(#statusFilter,#tagFilter,#priorityFilter,.lbl,#sortSelect,#clearFiltersBtn){display:none}
+  .tb-break{order:8;flex-basis:100%;height:0}
+  #projectFilter{order:9;max-width:160px} #statusFilter{order:10} #tagFilter{order:11} #priorityFilter{order:12} .toolbar .lbl{order:13} #sortSelect{order:14} #clearFiltersBtn{order:15}
+  body:not(.filters-open) .toolbar :is(#projectFilter,#statusFilter,#tagFilter,#priorityFilter,.lbl,#sortSelect,#clearFiltersBtn){display:none}
   body.filters-open .tb-break{display:block}
   .list-head{display:none}
   #dragHint:empty{display:none}
@@ -859,6 +859,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
         <div class="search-wrap"><svg class="ic sm"><use href="#i-search"/></svg><input type="search" id="searchFilter" placeholder="Buscar (pulsa / )" aria-label="Buscar"></div>
         <button type="button" id="filtersToggle" class="secondary toggle" aria-expanded="false"><svg class="ic sm"><use href="#i-filter"/></svg><span id="filtersToggleText">Filtros</span></button>
         <span class="tb-break" aria-hidden="true"></span>
+        <select id="projectFilter" aria-label="Filtrar por proyecto" hidden></select>
         <select id="statusFilter" aria-label="Filtrar por estado">
           <option value="">Todos los estados</option>
           <option value="pending">En proceso</option>
@@ -1340,7 +1341,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Cuando una tarea dependa de otra persona, pulsa el reloj de arena de la tarjeta (en el móvil, «⋯» → «Poner en espera…») o rellena «En espera de» en la ficha.</li><li>Indica de quién y cuándo reclamar. La tarea sale de Hoy, Mañana, Próximos 7 días y del planificador hasta ese día.</li><li>Ese día vuelve a «Hoy», en «Para reclamar», y recibes un aviso a la «Hora del aviso en tareas sin hora».</li><li>La vista <strong>En espera</strong> de la barra lateral las reúne por persona. Cuando te contesten, «Ya ha respondido».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado.</li><li>El buscador ignora las tildes y busca en todo: primero en la vista actual y, debajo, en el resto de proyectos (también las repetitivas ocultas) y en el archivo. Vista, orden y filtros se recuerdan.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado.</li><li>El buscador ignora las tildes y busca en todo: primero en la vista actual y, debajo, en el resto de proyectos (también las repetitivas ocultas) y en el archivo. Vista, orden y filtros se recuerdan.</li><li>En <strong>Hoy</strong>, <strong>Mañana</strong>, <strong>Próximos 7 días</strong> y <strong>Calendario</strong>, «Filtros» permite ver un solo proyecto. Lo que añadas con ese filtro puesto va a ese proyecto.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Calendario</strong>: en el ordenador, vista de mes o de semana (con horas de 8 a 22); en el móvil, la semana arriba y el día elegido por horas. Muestra las tareas en proceso con fecha (las repetitivas, en su próxima fecha y con el icono de repetir; las vencidas, en el día de hoy, en rojo y con su fecha original) y, en azul, las que están en espera, en su día de reclamar. Arrastra una tarea a otro día u hora para cambiarla (en el móvil, mantenla pulsada); pulsa un hueco vacío para crear una tarea ahí.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1637,7 +1638,7 @@ function loadLegacy(){
   return null;
 }
 function loadUI(){
-  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true};
+  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
@@ -1645,7 +1646,7 @@ function loadUI(){
       if(['month','week'].includes(u.calView)) d.calView=u.calView;
       if(['list','kanban'].includes(u.view)) d.view=u.view;
       if(['manual','priority','dateAsc','dateDesc'].includes(u.sort)) d.sort=u.sort;
-      ['search','status','tag','priority'].forEach(k=>{ if(typeof u[k]==='string') d[k]=u[k]; });
+      ['search','status','tag','priority','project'].forEach(k=>{ if(typeof u[k]==='string') d[k]=u[k]; });
       if(d.status==='review') d.status='paused';
       d.showScheduled=u.showScheduled===true;
       if(['auto','light','dark'].includes(u.theme)) d.theme=u.theme;
@@ -2372,6 +2373,14 @@ function fillTagSelect(sel,firstLabel,{none=null}={}){
   sel.value=cur; if(sel.value!==cur) sel.value='';
 }
 function fillProjectSelect(sel){ sel.replaceChildren(); appState.projects.forEach(p=>sel.append(opt(p.id,p.name||'Sin título'))); }
+function renderProjectFilter(){
+  const sel=$('projectFilter');
+  sel.hidden=!PROJ_FILTER_MODES.includes(ui.mode);
+  if(ui.project&&!appState.projects.some(p=>p.id===ui.project)){ ui.project=''; saveUI(); }
+  sel.replaceChildren(opt('','Todos los proyectos'));
+  appState.projects.forEach(p=>sel.append(opt(p.id,p.name||'Sin título')));
+  sel.value=ui.project;
+}
 function renderTagFilter(){
   fillTagSelect($('tagFilter'),'Todas las etiquetas',{none:'Sin etiqueta'});
   if(ui.tag&&ui.tag!=='__none'&&!getTag(ui.tag)){ ui.tag=''; saveUI(); }
@@ -2405,7 +2414,12 @@ function exportData(){
 }
 
 /* ================= Filtros y orden ================= */
-const isFiltered=()=>!!(ui.search.trim()||ui.status||ui.tag||ui.priority);
+/* El filtro de proyecto solo actúa en las vistas por fecha; aparte de matches() para no afectar a «También coinciden» */
+const PROJ_FILTER_MODES=['today','tomorrow','week','calendar'];
+const projFilter=()=>PROJ_FILTER_MODES.includes(ui.mode)?ui.project:'';
+/* Proyecto de las tareas nuevas: el filtrado, para que no desaparezcan de la vista al crearlas */
+const addTarget=()=>appState.projects.find(p=>p.id===projFilter())||currentProject();
+const isFiltered=()=>!!(ui.search.trim()||ui.status||ui.tag||ui.priority||projFilter());
 function matches(sl,words){
   if(!ui.showScheduled&&isSnoozed(sl)) return false;
   if(ui.status==='waiting'){ if(!isWaiting(sl)) return false; } else if(ui.status&&sl.status!==ui.status) return false;
@@ -2685,7 +2699,7 @@ function renderApp(){
   if($('itemModal').open) renderComments();
   const td=isDayView();
   [...selected].forEach(id=>{ if(!findProjectOf(id)) selected.delete(id); });
-  renderSidebar(); renderTagFilter(); renderBackupBanner(); renderArchiveBanner();
+  renderSidebar(); renderProjectFilter(); renderTagFilter(); renderBackupBanner(); renderArchiveBanner();
   document.body.classList.toggle('today-mode',td);
   document.body.classList.toggle('cal-mode',ui.mode==='calendar');
 
@@ -2705,7 +2719,7 @@ function renderApp(){
     /* En «Hoy» las finalizadas desaparecen al momento (siguen contando en «X de Y hechas hoy»);
        solo se ven si se filtra por «Finalizada» */
     const pool=ui.mode==='today'&&ui.status!=='done'?all.filter(e=>e.it.status!=='done'):all;
-    const vis=pool.filter(e=>matches(e.it,w));
+    const pf=projFilter(), vis=pool.filter(e=>(!pf||e.p.id===pf)&&matches(e.it,w));
     if(s) vis.sort((a,b)=>s(a.it,b.it));
     else if(ui.mode!=='today') vis.sort((a,b)=>(PRIO_WEIGHT[b.it.priority]-PRIO_WEIGHT[a.it.priority])||(a.it.dueTime||'99').localeCompare(b.it.dueTime||'99'));
     lastVisibleIds=vis.map(e=>e.it.id);
@@ -2806,7 +2820,7 @@ function renderApp(){
   hint=selectMode?'Selecciona varias tarjetas y usa la barra inferior. Esc para terminar.':'';
   $('dragHint').textContent=hint; $('dragHint').hidden=!hint;
   $('searchFilter').placeholder=isMobile()?'Buscar en todo':'Buscar en todo (pulsa / )';
-  const nf=[ui.status,ui.tag,ui.priority].filter(Boolean).length+(ui.sort!=='manual'?1:0);
+  const nf=[projFilter(),ui.status,ui.tag,ui.priority].filter(Boolean).length+(ui.sort!=='manual'?1:0);
   $('filtersToggleText').textContent=nf?`Filtros (${nf})`:'Filtros';
   $('tbCount').textContent=$('countLabel').textContent;
   { const t=todayStr(); let n=0; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status==='pending'&&!isSnoozed(it)&&!isWaiting(it)&&(!it.dueDate||it.dueDate<t)) n++; }));
@@ -2957,7 +2971,7 @@ function formSignature(){
 function openModal(item=null){
   if($('itemModal').open) return;
   const pOf=item?findProjectOf(item.id):null;
-  fillProjectSelect($('modProject')); $('modProject').value=(pOf||currentProject()).id;
+  fillProjectSelect($('modProject')); $('modProject').value=(pOf||addTarget()).id;
   if(item){
     editingItemId=item.id; $('modalTitle').textContent='Editar elemento';
     $('modTitle').value=item.title; tempItemTags=item.tags.filter(id=>getTag(id));
@@ -3546,7 +3560,8 @@ function calTitle(){
 /* Tareas en proceso con fecha (las en espera, en su día de reclamar), con los filtros activos */
 function calEntries(from,to,words){
   const t=todayStr(), out=[], keep=ui.showScheduled; ui.showScheduled=true;
-  appState.projects.forEach(p=>p.items.forEach(it=>{
+  const pf=projFilter();
+  appState.projects.forEach(p=>(pf&&p.id!==pf?[]:p.items).forEach(it=>{
     if(it.status!=='pending') return;
     let d=calDateOf(it), od=''; if(!d) return;
     if(d<t){ od=d; d=t; }
@@ -3876,7 +3891,7 @@ function mailsToTasks(mails){
     showMarkdownEdit(); setTimeout(()=>{ $('modTitle').focus(); $('modTitle').select(); },30);
     return;
   }
-  const dst=currentProject(), due=qaDefaultDate();
+  const dst=addTarget(), due=qaDefaultDate();
   commit(null,()=>{ mails.forEach(m=>dst.items.push(normalizeItem({title:mailTitle(m),notes:mailNotes(m),dueDate:due,status:'pending'}))); return `✅ ${pl(mails.length,'tarea creada','tareas creadas')} a partir de correos en «${dst.name}»`; });
 }
 async function mailFromFile(f){
@@ -4057,7 +4072,7 @@ function qaEnsureTags(names){
 function qaSubmit(){
   const r=qaParse();
   if(!r.title){ $('qaInput').focus(); showToast('Escribe el texto de la tarea',{icon:'pencil'}); return; }
-  const dst=appState.projects.find(p=>p.id===r.projectId)||currentProject();
+  const dst=appState.projects.find(p=>p.id===r.projectId)||addTarget();
   const due=r.dueDate||qaDefaultDate();
   const ok=commit(null,()=>{
     const tags=[...r.tags,...qaEnsureTags(r.newTags)];
@@ -4888,11 +4903,12 @@ $('deckName').addEventListener('input',e=>{ currentProject().name=e.target.value
 $('deckName').addEventListener('keydown',e=>{ if(e.key==='Enter') e.target.blur(); });
 
 $('searchFilter').addEventListener('input',e=>{ ui.search=e.target.value; saveUI(); renderApp(); });
+$('projectFilter').addEventListener('change',e=>{ ui.project=e.target.value; saveUI(); renderApp(); });
 $('statusFilter').addEventListener('change',e=>{ ui.status=e.target.value; saveUI(); renderApp(); });
 $('tagFilter').addEventListener('change',e=>{ ui.tag=e.target.value; saveUI(); renderApp(); });
 $('priorityFilter').addEventListener('change',e=>{ ui.priority=e.target.value; saveUI(); renderApp(); });
 $('sortSelect').addEventListener('change',e=>{ ui.sort=e.target.value; saveUI(); renderApp(); });
-$('clearFiltersBtn').addEventListener('click',()=>{ ui.search=ui.status=ui.tag=ui.priority=''; saveUI(); syncControls(); renderApp(); });
+$('clearFiltersBtn').addEventListener('click',()=>{ ui.search=ui.status=ui.tag=ui.priority=ui.project=''; saveUI(); syncControls(); renderApp(); });
 $('viewListBtn').addEventListener('click',()=>{ ui.view='list'; saveUI(); renderApp(); });
 $('viewKanbanBtn').addEventListener('click',()=>{ ui.view='kanban'; saveUI(); renderApp(); });
 { let t=null; $('slides').addEventListener('scroll',()=>{ const b=kbBoard(); if(!b||!isMobile()||b.classList.contains('kb-dragging')) return; clearTimeout(t); t=setTimeout(()=>{ kbIndex=kbCurrent(b); kbMarkTab(kbIndex); },60); },{passive:true}); }
