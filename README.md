@@ -7,17 +7,19 @@ Gestor personal de proyectos y tareas, instalable como app (PWA) en el PC (Chrom
 ## Qué hace
 
 - **Proyectos y tareas** con prioridades, etiquetas, sub-tareas, fecha y hora, avisos y notas con formato.
-- **Estados**: En proceso, Pausada y Finalizada. Además, la marca aparte «En espera de…» para lo que depende de otra persona (vuelve a «Hoy» el día de reclamar).
+- **Estados**: En proceso, Pausada y Finalizada. Una pausada puede llevar «Retomar el día»: esa fecha vuelve a «Hoy» y avisa. Además, la marca aparte «En espera de…» para lo que depende de otra persona (vuelve a «Hoy» el día de reclamar).
 - **Las finalizadas, siempre al final** de la lista, sea cual sea el orden elegido.
 - **Vistas**: Hoy, Mañana, Próximos 7 días, Calendario (mes/semana en el PC; semana + día en el móvil), En espera y cada proyecto, en lista o Kanban.
 - **Planificador** (tecla `P`): repasa las tareas en proceso como tarjetas, de la fecha más antigua a la más lejana.
 - **Añadir escribiendo en español** (teclas `Q` / `N`): entiende fechas, horas, repeticiones, `#proyecto`, `@etiqueta` y `!alta` / `!urgente`.
 - **Repetitivas**: al completarlas, la misma tarea pasa a su siguiente fecha.
 - **Archivo**: las finalizadas se archivan solas y la app recuerda revisarlas pasados 1, 3 o 6 meses.
+- **Papelera**: lo borrado (tareas, proyectos y tareas del archivo) se guarda 30 días, se sincroniza y se puede restaurar.
 - **Correos a tareas (solo PC)**: soltar un `.msg` de Outlook o un `.eml`, o pegar un correo, crea la tarea.
 - **Buscador en todo**, selección múltiple, mover y duplicar, deshacer (`Ctrl+Z`), modo oscuro y barra lateral plegable.
 - **Enviar a Habitica** desde la ficha, con dificultad, plazo y recordatorios para la app móvil.
-- **Avisos** con la app abierta (también minimizada). Con la app cerrada no es posible en Android sin un servidor de envío.
+- **Avisos** con la app abierta (también minimizada), con botones **Hecha** y **Aplazar 1 h** (o **Retomar** y **Ya ha respondido**). Con la app cerrada no es posible en Android sin un servidor de envío.
+- **Número en el icono** de la app instalada en el PC: tareas de hoy y vencidas (mientras la app está abierta; Android no lo admite).
 
 ## Instalación
 
@@ -45,7 +47,7 @@ Cómo funciona:
 - El token y la contraseña se guardan **solo en el `localStorage` de cada dispositivo**.
 - Se sincroniza al abrir la app, unos segundos después de cada cambio, al volver a la app o recuperar la conexión, y cada 3 minutos.
 - **Fusión elemento a elemento**: cada tarea, proyecto, etiqueta y entrada del archivo lleva su fecha de modificación (`updatedAt`) y en cada uno gana la versión más reciente. Los borrados se anotan (`deleted`, durante 180 días) para que no reaparezcan.
-- **No se sincronizan** los ajustes, el orden de proyectos y tareas ni la interfaz. Sí se sincroniza el archivo. Un dispositivo recién estrenado adopta lo que hay en GitHub sin añadir un proyecto vacío.
+- **No se sincronizan** los ajustes, el orden de proyectos y tareas ni la interfaz. Sí se sincronizan el archivo y la papelera. Un dispositivo recién estrenado adopta lo que hay en GitHub sin añadir un proyecto vacío.
 - Si algo falla (token caducado o sin permiso, contraseña incorrecta…), aparece un aviso y un punto rojo en «Ajustes y avisos»; la sincronización queda en pausa hasta que lo corrijas y pulses «Sincronizar ahora».
 - El Gist conserva el historial de versiones: si borras algo por error y ya se ha propagado, se puede recuperar desde la página del Gist en GitHub.
 - **Respaldo manual**: «Enviar al otro dispositivo» genera un archivo; en el otro, «Importar» ofrece **fusionarlo** con lo que ya hay (o sustituirlo todo).

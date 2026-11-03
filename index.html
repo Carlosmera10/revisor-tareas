@@ -178,6 +178,7 @@ button.toggle.active{background:var(--accent-soft);color:var(--accent);border-co
 .slide:hover{border-color:var(--line-strong);box-shadow:0 2px 10px rgba(24,34,58,.05)}
 .slide.paused{border-left-color:var(--review)}
 .badge.paused{background:var(--high-soft);color:var(--warn);cursor:pointer}
+.badge.paused.due{font-weight:700;box-shadow:inset 0 0 0 1px var(--warn)}
 .pause-field[hidden]{display:none}
 .slide.done{border-left-color:var(--done);background:var(--subtle)}
 .slide.done .slide-title{text-decoration:line-through;color:var(--faint)}
@@ -262,7 +263,8 @@ body.cal-mode .list-head{display:none}
 .arch-title{font-size:1rem;overflow-wrap:anywhere}
 .arch-extra{font-size:.86rem;color:var(--muted)}
 .arch-acts{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0;max-width:46%}
-#archiveModal{max-width:820px}
+#archiveModal,#trashModal{max-width:820px}
+.arch-sec.trash .arch-row{border-left-color:var(--line-strong)}
 #searchMore:empty{display:none}
 #searchMore{margin-top:26px;padding-top:14px;border-top:1px dashed var(--line-strong);display:flex;flex-direction:column;gap:10px}
 .search-more-head{font-size:1rem;font-weight:600;display:flex;align-items:center;gap:8px}
@@ -793,6 +795,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <ul id="projectList"></ul>
         <div class="side-actions">
       <button type="button" class="nav-item" id="openArchiveBtn" title="Archivo"><svg class="ic"><use href="#i-archive"/></svg><span class="nav-label">Archivo</span><span class="nav-count" id="archiveCount"></span></button>
+      <button type="button" class="nav-item" id="openTrashBtn" title="Papelera"><svg class="ic"><use href="#i-trash"/></svg><span class="nav-label">Papelera</span><span class="nav-count" id="trashCount"></span></button>
       <button type="button" class="nav-item" id="openTagsBtn" title="Etiquetas"><svg class="ic"><use href="#i-tag"/></svg><span class="nav-label">Etiquetas</span></button>
       <button type="button" class="nav-item" id="openSettingsBtn" title="Ajustes y avisos"><svg class="ic"><use href="#i-sliders"/></svg><span class="nav-label">Ajustes y avisos</span></button>
       <button type="button" class="nav-item" id="openHelpBtn" title="Instrucciones (tecla ?)"><svg class="ic"><use href="#i-help"/></svg><span class="nav-label">Instrucciones</span></button>
@@ -986,6 +989,8 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   <div class="field pause-field" id="pauseField" hidden>
     <label for="modPauseNote">Motivo de la pausa (opcional)</label>
     <input type="text" id="modPauseNote" maxlength="120" autocomplete="off" placeholder="Por ejemplo: hasta la reunión del jueves">
+    <label for="modResumeAt" style="margin-top:10px">Retomar el día (opcional)</label>
+    <input type="date" id="modResumeAt">
   </div>
   <div class="field">
     <span class="flabel" id="modTagsLabel">Etiquetas</span>
@@ -1270,6 +1275,18 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   <div class="modal-footer"><span></span><button type="button" id="archDoneBtn">Cerrar</button></div>
 </dialog>
 
+<!-- Papelera -->
+<dialog id="trashModal" aria-labelledby="trashHeading">
+  <div class="modal-header">
+    <h2 id="trashHeading"><svg class="ic lg"><use href="#i-trash"/></svg>Papelera</h2>
+    <button type="button" class="ghost icon" id="trashCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+  <p class="hint" id="trashSummary" style="margin:0 0 10px"></p>
+  <div class="search-wrap" style="margin-bottom:14px"><svg class="ic sm"><use href="#i-search"/></svg><input type="search" id="trashSearch" placeholder="Buscar en la papelera" aria-label="Buscar en la papelera"></div>
+  <div id="trashBody"></div>
+  <div class="modal-footer"><button type="button" id="trashEmptyBtn" class="danger small" hidden>Vaciar la papelera</button><span></span><button type="button" id="trashDoneBtn">Cerrar</button></div>
+</dialog>
+
 <!-- En espera -->
 <dialog id="waitModal" class="narrow" aria-labelledby="waitHeading">
   <div class="modal-header">
@@ -1353,8 +1370,12 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <div class="help-body"><ul><li>En la lista, desliza una tarjeta <strong>a la derecha</strong> para marcarla como hecha y <strong>a la izquierda</strong> para aplazarla.</li><li>Mantén pulsada el asa para reordenar.</li><li><strong>Kanban</strong>: las columnas van una al lado de otra; desliza a los lados o pulsa las pestañas de arriba para cambiar de columna. Para pasar una tarjeta a otra columna, arrástrala desde el asa hasta la pestaña o hasta el borde de la pantalla.</li><li>El botón de los tres puntos de cada tarjeta abre sus acciones; «Más», en la barra inferior, el resto de opciones.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-archive"/></svg>Archivo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Las tareas finalizadas se <strong>archivan solas</strong> pasados 7 días (se cambia en «Ajustes y avisos» → «Archivo»). También puedes archivar una ya: icono de archivo en la tarjeta (en el móvil, «⋯» → «Archivar ya»).</li><li>Las repetitivas no se archivan: pasan a su siguiente fecha.</li><li>Pasados tres meses (o uno, o seis, según elijas) te aviso con un aviso en la cabecera y una notificación para que revises las archivadas.</li><li>En el <strong>Archivo</strong> (barra lateral) puedes, por cada tarea: <strong>Copiar</strong> su texto para documentarla, <strong>Conservar</strong> (no vuelve a preguntar), <strong>Volver a abrir</strong> (vuelve a su proyecto como pendiente) o <strong>Eliminar</strong> definitivamente.</li><li>«Descargar como texto» guarda en un archivo .md todas las pendientes de revisar, con sus notas y sub-tareas.</li><li>El archivo va incluido en las copias de seguridad.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-trash"/></svg>Papelera<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Lo que borras (tareas, proyectos y tareas del archivo) pasa a la <strong>Papelera</strong> y se guarda 30 días. Después se elimina solo.</li><li><strong>Restaurar</strong> devuelve la tarea a su proyecto o al archivo. Si borraste un proyecto, «Restaurar proyecto» lo recupera con todas sus tareas.</li><li>La papelera se sincroniza entre dispositivos. «Eliminar definitivamente» y «Vaciar la papelera» no se pueden recuperar.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-pause"/></svg>Tareas pausadas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Una tarea pausada sigue en su proyecto, pero no aparece en las vistas por fecha ni avisa.</li><li>Si rellenas <strong>«Retomar el día»</strong> en la ficha, ese día vuelve a «Hoy», en el grupo «Para retomar», y avisa a la «Hora del aviso en tareas sin hora». Mientras tanto se ve en el calendario y en los próximos 7 días, en su día de retomar.</li><li>El botón <strong>Retomar</strong> la pasa a «En proceso». Para aplazarla, cambia la fecha en la ficha o arrástrala en el calendario.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-bell"/></svg>Avisos<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Actívalos en «Ajustes y avisos» → «Activar notificaciones».</li><li>Cada tarea tiene su propio campo «Aviso». Las que no tienen hora usan la «Hora del aviso en tareas sin hora».</li><li>Los avisos llegan mientras la app esté abierta, aunque esté minimizada. Si estaba cerrada, verás los pendientes al abrirla.</li></ul></div></details>
+    <div class="help-body"><ul><li>Actívalos en «Ajustes y avisos» → «Activar notificaciones».</li><li>Cada tarea tiene su propio campo «Aviso». Las que no tienen hora usan la «Hora del aviso en tareas sin hora».</li><li>Los avisos llegan mientras la app esté abierta, aunque esté minimizada. Si estaba cerrada, verás los pendientes al abrirla.</li><li>La notificación trae dos botones: <strong>Hecha</strong> (o «Retomar» / «Ya ha respondido») y <strong>Aplazar 1 h</strong>, que vuelve a avisar en una hora sin cambiar la fecha de la tarea. Si la app está cerrada, el botón se aplica al abrirla.</li><li>En el ordenador, con la app instalada, el icono muestra el <strong>número de tareas de hoy y vencidas</strong>. Se actualiza mientras la app está abierta. En Android no hay número: el sistema pone un punto cuando hay notificaciones.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-save"/></svg>Copias de seguridad<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Los datos se guardan en este navegador. Haz copias con «Exportar» (en el móvil: «Más» → «Exportar copia»).</li><li>«Importar» te deja elegir entre <strong>fusionar</strong> la copia con lo actual (no se pierde nada; en cada tarea prevalece la versión más reciente) o <strong>sustituir</strong> todo. Las dos se pueden deshacer.</li><li>La app te recuerda hacer copia cada cierto número de días; se cambia en «Ajustes y avisos».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-refresh"/></svg>Sincronizar el PC y el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1374,7 +1395,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
 const KEY='revisorGeneral_v9', UI_KEY='revisorGeneral_v9_ui', OLD_KEYS=['revisorGeneral_v8','revisorGeneral_v7','revisorGeneral_v6'];
 /* Almacenamiento: IndexedDB (sin el límite de ~5 MB de localStorage, que comparten otras apps del mismo origen) */
 const IDB_NAME='revisorTareas_db', IDB_STORE='kv', IDB_KEY='state', MIG_KEY='revisorGeneral_v9_idb', SYNC_KEY='revisorGeneral_v9_sync';
-const STATE_VERSION=12, TOMB_DAYS=180;
+const STATE_VERSION=13, TOMB_DAYS=180, TRASH_DAYS=30, ACT_KEY='notifActions';
 const LABEL={pending:'En proceso',paused:'Pausada',done:'Finalizada'};
 const STATUS_ICON={pending:'play',paused:'pause',done:'check-circle'};
 const PRIO_WEIGHT={urgente:3,alta:2,normal:1};
@@ -1556,6 +1577,9 @@ function normalizeItem(raw){
     status,
     reopenStatus:it.reopenStatus==='review'||it.reopenStatus==='paused'?'paused':'pending',
     pauseNote:status==='paused'&&typeof it.pauseNote==='string'?it.pauseNote.trim().slice(0,120):'',
+    resumeAt:status==='paused'&&parseYMD(it.resumeAt)?it.resumeAt:'',
+    resumeNotified:typeof it.resumeNotified==='string'?it.resumeNotified:'',
+    remindAt:status!=='done'&&validIso(it.remindAt)?it.remindAt:'',
     subtasks:Array.isArray(it.subtasks)?it.subtasks.filter(s=>s&&typeof s==='object').map(s=>({id:typeof s.id==='string'&&s.id?s.id:newId(),title:String(s.title??''),done:!!s.done})):[],
     comments:normalizeComments(it.comments,it.createdAt),
     habitica:normalizeHab(it.habitica),
@@ -1617,7 +1641,18 @@ function normalizeState(x){
     const archivedAt=validIso(a.archivedAt)?a.archivedAt:new Date().toISOString(), reviewedAt=validIso(a.reviewedAt)?a.reviewedAt:'';
     return {item:it,pid:String(a.pid||''),pname:String(a.pname||'Sin título'),archivedAt,reviewedAt,updatedAt:validIso(a.updatedAt)?a.updatedAt:legacyStamp(archivedAt,reviewedAt)};
   });
-  return {version:STATE_VERSION,activeId:projects.some(p=>p.id===x.activeId)?x.activeId:projects[0].id,projects,tags,settings:normalizeSettings(x.settings),archive,deleted:normalizeDeleted(x.deleted)};
+  /* Papelera: tareas borradas, con su proyecto de origen. arch guarda los datos del archivo si venían de ahí; byProject, si se borraron con su proyecto */
+  const trash=(Array.isArray(x.trash)?x.trash:[]).filter(a=>a&&typeof a==='object'&&a.item&&typeof a.item==='object').map(a=>{
+    const it=normalizeItem(a.item);
+    if(seen.has(it.id)) it.id=newId();
+    seen.add(it.id); uniqCm(it);
+    it.tags=[...new Set(it.tags.map(v=>{ const t=tags.find(t=>t.id===v); return t?t.id:''; }).filter(Boolean))];
+    const deletedAt=validIso(a.deletedAt)?a.deletedAt:new Date().toISOString(), ar=a.arch&&typeof a.arch==='object'?a.arch:null;
+    return {item:it,pid:String(a.pid||''),pname:String(a.pname||'Sin título'),deletedAt,byProject:!!a.byProject,
+      arch:ar?{archivedAt:validIso(ar.archivedAt)?ar.archivedAt:deletedAt,reviewedAt:validIso(ar.reviewedAt)?ar.reviewedAt:''}:null,
+      updatedAt:validIso(a.updatedAt)?a.updatedAt:legacyStamp(deletedAt)};
+  });
+  return {version:STATE_VERSION,activeId:projects.some(p=>p.id===x.activeId)?x.activeId:projects[0].id,projects,tags,settings:normalizeSettings(x.settings),archive,trash,deleted:normalizeDeleted(x.deleted)};
 }
 /* Elementos borrados (para que un borrado se propague entre dispositivos): {clave: fecha ISO}; se olvidan pasados TOMB_DAYS días */
 function normalizeDeleted(d){
@@ -1629,7 +1664,7 @@ function normalizeDeleted(d){
 const blankProject=(n='Nuevo proyecto')=>({id:newId(),name:n,items:[],updatedAt:''});
 function blankState(){
   const p=blankProject('Mi proyecto principal');
-  return {version:STATE_VERSION,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS).map(t=>({...t,updatedAt:''})),settings:normalizeSettings({}),archive:[],deleted:{}};
+  return {version:STATE_VERSION,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS).map(t=>({...t,updatedAt:''})),settings:normalizeSettings({}),archive:[],trash:[],deleted:{}};
 }
 /* Datos de versiones anteriores, guardados en localStorage */
 function loadLegacy(){
@@ -1753,7 +1788,7 @@ if(bc) bc.onmessage=async()=>{
 /* ================= Seguimiento de cambios (para sincronizar) ================= */
 /* Cada elemento (tarea, proyecto, etiqueta, entrada del archivo) lleva su updatedAt. Se detectan los cambios
    comparando con la «firma» que tenía en el último guardado; lo que ya no existe se anota en deleted. */
-const itemSig=it=>JSON.stringify(it,(k,v)=>(k==='updatedAt'||k==='notified'||k==='followNotified')?undefined:v);
+const itemSig=it=>JSON.stringify(it,(k,v)=>(k==='updatedAt'||k==='notified'||k==='followNotified'||k==='resumeNotified'||k==='remindAt')?undefined:v);
 function indexState(st){
   const m=new Map();
   st.projects.forEach(p=>{
@@ -1762,8 +1797,10 @@ function indexState(st){
   });
   st.tags.forEach(t=>m.set('tag:'+t.id,{ref:t,sig:'G'+JSON.stringify([t.name,t.emoji,t.bg,t.text])}));
   st.archive.forEach(a=>{ m.set(a.item.id,{ref:a,sig:'A'+JSON.stringify([a.pid,a.pname,a.archivedAt,a.reviewedAt])+itemSig(a.item)}); indexComments(m,a.item); });
+  (st.trash||[]).forEach(a=>{ m.set(a.item.id,{ref:a,sig:trashSig(a)}); indexComments(m,a.item); });
   return m;
 }
+const trashSig=a=>'X'+JSON.stringify([a.pid,a.pname,a.deletedAt,a.byProject,a.arch])+itemSig(a.item);
 /* Cada comentario lleva su propio updatedAt y su borrado se anota (cm:id): así se fusionan uno a uno entre dispositivos */
 function indexComments(m,it){ (it.comments||[]).forEach(c=>m.set('cm:'+c.id,{ref:c,sig:'C'+itemSig(c)})); }
 const sigsOf=idx=>{ const m=new Map(); idx.forEach((e,k)=>m.set(k,e.sig)); return m; };
@@ -1927,11 +1964,14 @@ const isSnoozed=it=>!!it.snoozedUntil&&it.status!=='done'&&todayStr()<it.snoozed
 const isWaiting=it=>!!it.waitingFor&&it.status!=='done';
 const isPaused=it=>it.status==='paused';
 const followDue=it=>isWaiting(it)&&!!it.followUp&&it.followUp<=todayStr();
+/* Pausada con fecha para retomar (si además está en espera, manda la fecha de reclamar) */
+const resumes=it=>isPaused(it)&&!isWaiting(it)&&!!it.resumeAt;
+const resumeDue=it=>resumes(it)&&it.resumeAt<=todayStr();
 const snoozeDateFor=(due,r)=>{ const d=parseYMD(due); if(!d||!r) return ''; const s=ymd(addDays(d,-r.showBefore)); return s>todayStr()?s:''; };
 function reschedule(item){
   const next=computeNext(item); if(!next) return null;
   item.history=[...item.history,new Date().toISOString()].slice(-200);
-  item.dueDate=ymd(next); item.status='pending'; item.reopenStatus='pending'; item.completedAt=''; item.notified='';
+  item.dueDate=ymd(next); item.status='pending'; item.reopenStatus='pending'; item.completedAt=''; item.notified=''; item.remindAt=''; item.resumeAt=''; item.resumeNotified='';
   item.subtasks.forEach(s=>{ s.done=false; });
   item.recurrence.occurrence++; item.recurrence.anchor=item.dueDate;
   item.snoozedUntil=snoozeDateFor(item.dueDate,item.recurrence);
@@ -1943,7 +1983,8 @@ function applyStatus(item,p,v,keepPos){
   if(v==='done'){ item.waitingFor=''; item.followUp=''; }
   if(v==='done'&&item.recurrence){ const r=reschedule(item); if(r) return r; }
   if(v==='done'&&!keepPos&&p){ const ix=p.items.indexOf(item); if(ix>=0&&ix<p.items.length-1){ p.items.splice(ix,1); p.items.push(item); } }
-  if(v!=='paused') item.pauseNote='';
+  if(v!=='paused'){ item.pauseNote=''; item.resumeAt=''; item.resumeNotified=''; }
+  if(v==='done') item.remindAt='';
   if(v==='done'){ item.reopenStatus=item.status==='paused'?'paused':'pending'; item.completedAt=new Date().toISOString(); if(item.recurrence) item.history=[...item.history,item.completedAt].slice(-200); }
   else item.completedAt='';
   item.status=v;
@@ -1971,7 +2012,7 @@ function setItemStatus(sl,v,card,msg){
 /* Poner fecha (planificador, acciones masivas, arrastrar a «Hoy») */
 function setDue(it,d){
   it.dueDate=d||''; if(!d){ it.dueTime=''; it.reminder='none'; }
-  it.notified=''; it.snoozedUntil='';
+  it.notified=''; it.remindAt=''; it.snoozedUntil='';
   if(it.recurrence&&d) it.recurrence.anchor=d;
 }
 
@@ -2020,7 +2061,7 @@ function duplicateItems(ids,targetId,reset){
   appState.projects.forEach(p=>p.items.filter(i=>set.has(i.id)).forEach(i=>{
     const c=clone(i); c.id=newId(); c.subtasks.forEach(s=>s.id=newId());
     c.comments=reset?[]:c.comments.map(x=>({...x,id:newId()}));
-    c.notified=''; c.history=[]; c.snoozedUntil=''; c.habitica=null; c.createdAt=new Date().toISOString();
+    c.notified=''; c.resumeNotified=''; c.remindAt=''; c.history=[]; c.snoozedUntil=''; c.habitica=null; c.createdAt=new Date().toISOString();
     if(p===dst) c.title+=' (copia)';
     if(reset){ c.status='pending'; c.reopenStatus='pending'; c.completedAt=''; c.subtasks.forEach(s=>s.done=false); }
     copies.push(c);
@@ -2052,6 +2093,7 @@ function todayEntries(){
   const t=todayStr(), out=[];
   appState.projects.forEach(p=>p.items.forEach(it=>{
     if(isWaiting(it)){ if(followDue(it)) out.push({p,it}); return; }
+    if(resumeDue(it)){ out.push({p,it}); return; }
     if(isSnoozed(it)||isPaused(it)) return;
     if(!it.dueDate||it.dueDate>t) return;
     if(it.status==='done'&&!(it.completedAt&&ymd(new Date(it.completedAt))===t)) return;
@@ -2065,7 +2107,7 @@ const todayPending=()=>todayEntries().filter(e=>e.it.status!=='done').length;
 function rangeEntries(mode){
   const t=todayStr(), tm=ymd(addDays(new Date(),1)), end=ymd(addDays(new Date(),6)), out=[];
   appState.projects.forEach(p=>p.items.forEach(it=>{
-    if(isPaused(it)&&!isWaiting(it)) return;
+    if(isPaused(it)&&!isWaiting(it)&&!it.resumeAt) return;
     const d=effDate(it); if(!d) return;
     if(mode==='tomorrow'){ if(d===tm) out.push({p,it}); return; }
     if(d>end) return;
@@ -2074,8 +2116,8 @@ function rangeEntries(mode){
   }));
   return out;
 }
-/* Fecha que cuenta en las vistas: la de reclamar si está en espera */
-const effDate=it=>isWaiting(it)?it.followUp:it.dueDate;
+/* Fecha que cuenta en las vistas: la de reclamar si está en espera y la de retomar si está pausada */
+const effDate=it=>isWaiting(it)?it.followUp:resumes(it)?it.resumeAt:it.dueDate;
 function waitingEntries(){ const out=[]; appState.projects.forEach(p=>p.items.forEach(it=>{ if(isWaiting(it)) out.push({p,it}); })); return out; }
 const viewEntries=mode=>mode==='today'?todayEntries():mode==='waiting'?waitingEntries():rangeEntries(mode);
 const rangePending=mode=>rangeEntries(mode).filter(e=>e.it.status!=='done').length;
@@ -2124,7 +2166,7 @@ function dateSheetItems(id){
 function openPostponeSheet(sl){ openSheet(`Aplazar «${short(sl.title,50)}»`,[...dateSheetItems(sl.id),{label:'Elegir otra fecha',icon:'calendar',fn:()=>openModal(sl)}]); }
 function confirmDelete(sl){
   if(sl.recurrence&&!confirm('Esta tarea se repite. Si la borras, se acaba la serie y no volverá a aparecer.\n\nPara marcarla como hecha usa la casilla de la izquierda.\n\n¿Borrarla de todas formas?')) return;
-  commit(`🗑️ «${short(sl.title)}» eliminada`,()=>{ const f=findProjectOf(sl.id); if(!f) return false; f.items=f.items.filter(i=>i.id!==sl.id); });
+  commit(`🗑️ «${short(sl.title)}» enviada a la papelera`,()=>trashItems([sl.id])?undefined:false);
 }
 function openCardSheet(sl){
   openSheet(sl.title,[
@@ -2151,6 +2193,7 @@ function openMoreSheet(){
     {label:'Etiquetas',icon:'tag',fn:()=>$('openTagsBtn').click()},
     {label:'Ajustes y avisos',icon:'sliders',fn:()=>$('openSettingsBtn').click()},
     {label:'Archivo',icon:'archive',note:archivePending().length?pl(archivePending().length,'por revisar','por revisar'):String(appState.archive.length||''),fn:()=>openArchive()},
+    {label:'Papelera',icon:'trash',note:String(appState.trash.length||''),fn:()=>openTrash()},
     {label:'Instrucciones',icon:'help',fn:()=>$('openHelpBtn').click()},
     {sec:'Copia de seguridad'},
     {label:'Exportar copia',icon:'download',fn:exportData},
@@ -2301,7 +2344,7 @@ function attachKanbanDrag(handle,card,sl,p){
 function renderSidebar(){
   const tb=$('todayBtn');
   tb.classList.toggle('active',isToday());
-  const tp=todayPending(); $('todayCount').textContent=tp; $('todayCount').classList.toggle('hot',tp>0&&!isToday());
+  const tp=todayPending(); updateAppBadge(tp); $('todayCount').textContent=tp; $('todayCount').classList.toggle('hot',tp>0&&!isToday());
   $('todayCount').title=pl(tp,'tarea pendiente para hoy o vencida','tareas pendientes para hoy o vencidas');
   $('bnTodayCount').textContent=tp&&!isToday()?String(tp):'';
   $('bnToday').classList.toggle('active',isToday());
@@ -2312,6 +2355,7 @@ function renderSidebar(){
   $('calendarBtn').classList.toggle('active',ui.mode==='calendar');
   const ap=archivePending().length; $('archiveCount').textContent=ap?String(ap):(appState.archive.length||''); $('archiveCount').classList.toggle('hot',ap>0);
   $('archiveCount').title=ap?pl(ap,'tarea archivada por revisar','tareas archivadas por revisar'):pl(appState.archive.length,'tarea archivada','tareas archivadas');
+  $('trashCount').textContent=appState.trash.length||''; $('trashCount').title=pl(appState.trash.length,'tarea en la papelera','tareas en la papelera');
   const wAll=waitingEntries(), wDue=wAll.filter(e=>followDue(e.it)).length;
   $('waitingCount').textContent=wDue?`${wDue}/${wAll.length}`:wAll.length; $('waitingCount').classList.toggle('hot',wDue>0&&ui.mode!=='waiting');
   $('waitingCount').title=pl(wAll.length,'tarea en espera','tareas en espera')+(wDue?`, ${wDue} para reclamar`:'');
@@ -2339,8 +2383,10 @@ function renderSidebar(){
       tools.append(up,down);
       if(projects.length>1) tools.append(btn('','','Eliminar proyecto',e=>{
         e.stopPropagation();
-        if(!confirm(`¿Eliminar el proyecto «${p.name}» y sus ${pl(p.items.length,'elemento','elementos')}?`)) return;
-        commit(`🗑️ Proyecto «${short(p.name)}» eliminado`,()=>{
+        if(!confirm(`¿Eliminar el proyecto «${p.name}»?`+(p.items.length?` Sus ${pl(p.items.length,'elemento','elementos')} irán a la papelera ${TRASH_DAYS} días.`:''))) return;
+        commit(`🗑️ Proyecto «${short(p.name)}» enviado a la papelera`,()=>{
+          const now=new Date().toISOString();
+          p.items.forEach(it=>appState.trash.push(trashEntry(it,p,now,true)));
           appState.projects=appState.projects.filter(x=>x.id!==p.id);
           appState.activeId=appState.projects[Math.max(0,idx-1)].id; selected.clear(); suppressConfetti=true;
         });
@@ -2572,12 +2618,14 @@ function createCard(sl,p,ctx){
     badges.append(btn('Mostrar ya','secondary small','Mostrarla ya en el tablero',e=>{ e.stopPropagation(); commit(null,()=>{ const f=findItem(sl.id); if(f) f.it.snoozedUntil=''; }); }));
   }
   if(isPaused(sl)){
-    const pb=badge('paused','pause','Pausada'+(sl.pauseNote?': '+sl.pauseNote:''));
-    pb.title=sl.pauseNote?`Pausada: ${sl.pauseNote}`:'Pausada. Pulsa para anotar el motivo';
+    const rd=resumeDue(sl), rs=sl.resumeAt&&!isWaiting(sl)?(rd?'Para retomar':'Retomar el '+fmtDate(sl.resumeAt,true)):'';
+    const pb=badge('paused'+(rd?' due':''),rd?'play':'pause','Pausada'+(sl.pauseNote?': '+sl.pauseNote:'')+(rs?' · '+rs:''));
+    pb.title=(sl.pauseNote?`Pausada: ${sl.pauseNote}`:'Pausada. Pulsa para anotar el motivo')+(sl.resumeAt?`. Retomar el ${fmtDate(sl.resumeAt,true)}`:'');
     pb.setAttribute('role','button'); pb.tabIndex=0;
     const f=e=>{ e.stopPropagation(); openModal(sl); setTimeout(()=>$('modPauseNote').focus(),50); };
     pb.addEventListener('click',f); pb.addEventListener('keydown',e=>{ if(e.key==='Enter') f(e); });
     badges.append(pb);
+    if(rd) badges.append(btn('Retomar','secondary small','Pasarla a «En proceso»',e=>{ e.stopPropagation(); setItemStatus(sl,'pending'); }));
   }
   if(isWaiting(sl)){
     const due=followDue(sl);
@@ -2727,9 +2775,10 @@ function renderApp(){
     const t=todayStr(), tm=ymd(addDays(new Date(),1));
     let groups;
     if(ui.mode==='today') groups=[
-      {title:'Vencidas',icon:'alert-circle',cls:'overdue',items:vis.filter(e=>!isWaiting(e.it)&&e.it.dueDate&&e.it.dueDate<t)},
-      {title:'Para hoy',icon:'sun',cls:'',items:vis.filter(e=>!isWaiting(e.it)&&e.it.dueDate===t)},
-      {title:'Para reclamar',icon:'hourglass',cls:'waitgrp',items:vis.filter(e=>isWaiting(e.it))}
+      {title:'Vencidas',icon:'alert-circle',cls:'overdue',items:vis.filter(e=>!isWaiting(e.it)&&!resumeDue(e.it)&&e.it.dueDate&&e.it.dueDate<t)},
+      {title:'Para hoy',icon:'sun',cls:'',items:vis.filter(e=>!isWaiting(e.it)&&!resumeDue(e.it)&&e.it.dueDate===t)},
+      {title:'Para reclamar',icon:'hourglass',cls:'waitgrp',items:vis.filter(e=>isWaiting(e.it))},
+      {title:'Para retomar',icon:'play',cls:'waitgrp',items:vis.filter(e=>resumeDue(e.it))}
     ];
     else if(ui.mode==='tomorrow') groups=[{title:'Para mañana',icon:'sunrise',cls:'',items:vis}];
     else if(ui.mode==='waiting'){
@@ -2967,7 +3016,7 @@ function showMarkdownPreview(){
 }
 function formSignature(){
   return JSON.stringify([$('modTitle').value,$('modProject').value,[...tempItemTags].sort(),$('modPriority').value,$('modDate').value,$('modTime').value,
-    $('modReminder').value,$('modLink').value,$('modNotes').value,$('modNewSubtask').value,tempSubtasks,recFromForm(),$('modWaitFor').value,$('modFollowUp').value,$('modStatus').value,$('modPauseNote').value,$('cmInput').value.trim(),editingItemId?0:tempComments]);
+    $('modReminder').value,$('modLink').value,$('modNotes').value,$('modNewSubtask').value,tempSubtasks,recFromForm(),$('modWaitFor').value,$('modFollowUp').value,$('modStatus').value,$('modPauseNote').value,$('modResumeAt').value,$('cmInput').value.trim(),editingItemId?0:tempComments]);
 }
 function openModal(item=null){
   if($('itemModal').open) return;
@@ -2980,11 +3029,11 @@ function openModal(item=null){
     $('modReminder').value=item.reminder; $('modLink').value=item.link; $('modNotes').value=item.notes;
     tempSubtasks=clone(item.subtasks); editingRecOcc=item.recurrence?item.recurrence.occurrence:1; editingHistory=item.history;
     $('modWaitFor').value=item.waitingFor; $('modFollowUp').value=item.followUp;
-    $('modStatus').value=item.status; $('modPauseNote').value=item.pauseNote||'';
+    $('modStatus').value=item.status; $('modPauseNote').value=item.pauseNote||''; $('modResumeAt').value=item.resumeAt||'';
     recToForm(item.recurrence,item.dueDate);
   } else {
     editingItemId=null; $('modalTitle').textContent='Nuevo elemento';
-    ['modTitle','modDate','modTime','modLink','modNotes','modWaitFor','modFollowUp','modPauseNote'].forEach(id=>$(id).value='');
+    ['modTitle','modDate','modTime','modLink','modNotes','modWaitFor','modFollowUp','modPauseNote','modResumeAt'].forEach(id=>$(id).value='');
     $('modStatus').value='pending';
     if(['today','tomorrow','week'].includes(ui.mode)) $('modDate').value=ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):todayStr();
     tempItemTags=ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
@@ -3025,7 +3074,8 @@ function saveModal(){
     reminder:due?$('modReminder').value:'none',link,notes:$('modNotes').value,
     subtasks:clone(tempSubtasks).filter(s=>s.title.trim()),recurrence:rec,
     waitingFor:$('modWaitFor').value.trim().slice(0,80),followUp:$('modWaitFor').value.trim()?$('modFollowUp').value:'',
-    pauseNote:$('modStatus').value==='paused'?$('modPauseNote').value.trim().slice(0,120):''};
+    pauseNote:$('modStatus').value==='paused'?$('modPauseNote').value.trim().slice(0,120):'',
+    resumeAt:$('modStatus').value==='paused'?$('modResumeAt').value:''};
   const newStatus=$('modStatus').value;
   const dst=appState.projects.find(p=>p.id===$('modProject').value)||currentProject(), editing=editingItemId;
   const savedId=editing||newId();
@@ -3034,7 +3084,8 @@ function saveModal(){
     if(editing){
       const src=findProjectOf(editing), sl=src&&src.items.find(i=>i.id===editing);
       if(!sl){ dst.items.push(normalizeItem({...fields,id:savedId,status:'pending',comments:newComments})); return '✅ El elemento ya no existía (¿otra pestaña?); se ha creado de nuevo'; }
-      if(sl.dueDate!==fields.dueDate||sl.dueTime!==fields.dueTime||sl.reminder!==fields.reminder) sl.notified='';
+      if(sl.dueDate!==fields.dueDate||sl.dueTime!==fields.dueTime||sl.reminder!==fields.reminder){ sl.notified=''; sl.remindAt=''; }
+      if(sl.resumeAt!==fields.resumeAt) sl.resumeNotified='';
       if(sl.followUp!==fields.followUp) sl.followNotified='';
       if(sl.status==='done'){ fields.waitingFor=''; fields.followUp=''; }
       const wasSnoozed=!!sl.snoozedUntil, dateChanged=sl.dueDate!==fields.dueDate;
@@ -3045,7 +3096,7 @@ function saveModal(){
       if(dateChanged&&!wasSnoozed) sl.snoozedUntil='';
       let spawn=null;
       if(sl.status!==newStatus) spawn=applyStatus(sl,src,newStatus);
-      if(newStatus==='paused') sl.pauseNote=fields.pauseNote;
+      if(newStatus==='paused'){ sl.pauseNote=fields.pauseNote; sl.resumeAt=fields.resumeAt; }
       if(dst!==src){ src.items=src.items.filter(i=>i!==sl); dst.items.push(sl); return `✅ Guardado y movido a «${dst.name}»`; }
       return spawn?spawnMsg(spawn):'✅ Cambios guardados';
     }
@@ -3294,9 +3345,13 @@ function archKeep(ids){ const set=new Set(ids), now=new Date().toISOString(); co
 function archDelete(ids){
   if(!ids.length) return;
   const one=ids.length===1&&appState.archive.find(a=>a.item.id===ids[0]);
-  if(!confirm(one?`¿Eliminar definitivamente «${short(one.item.title,60)}»?`:`¿Eliminar definitivamente ${pl(ids.length,'tarea archivada','tareas archivadas')}?`)) return;
+  if(!confirm(one?`¿Enviar a la papelera «${short(one.item.title,60)}»?`:`¿Enviar a la papelera ${pl(ids.length,'tarea archivada','tareas archivadas')}?`)) return;
   const set=new Set(ids);
-  commit(null,()=>{ const before=appState.archive.length; appState.archive=appState.archive.filter(a=>!set.has(a.item.id)); const n=before-appState.archive.length; return n?`🗑️ ${pl(n,'tarea eliminada','tareas eliminadas')} definitivamente`:false; });
+  commit(null,()=>{
+    const now=new Date().toISOString(); let n=0;
+    appState.archive=appState.archive.filter(a=>{ if(!set.has(a.item.id)) return true; appState.trash.push({...trashEntry(a.item,{id:a.pid,name:a.pname},now),arch:{archivedAt:a.archivedAt,reviewedAt:a.reviewedAt}}); n++; return false; });
+    return n?`🗑️ ${pl(n,'tarea enviada','tareas enviadas')} a la papelera`:false;
+  });
   renderArchive();
 }
 function archReopen(id){
@@ -3334,7 +3389,7 @@ function archRow(a,pending){
   const acts=el('div','arch-acts');
   if(pending) acts.append(btn('Conservar','secondary small','No volver a preguntar por esta tarea',()=>archKeep([it.id]),'check'));
   const cp=btn('Copiar','ghost small','Copiar como texto para documentarla',async()=>{ try{ await navigator.clipboard.writeText(archiveMd([a])); cp.lastChild.textContent='Copiada'; }catch(e){ downloadText(`tarea-${todayStr()}.md`,archiveMd([a])); } },'copy');
-  acts.append(cp,btn('Volver a abrir','ghost small','Devolverla a su proyecto como pendiente',()=>archReopen(it.id),'undo'),btn('','ghost danger small icon','Eliminar definitivamente',()=>archDelete([it.id]),'trash'));
+  acts.append(cp,btn('Volver a abrir','ghost small','Devolverla a su proyecto como pendiente',()=>archReopen(it.id),'undo'),btn('','ghost danger small icon','Enviar a la papelera',()=>archDelete([it.id]),'trash'));
   row.append(main,acts);
   return row;
 }
@@ -3375,6 +3430,93 @@ function openArchive(q=''){
   closeDrawer(); closeSheet();
   $('archSearch').value=q; $('archiveModal').showModal(); renderArchive();
   if(!isMobile()) setTimeout(()=>$('archSearch').focus(),0);
+}
+
+/* ---- Papelera: lo borrado se guarda TRASH_DAYS días y se sincroniza como el archivo ---- */
+function trashEntry(it,p,now,byProject=false){ it.remindAt=''; return {item:it,pid:p.id,pname:p.name,deletedAt:now,byProject,arch:null}; }
+function trashItems(ids){
+  const set=new Set(ids), now=new Date().toISOString(); let n=0;
+  appState.projects.forEach(p=>{ p.items=p.items.filter(it=>{ if(!set.has(it.id)) return true; appState.trash.push(trashEntry(it,p,now)); n++; return false; }); });
+  ids.forEach(id=>selected.delete(id));
+  return n;
+}
+function restoreTrash(ids){
+  commit(null,()=>{
+    const set=new Set(ids), back=appState.trash.filter(a=>set.has(a.item.id));
+    if(!back.length) return false;
+    appState.trash=appState.trash.filter(a=>!set.has(a.item.id));
+    let made=''; const dst=new Set();
+    back.forEach(a=>{
+      if(a.arch){ appState.archive.push({item:a.item,pid:a.pid,pname:a.pname,archivedAt:a.arch.archivedAt,reviewedAt:a.arch.reviewedAt}); dst.add('el archivo'); return; }
+      let p=appState.projects.find(x=>x.id===a.pid);
+      if(!p){ p={id:a.pid||newId(),name:a.pname,items:[],updatedAt:''}; appState.projects.push(p); made=p.name; }
+      p.items.push(a.item); dst.add(`«${p.name}»`);
+    });
+    suppressConfetti=true;
+    return `↩️ ${pl(back.length,'tarea restaurada','tareas restauradas')}`+(dst.size===1?` en ${[...dst][0]}`:'')+(made?' (proyecto recuperado)':'');
+  });
+  renderTrash();
+}
+function trashPurge(ids){
+  if(!ids.length) return;
+  const one=ids.length===1&&appState.trash.find(a=>a.item.id===ids[0]);
+  if(!confirm(one?`¿Eliminar definitivamente «${short(one.item.title,60)}»? No se podrá recuperar.`:`¿Eliminar definitivamente ${pl(ids.length,'tarea','tareas')}? No se podrán recuperar.`)) return;
+  const set=new Set(ids);
+  commit(null,()=>{ const before=appState.trash.length; appState.trash=appState.trash.filter(a=>!set.has(a.item.id)); const n=before-appState.trash.length; return n?`🗑️ ${pl(n,'tarea eliminada','tareas eliminadas')} definitivamente`:false; });
+  renderTrash();
+}
+const trashExpired=a=>Date.parse(a.deletedAt)<=Date.now()-TRASH_DAYS*DAY_MS;
+let trashRanOn='';
+function purgeTrash(force=false){
+  const t=todayStr(); if(trashRanOn===t&&!force) return; trashRanOn=t;
+  if(!appState.trash.some(trashExpired)) return;
+  appState.trash=appState.trash.filter(a=>!trashExpired(a));
+  save(); renderSidebar();
+}
+function trashRow(a){
+  const it=a.item, row=el('div','arch-row'), main=el('div','arch-main');
+  main.append(el('strong','arch-title',it.title));
+  const left=Math.max(1,Math.ceil((Date.parse(a.deletedAt)+TRASH_DAYS*DAY_MS-Date.now())/DAY_MS));
+  const meta=el('div','badges-row');
+  meta.append(badge('proj',a.arch?'archive':'folder',(a.arch?'Archivo · ':'')+(a.pname||'Sin título')),badge('','trash','Eliminada el '+archFmt(a.deletedAt)),badge('snz','clock','Quedan '+pl(left,'día','días')));
+  it.tags.map(getTag).filter(Boolean).forEach(t=>{ const tb=el('span','tag-badge'); tb.append(el('span','tag-dot'),document.createTextNode(t.name)); tb.style.backgroundColor=t.bg; tb.style.color=t.text; tb.style.cursor='default'; meta.append(tb); });
+  main.append(meta);
+  const acts=el('div','arch-acts');
+  acts.append(btn('Restaurar','secondary small',a.arch?'Devolverla al archivo':'Devolverla a su proyecto',()=>restoreTrash([it.id]),'undo'),btn('','ghost danger small icon','Eliminar definitivamente',()=>trashPurge([it.id]),'trash'));
+  row.append(main,acts);
+  return row;
+}
+function renderTrash(){
+  if(!$('trashModal').open) return;
+  const body=$('trashBody'); body.replaceChildren();
+  const total=appState.trash.length, words=norm($('trashSearch').value).split(/\s+/).filter(Boolean);
+  const all=[...appState.trash].sort((a,b)=>b.deletedAt.localeCompare(a.deletedAt)).filter(a=>archMatches(a,words));
+  $('trashSummary').textContent=total?`${pl(total,'tarea','tareas')}. Se borran solas a los ${TRASH_DAYS} días.`:'';
+  $('trashEmptyBtn').hidden=!total;
+  if(!all.length){ body.append(total?emptyState('Nada coincide con la búsqueda','Prueba con otras palabras.'):emptyState('La papelera está vacía',`Lo que borres se guarda aquí ${TRASH_DAYS} días.`)); return; }
+  const groups=new Map();
+  all.filter(a=>a.byProject).forEach(a=>{ if(!groups.has(a.pid)) groups.set(a.pid,[]); groups.get(a.pid).push(a); });
+  groups.forEach(list=>{
+    const sec=el('section','arch-sec trash'), h=el('div','group-title');
+    h.append(ic('folder','sm'),document.createTextNode(`Proyecto «${list[0].pname}» `),el('span','n',`(${list.length})`)); sec.append(h);
+    const ids=appState.trash.filter(a=>a.byProject&&a.pid===list[0].pid).map(a=>a.item.id);
+    const r=el('div','row'); r.style.cssText='gap:8px;margin:4px 0 10px';
+    r.append(btn('Restaurar proyecto','secondary small','Recuperar el proyecto con todas sus tareas',()=>restoreTrash(ids),'undo')); sec.append(r);
+    list.forEach(a=>sec.append(trashRow(a)));
+    body.append(sec);
+  });
+  const rest=all.filter(a=>!a.byProject);
+  if(rest.length){
+    const sec=el('section','arch-sec trash'), h=el('div','group-title');
+    h.append(ic('trash','sm'),document.createTextNode('Tareas eliminadas '),el('span','n',`(${rest.length})`)); sec.append(h);
+    rest.forEach(a=>sec.append(trashRow(a)));
+    body.append(sec);
+  }
+}
+function openTrash(){
+  if(document.querySelector('dialog[open]')) return;
+  closeDrawer(); closeSheet();
+  $('trashSearch').value=''; $('trashModal').showModal(); renderTrash();
 }
 
 /* ---- En espera ---- */
@@ -3551,7 +3693,7 @@ async function connectHab(){
 let calAnchor=todayStr(), calSel=todayStr();
 const CAL_H0=8, CAL_H1=22;
 const calWeekStart=d=>{ const x=startOfDay(d); return addDays(x,-((x.getDay()+6)%7)); };
-const calDateOf=it=>isWaiting(it)?(it.followUp||it.dueDate):it.dueDate;
+const calDateOf=it=>isWaiting(it)?(it.followUp||it.dueDate):resumes(it)?it.resumeAt:it.dueDate;
 const capFirst=x=>x.charAt(0).toUpperCase()+x.slice(1);
 function calMode(){ return isMobile()?'day':ui.calView; }
 function calTitle(){
@@ -3565,7 +3707,7 @@ function calEntries(from,to,words){
   const t=todayStr(), out=[], keep=ui.showScheduled; ui.showScheduled=true;
   const pf=projFilter();
   appState.projects.forEach(p=>(pf&&p.id!==pf?[]:p.items).forEach(it=>{
-    if(it.status!=='pending') return;
+    if(it.status!=='pending'&&!resumes(it)) return;
     let d=calDateOf(it), od=''; if(!d) return;
     if(d<t){ od=d; d=t; }
     if(d<from||d>to) return;
@@ -3581,6 +3723,7 @@ function calMove(id,date,time){
     const f=findItem(id); if(!f) return false;
     const it=f.it, w=isWaiting(it)&&it.followUp;
     if(w){ if(it.followUp===date) return false; it.followUp=date; it.followNotified=''; return `⏳ Reclamar a ${it.waitingFor} el ${fmtDate(date,true)}`; }
+    if(resumes(it)){ if(it.resumeAt===date) return false; it.resumeAt=date; it.resumeNotified=''; return `⏸️ Retomar «${short(it.title)}» el ${fmtDate(date,true)}`; }
     const sameTime=time===undefined||time===it.dueTime;
     if(it.dueDate===date&&sameTime) return false;
     setDue(it,date);
@@ -3597,15 +3740,16 @@ function openModalAt(date,time=''){
 }
 function calChip(e,opts={}){
   const {it,p}=e, t=todayStr();
-  const c=el('div','cal-chip'+(it.priority!=='normal'?' cp-'+it.priority:'')+(isWaiting(it)?' wait':'')+(e.od?' overdue':''));
+  const c=el('div','cal-chip'+(it.priority!=='normal'?' cp-'+it.priority:'')+(isWaiting(it)||resumes(it)?' wait':'')+(e.od?' overdue':''));
   c.dataset.id=it.id; c.tabIndex=0; c.setAttribute('role','button');
   if(e.od) c.append(ic('alert-circle','sm'));
   if(isWaiting(it)) c.append(ic('hourglass','sm'));
+  if(resumes(it)) c.append(ic('pause','sm'));
   if(it.recurrence) c.append(ic('repeat','sm'));
-  if(it.dueTime&&!isWaiting(it)&&!e.od&&!opts.noTime) c.append(el('span','t',it.dueTime));
+  if(it.dueTime&&!isWaiting(it)&&!resumes(it)&&!e.od&&!opts.noTime) c.append(el('span','t',it.dueTime));
   c.append(el('span','n',isWaiting(it)?`${it.title} · ${it.waitingFor}`:it.title));
   if(e.od) c.append(el('span','od',fmtDate(e.od)));
-  c.title=(e.od?(isWaiting(it)?`Reclamar pendiente desde el ${fmtDate(e.od,true)}\n`:`Vencida el ${fmtDate(e.od,true)}\n`):'')+`${it.title}\n${p.name}`+(it.dueTime?` · ${it.dueTime}`:'')+(isWaiting(it)?`\nEn espera de ${it.waitingFor}`:'')+(it.recurrence?`\n${recSummary(it.recurrence)}`:'');
+  c.title=(e.od?(isWaiting(it)?`Reclamar pendiente desde el ${fmtDate(e.od,true)}\n`:resumes(it)?`Retomar pendiente desde el ${fmtDate(e.od,true)}\n`:`Vencida el ${fmtDate(e.od,true)}\n`):'')+`${it.title}\n${p.name}`+(it.dueTime?` · ${it.dueTime}`:'')+(isWaiting(it)?`\nEn espera de ${it.waitingFor}`:'')+(resumes(it)?`\nPausada: retomar este día`:'')+(it.recurrence?`\n${recSummary(it.recurrence)}`:'');
   const open=ev=>{ ev.stopPropagation(); if(c._dragged) return; openModal(it); };
   c.addEventListener('click',open); c.addEventListener('keydown',ev=>{ if(ev.key==='Enter') open(ev); });
   if(!isMobile()){
@@ -3676,7 +3820,7 @@ function renderCalendar(list,words){
   lastVisibleIds=ents.map(e=>e.it.id);
   $('countLabel').textContent=pl(ents.length,'tarea','tareas');
   const DOW=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  const hourOf=e=>e.it.dueTime&&!isWaiting(e.it)&&!e.od?Math.min(CAL_H1,Math.max(CAL_H0,parseInt(e.it.dueTime,10))):null;
+  const hourOf=e=>e.it.dueTime&&!isWaiting(e.it)&&!resumes(e.it)&&!e.od?Math.min(CAL_H1,Math.max(CAL_H0,parseInt(e.it.dueTime,10))):null;
 
   if(m==='month'){
     const grid=el('div','cal-month');
@@ -4319,9 +4463,10 @@ function recordsOf(st){
   const m=new Map();
   st.projects.forEach(p=>p.items.forEach(it=>m.set(it.id,{kind:'t',pid:p.id,item:it,at:it.updatedAt})));
   st.archive.forEach(a=>m.set(a.item.id,{kind:'a',entry:a,item:a.item,at:a.updatedAt}));
+  (st.trash||[]).forEach(a=>m.set(a.item.id,{kind:'x',entry:a,item:a.item,at:a.updatedAt}));
   return m;
 }
-const recSig=r=>r.kind==='t'?'T'+r.pid+'|'+itemSig(r.item):'A'+JSON.stringify([r.entry.pid,r.entry.pname,r.entry.archivedAt,r.entry.reviewedAt])+itemSig(r.item);
+const recSig=r=>r.kind==='x'?trashSig(r.entry):r.kind==='t'?'T'+r.pid+'|'+itemSig(r.item):'A'+JSON.stringify([r.entry.pid,r.entry.pname,r.entry.archivedAt,r.entry.reviewedAt])+itemSig(r.item);
 /* Une dos listas por clave: devuelve, en el orden local y luego los nuevos de GitHub, la versión ganadora de cada una */
 function unionWinners(la,ra,keyOf,atOf,sigOf){
   const lm=new Map(la.map(x=>[keyOf(x),x])), rm=new Map(ra.map(x=>[keyOf(x),x])), seen=new Set(), out=[];
@@ -4343,23 +4488,24 @@ function mergeStates(local,remote){
   const projects=unionWinners(local.projects,remote.projects,p=>p.id,p=>p.updatedAt,p=>p.name)
     .filter(x=>alive(x.k,x.w.updatedAt)).map(x=>({id:x.w.id,name:x.w.name,items:[],updatedAt:x.w.updatedAt}));
   if(!projects.length) projects.push(blankProject('Mi proyecto principal'));
-  const pMap=new Map(projects.map(p=>[p.id,p])), archive=[];
+  const pMap=new Map(projects.map(p=>[p.id,p])), archive=[], trash=[];
   const lr=recordsOf(local), rr=recordsOf(remote);
   unionWinners([...lr.values()],[...rr.values()],r=>r.item.id,r=>r.at,recSig).forEach(x=>{
     const w=x.w; if(!alive(x.k,w.at)) return;
     const item=clone(w.item), mine=lr.get(x.k);
-    if(mine&&w!==mine){ item.notified=mine.item.notified; item.followNotified=mine.item.followNotified; } /* los avisos ya mostrados son de cada dispositivo */
+    if(mine&&w!==mine){ item.notified=mine.item.notified; item.followNotified=mine.item.followNotified; item.resumeNotified=mine.item.resumeNotified; item.remindAt=mine.item.remindAt; } /* los avisos ya mostrados son de cada dispositivo */
     /* Comentarios: se unen los de las dos versiones (en cada uno gana el más reciente) y se respetan los borrados */
     const cl=x.local?x.local.item.comments||[]:[], cr=x.remote?x.remote.item.comments||[]:[];
     item.comments=unionWinners(cl,cr,c=>c.id,c=>c.updatedAt,c=>itemSig(c)).filter(y=>alive('cm:'+y.k,y.w.updatedAt)).map(y=>clone(y.w)).sort(byAt);
     if(w.kind==='a'){ const e=clone(w.entry); e.item=item; archive.push(e); }
+    else if(w.kind==='x'){ const e=clone(w.entry); e.item=item; trash.push(e); }
     else (pMap.get(w.pid)||projects[0]).items.push(item);
   });
-  return normalizeState({version:STATE_VERSION,activeId:local.activeId,projects,tags,settings:local.settings,archive,deleted:del});
+  return normalizeState({version:STATE_VERSION,activeId:local.activeId,projects,tags,settings:local.settings,archive,trash,deleted:del});
 }
 /* Un dispositivo recién estrenado (sin datos propios) adopta lo de GitHub tal cual, para no sumar un proyecto vacío */
 function isPristine(st){
-  return st.projects.length===1&&!st.projects[0].items.length&&st.projects[0].name==='Mi proyecto principal'&&!st.archive.length
+  return st.projects.length===1&&!st.projects[0].items.length&&st.projects[0].name==='Mi proyecto principal'&&!st.archive.length&&!(st.trash||[]).length
     &&!Object.keys(st.deleted).length&&st.tags.every(t=>!t.updatedAt);
 }
 function adoptRemote(remote,local){ const st=clone(remote); st.settings=local.settings; st.activeId=st.projects[0].id; return normalizeState(st); }
@@ -4388,7 +4534,7 @@ async function pipeBytes(u8,stream){
   return new Uint8Array(await new Response(stream.readable).arrayBuffer());
 }
 async function encryptState(st,saltB64){
-  const payload={app:'revisor-tareas',v:1,savedAt:new Date().toISOString(),projects:st.projects,tags:st.tags,archive:st.archive,deleted:st.deleted};
+  const payload={app:'revisor-tareas',v:1,savedAt:new Date().toISOString(),projects:st.projects,tags:st.tags,archive:st.archive,trash:st.trash,deleted:st.deleted};
   let bytes=te.encode(JSON.stringify(payload)), z=0;
   if(typeof CompressionStream==='function'){ try{ bytes=await pipeBytes(bytes,new CompressionStream('gzip')); z=1; }catch(e){ bytes=te.encode(JSON.stringify(payload)); z=0; } }
   const salt=saltB64?b64d(saltB64):crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
@@ -4410,7 +4556,7 @@ async function decryptEnv(text){
     plain=await pipeBytes(plain,new DecompressionStream('gzip'));
   }
   let obj; try{ obj=JSON.parse(td.decode(plain)); }catch(e){ throw bad(); }
-  const st=normalizeState({projects:obj.projects,tags:obj.tags,archive:obj.archive,deleted:obj.deleted,settings:{}});
+  const st=normalizeState({projects:obj.projects,tags:obj.tags,archive:obj.archive,trash:obj.trash,deleted:obj.deleted,settings:{}});
   if(!st) throw bad();
   return {st,salt:env.salt};
 }
@@ -4610,12 +4756,13 @@ async function enableNotifications(){
   appState.settings.notifyEnabled=true; save(); renderSettings();
   notify('Notificaciones activadas','Te avisaré de las tareas que tengan «Aviso» configurado.',{tag:'test'});
 }
-async function notify(title,body,data={}){
+/* actions: botones de la notificación (solo con el service worker). Los gestiona sw.js y se aplican en drainNotifActions */
+async function notify(title,body,data={},actions){
   if(notifState()!=='on') return false;
   const opts={body,icon:'icon-192.png',badge:'icon-192.png',tag:data.tag||undefined,renotify:!!data.tag,silent:false,requireInteraction:true,vibrate:[250,120,250],data,lang:'es'};
   try{
     const reg=swReg||(navigator.serviceWorker&&await Promise.race([navigator.serviceWorker.ready,new Promise(r=>setTimeout(()=>r(null),3000))]));
-    if(reg){ await reg.showNotification(title,opts); return true; }
+    if(reg){ await reg.showNotification(title,actions?{...opts,actions}:opts); return true; }
   }catch(e){}
   try{
     const n=new Notification(title,opts);
@@ -4628,6 +4775,50 @@ function whenText(it){
   let s=it.dueDate===t?'hoy':it.dueDate===ymd(addDays(new Date(),1))?'mañana':`el ${fmtDate(it.dueDate,true)}`;
   if(it.dueTime) s+=` a las ${it.dueTime}`;
   return s;
+}
+const NOTIF_ACTIONS={
+  task:[{action:'done',title:'Hecha'},{action:'snooze',title:'Aplazar 1 h'}],
+  resume:[{action:'done',title:'Retomar'},{action:'snooze',title:'Aplazar 1 h'}],
+  follow:[{action:'done',title:'Ya ha respondido'},{action:'snooze',title:'Aplazar 1 h'}]
+};
+function alertText({p,it,overdue,follow,resume}){
+  if(follow) return {kind:'follow',title:`Reclamar a ${it.waitingFor}`,body:`${it.title}. Proyecto: ${p.name}`};
+  if(resume) return {kind:'resume',title:`Retomar: ${it.title}`,body:(it.pauseNote?`Pausada: ${it.pauseNote}. `:'')+`Proyecto: ${p.name}`};
+  return {kind:'task',title:it.title,body:(it.dueDate?`${overdue?'Vencida':'Vence'} ${whenText(it)}. `:'')+`Proyecto: ${p.name}`};
+}
+/* Los botones de las notificaciones dejan su acción en IndexedDB (sw.js) y aquí se aplican:
+   así funcionan también con la app cerrada, y se aplican al abrirla */
+function idbTake(k){
+  return idbOpen().then(db=>new Promise((res,rej)=>{
+    const t=db.transaction(IDB_STORE,'readwrite'), s=t.objectStore(IDB_STORE); let v;
+    const g=s.get(k); g.onsuccess=()=>{ v=g.result; if(v!==undefined) s.delete(k); };
+    t.oncomplete=()=>res(v); t.onerror=()=>rej(t.error); t.onabort=()=>rej(t.error);
+  }));
+}
+function applyNotifAction(a){
+  const f=findItem(a.itemId); if(!f) return;
+  const it=f.it;
+  if(a.action==='snooze'){
+    it.remindAt=new Date((a.at||Date.now())+3600000).toISOString(); save();
+    showToast(`⏰ «${short(it.title)}»: te aviso otra vez en 1 hora`,{icon:'bell'});
+  }
+  else if(a.kind==='resume'){ if(isPaused(it)) setItemStatus(it,'pending'); }
+  else if(a.kind==='follow'){ if(it.waitingFor) clearWaiting(it.id); }
+  else if(it.status!=='done') setItemStatus(it,'done');
+}
+let notifDraining=false;
+async function drainNotifActions(){
+  if(notifDraining||storeMode!=='idb'||drag.kind||document.querySelector('dialog[open]')) return;
+  notifDraining=true;
+  try{ const list=await idbTake(ACT_KEY); if(Array.isArray(list)) list.forEach(applyNotifAction); }catch(e){}
+  notifDraining=false;
+}
+/* Número en el icono de la app instalada (Windows y macOS; Android no lo admite) */
+let lastBadgeN=-1;
+function updateAppBadge(n){
+  if(!('setAppBadge' in navigator)||n===lastBadgeN) return;
+  lastBadgeN=n;
+  try{ (n?navigator.setAppBadge(n):navigator.clearAppBadge()).catch(()=>{}); }catch(e){}
 }
 function checkReminders(){
   const now=Date.now(), fired=[];
@@ -4646,15 +4837,31 @@ function checkReminders(){
     const trig=new Date(d.getFullYear(),d.getMonth(),d.getDate(),hh,mm).getTime();
     if(now>=trig){ it.followNotified=it.followUp; if(now-trig<2*DAY_MS) fired.push({p,it,follow:true}); }
   }));
-  if(!fired.length) return;
+  appState.projects.forEach(p=>p.items.forEach(it=>{
+    if(!resumeDue(it)||it.resumeNotified===it.resumeAt) return;
+    const d=parseYMD(it.resumeAt); const [hh,mm]=appState.settings.defaultHour.split(':').map(Number);
+    const trig=new Date(d.getFullYear(),d.getMonth(),d.getDate(),hh,mm).getTime();
+    if(now>=trig){ it.resumeNotified=it.resumeAt; if(now-trig<2*DAY_MS) fired.push({p,it,resume:true}); }
+  }));
+  /* «Aplazar 1 h» desde la notificación: vuelve a avisar sin cambiar la fecha de la tarea */
+  let dirty=false;
+  appState.projects.forEach(p=>p.items.forEach(it=>{
+    if(!it.remindAt||now<Date.parse(it.remindAt)) return;
+    it.remindAt=''; dirty=true;
+    if(it.status==='done'||fired.some(f=>f.it===it)) return;
+    if(followDue(it)) fired.push({p,it,follow:true});
+    else if(resumeDue(it)) fired.push({p,it,resume:true});
+    else if(!isWaiting(it)&&!isPaused(it)) fired.push({p,it,overdue:isOverdue(it)});
+  }));
+  if(!fired.length){ if(dirty) save(); return; }
   save();
   if(fired.length>3){
     notify(`Tienes ${fired.length} avisos de tareas`,fired.slice(0,4).map(f=>'• '+f.it.title).join('\n')+(fired.length>4?'\n…':''),{tag:'resumen'});
     showToast(`${fired.length} tareas con aviso. Las tienes en «Hoy».`,{icon:'bell',action:'Ver Hoy',fn:switchToToday,timeout:15000});
   } else {
-    fired.forEach(({p,it,overdue,follow})=>notify(follow?`Reclamar a ${it.waitingFor}`:it.title,follow?`${it.title}. Proyecto: ${p.name}`:`${overdue?'Vencida':'Vence'} ${whenText(it)}. Proyecto: ${p.name}`,{tag:it.id,itemId:it.id,projectId:p.id}));
+    fired.forEach(f=>{ const a=alertText(f); notify(a.title,a.body,{tag:f.it.id,itemId:f.it.id,projectId:f.p.id,kind:a.kind},NOTIF_ACTIONS[a.kind]); });
     const f=fired[fired.length-1];
-    showToast(f.follow?`Reclamar a ${f.it.waitingFor}: ${short(f.it.title)}`:`${short(f.it.title)}: ${f.overdue?'vencida':'vence'} ${whenText(f.it)}`,{icon:'bell',action:'Abrir',fn:()=>openItemById(f.p.id,f.it.id),timeout:15000});
+    showToast(f.follow?`Reclamar a ${f.it.waitingFor}: ${short(f.it.title)}`:f.resume?`Retomar: ${short(f.it.title)}`:f.it.dueDate?`${short(f.it.title)}: ${f.overdue?'vencida':'vence'} ${whenText(f.it)}`:short(f.it.title),{icon:'bell',action:'Abrir',fn:()=>openItemById(f.p.id,f.it.id),timeout:15000});
   }
 }
 function checkBackupNotify(){
@@ -4664,13 +4871,15 @@ function checkBackupNotify(){
     notify('Copia de seguridad pendiente','Abre la app y pulsa «Exportar» para guardar una copia.',{tag:'backup'});
   }
 }
-function overdueSig(){ return appState.projects.map(p=>p.items.filter(i=>isOverdue(i)||isSnoozed(i)||followDue(i)).map(i=>i.id).join(',')).join('|'); }
+function overdueSig(){ return appState.projects.map(p=>p.items.filter(i=>isOverdue(i)||isSnoozed(i)||followDue(i)||resumeDue(i)).map(i=>i.id).join(',')).join('|'); }
 function tick(){
   checkReminders(); checkBackupNotify(); checkArchiveNotify();
   const busy=drag.kind||document.querySelector('dialog[open]');
   if(busy) return;
   if(renderPending){ renderPending=false; renderApp(); return; }
+  drainNotifActions();
   autoArchive();
+  purgeTrash();
   if(todayStr()!==lastDay){ lastDay=todayStr(); renderApp(); }
   else if(overdueSig()!==lastOverdueSig) renderApp();
   else renderBackupBanner();
@@ -4950,9 +5159,9 @@ $('bulkPriority').addEventListener('change',e=>{
 });
 $('bulkMoveBtn').addEventListener('click',()=>openMoveModal(selectedEntries().map(x=>x.it.id)));
 $('bulkDeleteBtn').addEventListener('click',()=>commit(null,()=>{
-  const n=selected.size; if(!n) return false;
-  appState.projects.forEach(p=>{ p.items=p.items.filter(i=>!selected.has(i.id)); }); selected.clear();
-  return `🗑️ ${pl(n,'elemento eliminado','elementos eliminados')}`;
+  const n=trashItems([...selected]); if(!n) return false;
+  selected.clear();
+  return `🗑️ ${pl(n,'elemento enviado','elementos enviados')} a la papelera`;
 }));
 $('bulkAllBtn').addEventListener('click',()=>{ lastVisibleIds.forEach(id=>selected.add(id)); renderApp(); });
 $('bulkNoneBtn').addEventListener('click',()=>{ selected.clear(); renderApp(); });
@@ -4963,6 +5172,10 @@ $('bannerExportBtn').addEventListener('click',exportData);
 $('archBannerOpenBtn').addEventListener('click',()=>openArchive());
 $('archBannerSnoozeBtn').addEventListener('click',()=>{ appState.settings.archiveSnooze=addDays(new Date(),7).toISOString(); save(); renderApp(); });
 $('openArchiveBtn').addEventListener('click',()=>openArchive());
+$('openTrashBtn').addEventListener('click',()=>openTrash());
+['trashCloseBtn','trashDoneBtn'].forEach(id=>$(id).addEventListener('click',()=>$('trashModal').close()));
+$('trashSearch').addEventListener('input',renderTrash);
+$('trashEmptyBtn').addEventListener('click',()=>trashPurge(appState.trash.map(a=>a.item.id)));
 ['archCloseBtn','archDoneBtn'].forEach(id=>$(id).addEventListener('click',()=>$('archiveModal').close()));
 $('archSearch').addEventListener('input',renderArchive);
 $('setArchiveDays').addEventListener('change',e=>{ appState.settings.archiveDays=clamp(parseInt(e.target.value,10)||7,1,90); e.target.value=appState.settings.archiveDays; save(); autoArchive(true); });
@@ -5048,9 +5261,11 @@ function syncControls(){
   syncControls(); applyTheme(); applySide();
   renderApp();
   autoArchive();
+  purgeTrash();
+  drainNotifActions();
   if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
     navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{ swReg=r; }).catch(()=>{});
-    navigator.serviceWorker.addEventListener('message',e=>{ if(e.data&&e.data.type==='open-item') openItemById(e.data.projectId,e.data.itemId); });
+    navigator.serviceWorker.addEventListener('message',e=>{ if(!e.data) return; if(e.data.type==='open-item') openItemById(e.data.projectId,e.data.itemId); else if(e.data.type==='notif-action') drainNotifActions(); });
   }
   const q=new URLSearchParams(location.search);
   if(q.get('item')){ const pid=q.get('project'), iid=q.get('item'); history.replaceState(null,'',location.pathname); setTimeout(()=>openItemById(pid,iid),50); }
@@ -5061,7 +5276,7 @@ function syncControls(){
   setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
   window.addEventListener('online',()=>syncNow());
-  window.__revisor={get state(){return appState;},habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
+  window.__revisor={get state(){return appState;},habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>
