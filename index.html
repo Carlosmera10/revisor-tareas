@@ -719,12 +719,69 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
 @keyframes sheet-in{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
 @media(min-width:761px) and (max-width:900px){main{padding:0 18px 56px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== Concentración (pomodoro): solo en el PC ===== */
+@media(max-width:760px){.pc-only{display:none!important}}
+:root{--tree-a:#2f8f5b;--tree-b:#4c9f70;--tree-c:#1f7a56;--trunk:#8a6a4a;--soil:#d9dee6}
+:root[data-theme=dark]{--tree-a:#3aa874;--tree-b:#5cb98a;--tree-c:#2c8f66;--trunk:#a78660;--soil:#2a3246}
+.fc-tree{display:block;width:100%;height:100%}
+.fc-soil{fill:var(--soil)}.fc-trunk{fill:var(--trunk)}
+.fc-a{fill:var(--tree-a)}.fc-b{fill:var(--tree-b)}.fc-c{fill:var(--tree-c)}
+.fc-widget{position:fixed;left:calc(var(--sidebar-w) + 20px);bottom:20px;z-index:190;display:flex;align-items:center;gap:10px;width:min(372px,calc(100vw - var(--sidebar-w) - 40px));padding:8px 8px 8px 10px;background:var(--panel);border:1px solid var(--line-strong);border-left:4px solid var(--done);border-radius:12px;box-shadow:0 10px 28px rgba(10,16,30,.18)}
+.fc-widget[hidden]{display:none}
+.fc-widget.break{border-left-color:var(--accent)}.fc-widget.ready{border-left-color:var(--line-strong)}
+body.selecting .fc-widget{bottom:84px}
+body.focusing main{padding-bottom:96px}
+.fc-wtree{width:44px;height:44px;flex-shrink:0}
+.fc-winfo{flex:1;min-width:0;background:none;border:0;padding:0;text-align:left;color:var(--ink);display:block;font:inherit}
+.fc-winfo:hover{background:none}
+.fc-time{font-size:1.25rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2;display:block}
+.fc-wsub{display:block;font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-wacts{display:flex;gap:2px;flex-shrink:0;align-items:center}
+.slide.focusing{border-left-color:var(--done)}
+.badge.focus{background:var(--done-soft);color:var(--done)}
+#focusModal{max-width:820px}
+.fc-now{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;padding-bottom:14px}
+.fc-now .field{margin:0;min-width:0}
+.fc-now .grow{flex:1 1 300px}.fc-now select{width:100%}
+.fc-now input[type=number]{width:84px}
+.fc-now.on{align-items:center}
+.fc-now .fc-wtree{width:64px;height:64px}
+.fc-now .fc-time{font-size:1.9rem}
+.fc-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.fc-tile{background:var(--subtle);border:1px solid var(--subtle-line);border-radius:10px;padding:12px 14px;min-width:0}
+.fc-tile span{display:block;font-size:.82rem;color:var(--muted)}
+.fc-tile strong{display:block;font-size:1.45rem;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.fc-meter{height:6px;border-radius:99px;background:var(--track);margin-top:8px;overflow:hidden}
+.fc-meter i{display:block;height:100%;border-radius:99px;background:var(--done)}
+.fc-h{font-size:.95rem;font-weight:600;margin:20px 0 8px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+.fc-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.fc-day{background:var(--subtle);border:1px solid var(--subtle-line);border-radius:10px;padding:6px;min-height:96px;display:flex;flex-direction:column}
+.fc-day.today{border-color:var(--done)}
+.fc-day b{font-size:.78rem;font-weight:600;color:var(--muted)}
+.fc-day em{font-style:normal;font-size:.76rem;color:var(--muted);margin-top:auto;padding-top:4px}
+.fc-grove{display:flex;flex-wrap:wrap;gap:0;margin-top:4px}
+.fc-grove span{width:24px;height:24px}
+.fc-bar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) 84px;gap:10px;align-items:center;padding:4px 0;font-size:.9rem}
+.fc-bar>span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fc-bar>span:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.fc-track{height:8px;background:var(--track);border-radius:4px;overflow:hidden}
+.fc-track i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.fc-ses{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:.9rem;border-bottom:1px solid var(--subtle-line)}
+.fc-ses>span:nth-child(2){flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fc-ses time,.fc-ses .m{color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0}
+.fc-set{margin-top:18px;border-top:1px solid var(--line);padding-top:12px}
+.fc-set summary{cursor:pointer;font-weight:600}
+.fc-set .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}
+.fc-set input[type=number]{width:100%}
 </style>
 </head>
 <body>
 <!-- Iconos (trazo fino, estilo Lucide, licencia ISC) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-timer" viewBox="0 0 24 24"><path d="M10 2h4"/><path d="m12 14 3-3"/><circle cx="12" cy="14" r="8"/></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24"><path d="M8 19a4 4 0 0 1-2.24-7.32A3.5 3.5 0 0 1 9 6.03V6a3 3 0 1 1 6 0v.04a3.5 3.5 0 0 1 3.24 5.65A4 4 0 0 1 16 19Z"/><path d="M12 19v3"/></symbol>
   <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
@@ -794,6 +851,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <div class="nav-section"><span class="nav-label">Proyectos</span> <button type="button" id="newProjectBtn" title="Crear proyecto" aria-label="Crear proyecto"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>
     <ul id="projectList"></ul>
         <div class="side-actions">
+      <button type="button" class="nav-item pc-only" id="openFocusBtn" title="Concentración (tecla F)"><svg class="ic"><use href="#i-timer"/></svg><span class="nav-label">Concentración</span><span class="nav-count" id="focusCount"></span></button>
       <button type="button" class="nav-item" id="openArchiveBtn" title="Archivo"><svg class="ic"><use href="#i-archive"/></svg><span class="nav-label">Archivo</span><span class="nav-count" id="archiveCount"></span></button>
       <button type="button" class="nav-item" id="openTrashBtn" title="Papelera"><svg class="ic"><use href="#i-trash"/></svg><span class="nav-label">Papelera</span><span class="nav-count" id="trashCount"></span></button>
       <button type="button" class="nav-item" id="openTagsBtn" title="Etiquetas"><svg class="ic"><use href="#i-tag"/></svg><span class="nav-label">Etiquetas</span></button>
@@ -986,6 +1044,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <div class="field"><label for="modStatus">Estado</label>
       <select id="modStatus"><option value="pending">En proceso</option><option value="paused">Pausada</option><option value="done">Finalizada</option></select></div>
   </div>
+  <p class="hint pc-only" id="modFocusLine" hidden></p>
   <div class="field pause-field" id="pauseField" hidden>
     <label for="modPauseNote">Motivo de la pausa (opcional)</label>
     <input type="text" id="modPauseNote" maxlength="120" autocomplete="off" placeholder="Por ejemplo: hasta la reunión del jueves">
@@ -1275,6 +1334,35 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   <div class="modal-footer"><span></span><button type="button" id="archDoneBtn">Cerrar</button></div>
 </dialog>
 
+<!-- Concentración (solo PC) -->
+<div id="focusWidget" class="fc-widget pc-only" role="timer" hidden></div>
+<dialog id="focusModal" aria-labelledby="fcHeading">
+  <div class="modal-header">
+    <h2 id="fcHeading"><svg class="ic lg"><use href="#i-timer"/></svg>Concentración</h2>
+    <button type="button" class="ghost icon" id="fcCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+  <div id="fcNow"></div>
+  <div class="fc-tiles" id="fcTiles"></div>
+  <div class="fc-h">Bosque de esta semana</div>
+  <div class="fc-week" id="fcWeek"></div>
+  <div class="fc-h"><span>Tiempo dedicado</span>
+    <span class="seg" id="fcRangeSeg" role="group" aria-label="Periodo"><button type="button" data-r="week">Semana</button><button type="button" data-r="month">Mes</button><button type="button" data-r="year">Año</button></span>
+  </div>
+  <div id="fcBars"></div>
+  <div class="fc-h">Sesiones de hoy</div>
+  <div id="fcSessions"></div>
+  <details class="fc-set">
+    <summary>Ajustes del temporizador</summary>
+    <div class="grid">
+      <div class="field"><label for="fcBreak">Descanso (minutos)</label><input type="number" id="fcBreak" min="1" max="60"></div>
+      <div class="field"><label for="fcLong">Descanso largo, cada 4 (minutos)</label><input type="number" id="fcLong" min="1" max="90"></div>
+      <div class="field"><label for="fcGoal">Objetivo diario (minutos)</label><input type="number" id="fcGoal" min="10" max="960" step="5"></div>
+    </div>
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px"><input type="checkbox" id="fcSound"> Sonido al terminar</label>
+  </details>
+  <div class="modal-footer"><button type="button" id="fcCsvBtn" class="secondary small"><svg class="ic sm"><use href="#i-download"/></svg>Exportar a Excel</button><span></span><button type="button" id="fcDoneBtn">Cerrar</button></div>
+</dialog>
+
 <!-- Papelera -->
 <dialog id="trashModal" aria-labelledby="trashHeading">
   <div class="modal-header">
@@ -1370,6 +1458,8 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <div class="help-body"><ul><li>En la lista, desliza una tarjeta <strong>a la derecha</strong> para marcarla como hecha y <strong>a la izquierda</strong> para aplazarla.</li><li>Mantén pulsada el asa para reordenar.</li><li><strong>Kanban</strong>: las columnas van una al lado de otra; desliza a los lados o pulsa las pestañas de arriba para cambiar de columna. Para pasar una tarjeta a otra columna, arrástrala desde el asa hasta la pestaña o hasta el borde de la pantalla.</li><li>El botón de los tres puntos de cada tarjeta abre sus acciones; «Más», en la barra inferior, el resto de opciones.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-archive"/></svg>Archivo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Las tareas finalizadas se <strong>archivan solas</strong> pasados 7 días (se cambia en «Ajustes y avisos» → «Archivo»). También puedes archivar una ya: icono de archivo en la tarjeta (en el móvil, «⋯» → «Archivar ya»).</li><li>Las repetitivas no se archivan: pasan a su siguiente fecha.</li><li>Pasados tres meses (o uno, o seis, según elijas) te aviso con un aviso en la cabecera y una notificación para que revises las archivadas.</li><li>En el <strong>Archivo</strong> (barra lateral) puedes, por cada tarea: <strong>Copiar</strong> su texto para documentarla, <strong>Conservar</strong> (no vuelve a preguntar), <strong>Volver a abrir</strong> (vuelve a su proyecto como pendiente) o <strong>Eliminar</strong> definitivamente.</li><li>«Descargar como texto» guarda en un archivo .md todas las pendientes de revisar, con sus notas y sub-tareas.</li><li>El archivo va incluido en las copias de seguridad.</li></ul></div></details>
+  <details class="help-sec pc-only"><summary><svg class="ic"><use href="#i-timer"/></svg>Concentración (solo en el ordenador)<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Pulsa el <strong>icono del temporizador</strong> de una tarjeta para empezar con esa tarea, o abre «Concentración» en la barra lateral (tecla <strong>F</strong>).</li><li>Mientras trabajas, un árbol crece en la esquina inferior. Puedes minimizar la app o cerrarla: el tiempo sigue contando.</li><li>Si terminas antes, <strong>se guarda lo que hayas trabajado</strong> y el árbol se queda más pequeño. Nada se pierde. Si son menos de 1 minuto, no se anota.</li><li>Al acabar empieza el descanso. Cada 4 sesiones completas, el descanso es largo.</li><li>El tiempo aparece en la tarjeta y en la ficha. Estos datos se guardan en este ordenador, entran en la copia de seguridad y no se sincronizan con el móvil.</li><li>«Exportar a Excel» descarga todas las sesiones en un CSV.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-trash"/></svg>Papelera<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Lo que borras (tareas, proyectos y tareas del archivo) pasa a la <strong>Papelera</strong> y se guarda 30 días. Después se elimina solo.</li><li><strong>Restaurar</strong> devuelve la tarea a su proyecto o al archivo. Si borraste un proyecto, «Restaurar proyecto» lo recupera con todas sus tareas.</li><li>La papelera se sincroniza entre dispositivos. «Eliminar definitivamente» y «Vaciar la papelera» no se pueden recuperar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pause"/></svg>Tareas pausadas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1395,7 +1485,8 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
 const KEY='revisorGeneral_v9', UI_KEY='revisorGeneral_v9_ui', OLD_KEYS=['revisorGeneral_v8','revisorGeneral_v7','revisorGeneral_v6'];
 /* Almacenamiento: IndexedDB (sin el límite de ~5 MB de localStorage, que comparten otras apps del mismo origen) */
 const IDB_NAME='revisorTareas_db', IDB_STORE='kv', IDB_KEY='state', MIG_KEY='revisorGeneral_v9_idb', SYNC_KEY='revisorGeneral_v9_sync';
-const STATE_VERSION=13, TOMB_DAYS=180, TRASH_DAYS=30, ACT_KEY='notifActions';
+const STATE_VERSION=14, TOMB_DAYS=180, TRASH_DAYS=30, ACT_KEY='notifActions', FOCUS_KEY='revisorGeneral_v9_focus', FOCUS_MAX=20000;
+let fs=null, fcIdx=null, fcIdxOf=null, fcWorker=null, fcRange='week', fcAudio=null, fcBaseTitle='', fcLastP=-1;
 const LABEL={pending:'En proceso',paused:'Pausada',done:'Finalizada'};
 const STATUS_ICON={pending:'play',paused:'pause',done:'check-circle'};
 const PRIO_WEIGHT={urgente:3,alta:2,normal:1};
@@ -1424,7 +1515,7 @@ const DEFAULT_TAGS=[
   {id:'t4',name:'Revisión',emoji:'',bg:'#fef7e0',text:'#8a5a00'}
 ];
 /* Los mensajes que empiezan por estos símbolos se muestran con el icono correspondiente */
-const TOAST_ICON={'🗑️':'trash','✅':'check-circle','🔁':'repeat','⏰':'bell','💾':'save','⇄':'move','⧉':'copy','🏷️':'tag','📥':'upload','📁':'folder','↩️':'undo','📲':'monitor-down','📅':'calendar','📦':'archive','⏳':'hourglass','⏸️':'pause','▶️':'play'};
+const TOAST_ICON={'🌳':'tree','🗑️':'trash','✅':'check-circle','🔁':'repeat','⏰':'bell','💾':'save','⇄':'move','⧉':'copy','🏷️':'tag','📥':'upload','📁':'folder','↩️':'undo','📲':'monitor-down','📅':'calendar','📦':'archive','⏳':'hourglass','⏸️':'pause','▶️':'play'};
 
 /* ================= Utilidades ================= */
 const $=id=>document.getElementById(id);
@@ -1608,9 +1699,21 @@ function normalizeSettings(s){
     archiveDays:clamp(parseInt(s.archiveDays,10)||7,1,90),
     archiveReview:['0','1','3','6'].includes(String(s.archiveReview))?String(s.archiveReview):'3',
     archiveNotified:validIso(s.archiveNotified)?s.archiveNotified:'',
-    archiveSnooze:validIso(s.archiveSnooze)?s.archiveSnooze:''
+    archiveSnooze:validIso(s.archiveSnooze)?s.archiveSnooze:'',
+    focusWork:clamp(parseInt(s.focusWork,10)||25,1,180),
+    focusBreak:clamp(parseInt(s.focusBreak,10)||5,1,60),
+    focusLong:clamp(parseInt(s.focusLong,10)||15,1,90),
+    focusGoal:clamp(parseInt(s.focusGoal,10)||100,10,960),
+    focusSound:s.focusSound!==false
   };
 }
+/* Sesiones de concentración: se guardan con su título y proyecto, para no perderlas si se borra la tarea. No se sincronizan */
+function normalizeFocus(list){
+  const seen=new Set(), str=(v,n)=>typeof v==='string'?v.slice(0,n):'';
+  return (Array.isArray(list)?list:[]).filter(a=>a&&typeof a==='object'&&validIso(a.at)&&a.sec>0).map(a=>({id:str(a.id,60)||newId(),at:a.at,sec:clamp(Math.round(a.sec),1,14400),itemId:str(a.itemId,60),pid:str(a.pid,60),title:str(a.title,200),pname:str(a.pname,120),full:!!a.full}))
+    .filter(a=>{ if(seen.has(a.id)) return false; seen.add(a.id); return true; }).sort((a,b)=>Date.parse(a.at)-Date.parse(b.at)).slice(-FOCUS_MAX);
+}
+const mergeFocus=(a,b)=>normalizeFocus([...(a||[]),...(b||[])]);
 function normalizeState(x){
   if(!x||typeof x!=='object'||!Array.isArray(x.projects)) return null;
   const seenTag=new Set();
@@ -1652,7 +1755,7 @@ function normalizeState(x){
       arch:ar?{archivedAt:validIso(ar.archivedAt)?ar.archivedAt:deletedAt,reviewedAt:validIso(ar.reviewedAt)?ar.reviewedAt:''}:null,
       updatedAt:validIso(a.updatedAt)?a.updatedAt:legacyStamp(deletedAt)};
   });
-  return {version:STATE_VERSION,activeId:projects.some(p=>p.id===x.activeId)?x.activeId:projects[0].id,projects,tags,settings:normalizeSettings(x.settings),archive,trash,deleted:normalizeDeleted(x.deleted)};
+  return {version:STATE_VERSION,activeId:projects.some(p=>p.id===x.activeId)?x.activeId:projects[0].id,projects,tags,settings:normalizeSettings(x.settings),archive,trash,focus:normalizeFocus(x.focus),deleted:normalizeDeleted(x.deleted)};
 }
 /* Elementos borrados (para que un borrado se propague entre dispositivos): {clave: fecha ISO}; se olvidan pasados TOMB_DAYS días */
 function normalizeDeleted(d){
@@ -1664,7 +1767,7 @@ function normalizeDeleted(d){
 const blankProject=(n='Nuevo proyecto')=>({id:newId(),name:n,items:[],updatedAt:''});
 function blankState(){
   const p=blankProject('Mi proyecto principal');
-  return {version:STATE_VERSION,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS).map(t=>({...t,updatedAt:''})),settings:normalizeSettings({}),archive:[],trash:[],deleted:{}};
+  return {version:STATE_VERSION,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS).map(t=>({...t,updatedAt:''})),settings:normalizeSettings({}),archive:[],trash:[],focus:[],deleted:{}};
 }
 /* Datos de versiones anteriores, guardados en localStorage */
 function loadLegacy(){
@@ -1877,7 +1980,7 @@ function undo(quiet=false){
   const snap=undoStack.pop();
   if(!snap){ if(!quiet) showToast('No hay nada que deshacer',{icon:'undo'}); return false; }
   const st=normalizeState(JSON.parse(snap)); if(!st) return false;
-  st.settings=appState.settings;
+  st.settings=appState.settings; st.focus=appState.focus;
   st.deleted=Object.assign({},st.deleted,appState.deleted);
   appState=st; suppressConfetti=true; selected.clear();
   save(); renderApp(); if(!quiet) showToast('Cambio deshecho',{icon:'undo'});
@@ -2355,6 +2458,7 @@ function renderSidebar(){
   $('calendarBtn').classList.toggle('active',ui.mode==='calendar');
   const ap=archivePending().length; $('archiveCount').textContent=ap?String(ap):(appState.archive.length||''); $('archiveCount').classList.toggle('hot',ap>0);
   $('archiveCount').title=ap?pl(ap,'tarea archivada por revisar','tareas archivadas por revisar'):pl(appState.archive.length,'tarea archivada','tareas archivadas');
+  const fm=Math.round(fcOn(todayStr()).reduce((a,x)=>a+x.sec,0)/60); $('focusCount').textContent=fm?fm+' min':''; $('focusCount').title=fm?`${fm} minutos de concentración hoy`:'';
   $('trashCount').textContent=appState.trash.length||''; $('trashCount').title=pl(appState.trash.length,'tarea en la papelera','tareas en la papelera');
   const wAll=waitingEntries(), wDue=wAll.filter(e=>followDue(e.it)).length;
   $('waitingCount').textContent=wDue?`${wDue}/${wAll.length}`:wAll.length; $('waitingCount').classList.toggle('hot',wDue>0&&ui.mode!=='waiting');
@@ -2556,7 +2660,7 @@ function renderBulkBar(){
 /* ================= Tarjetas ================= */
 function createCard(sl,p,ctx){
   const snz=isSnoozed(sl);
-  const card=el('div','slide'+(sl.status==='done'?' done':sl.status==='paused'?' paused':'')+(selected.has(sl.id)?' selected':'')+(snz?' snoozed':'')+(isWaiting(sl)?' waiting':''));
+  const card=el('div','slide'+(sl.status==='done'?' done':sl.status==='paused'?' paused':'')+(selected.has(sl.id)?' selected':'')+(snz?' snoozed':'')+(isWaiting(sl)?' waiting':'')+(fs&&fs.itemId===sl.id&&fs.phase==='work'?' focusing':''));
   card.dataset.id=sl.id;
   const mobile=isMobile();
   const canDrag=!selectMode&&!mobile, canReorder=!selectMode&&ctx.manual;
@@ -2617,6 +2721,7 @@ function createCard(sl,p,ctx){
     const zb=badge('snz','clock','Aparece el '+fmtDate(sl.snoozedUntil,true)); zb.title='Repetitiva ya hecha: está oculta hasta ese día'; badges.append(zb);
     badges.append(btn('Mostrar ya','secondary small','Mostrarla ya en el tablero',e=>{ e.stopPropagation(); commit(null,()=>{ const f=findItem(sl.id); if(f) f.it.snoozedUntil=''; }); }));
   }
+  if(!isMobile()){ const ft=fcByItem().get(sl.id); if(ft){ const fb=badge('focus','timer',fcDur(ft.sec)); fb.title=`Concentración: ${fcDur(ft.sec)} en ${pl(ft.n,'sesión','sesiones')}`; badges.append(fb); } }
   if(isPaused(sl)){
     const rd=resumeDue(sl), rs=sl.resumeAt&&!isWaiting(sl)?(rd?'Para retomar':'Retomar el '+fmtDate(sl.resumeAt,true)):'';
     const pb=badge('paused'+(rd?' due':''),rd?'play':'pause','Pausada'+(sl.pauseNote?': '+sl.pauseNote:'')+(rs?' · '+rs:''));
@@ -2696,7 +2801,9 @@ function createCard(sl,p,ctx){
   Object.entries(LABEL).forEach(([v,l])=>sel.append(opt(v,l)));
   sel.value=sl.status;
   sel.addEventListener('change',()=>setItemStatus(sl,sel.value,card));
-  controls.append(sel,
+  if(!mobile&&sl.status!=='done') controls.append(btn('','ghost icon'+(fs&&fs.itemId===sl.id?' on':''),'Concentrarme en esta tarea',()=>fcStart(sl.id),'timer'));
+  controls.prepend(sel);
+  controls.append(
     btn('','ghost icon','Editar',()=>openModal(sl),'pencil'),
     sl.status==='done'?btn('','ghost icon','Archivar ya',()=>commit(null,()=>archiveItems([sl.id])?`📦 «${short(sl.title)}» archivada`:false),'archive')
       :btn('','ghost icon'+(isWaiting(sl)?' on':''),isWaiting(sl)?`En espera de ${sl.waitingFor}`:'Poner en espera de alguien',()=>openWaitModal(sl),'hourglass'),
@@ -3030,9 +3137,10 @@ function openModal(item=null){
     tempSubtasks=clone(item.subtasks); editingRecOcc=item.recurrence?item.recurrence.occurrence:1; editingHistory=item.history;
     $('modWaitFor').value=item.waitingFor; $('modFollowUp').value=item.followUp;
     $('modStatus').value=item.status; $('modPauseNote').value=item.pauseNote||''; $('modResumeAt').value=item.resumeAt||'';
+    const ft=fcByItem().get(item.id); $('modFocusLine').hidden=!ft; $('modFocusLine').textContent=ft?`Concentración: ${fcDur(ft.sec)} en ${pl(ft.n,'sesión','sesiones')}`:'';
     recToForm(item.recurrence,item.dueDate);
   } else {
-    editingItemId=null; $('modalTitle').textContent='Nuevo elemento';
+    editingItemId=null; $('modalTitle').textContent='Nuevo elemento'; $('modFocusLine').hidden=true;
     ['modTitle','modDate','modTime','modLink','modNotes','modWaitFor','modFollowUp','modPauseNote','modResumeAt'].forEach(id=>$(id).value='');
     $('modStatus').value='pending';
     if(['today','tomorrow','week'].includes(ui.mode)) $('modDate').value=ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):todayStr();
@@ -3430,6 +3538,218 @@ function openArchive(q=''){
   closeDrawer(); closeSheet();
   $('archSearch').value=q; $('archiveModal').showModal(); renderArchive();
   if(!isMobile()) setTimeout(()=>$('archSearch').focus(),0);
+}
+
+/* ================= Concentración (pomodoro, solo PC) =================
+   El temporizador va por marcas de tiempo y se guarda en localStorage de este dispositivo: sigue contando con la app cerrada.
+   fs={id,phase:'work'|'break'|'ready',itemId,pid,title,pname,start,ends,paused,planned}. paused = segundos restantes si está en pausa. */
+const FC_TITLE=/^[⏸⏱☕] /;
+const fcDur=sec=>{ const m=Math.max(1,Math.round(sec/60)); return m<60?`${m} min`:`${Math.floor(m/60)} h${m%60?` ${m%60} min`:''}`; };
+const fcClock=sec=>{ const t=Math.max(0,Math.ceil(sec)); return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`; };
+const fcOn=day=>appState.focus.filter(x=>ymd(new Date(x.at))===day);
+function fcByItem(){
+  if(fcIdx&&fcIdxOf===appState.focus) return fcIdx;
+  const m=new Map();
+  appState.focus.forEach(x=>{ if(!x.itemId) return; const e=m.get(x.itemId)||{sec:0,n:0}; e.sec+=x.sec; e.n++; m.set(x.itemId,e); });
+  fcIdx=m; fcIdxOf=appState.focus; return m;
+}
+function treeSvg(p,v=0){
+  p=Math.max(0,Math.min(1,p));
+  const h=6+18*p, top=34-h, r=2.5+9.5*p, c='abc'[v%3], w=1.6+1.8*p, q=+(r*.8).toFixed(2), dx=+(r*.75).toFixed(2), dy=+(top+r*.6).toFixed(2);
+  return `<svg class="fc-tree" viewBox="0 0 40 40" aria-hidden="true"><ellipse cx="20" cy="35" rx="${(6+8*p).toFixed(1)}" ry="1.8" class="fc-soil"/><rect x="${(20-w/2).toFixed(2)}" y="${top.toFixed(2)}" width="${w.toFixed(2)}" height="${h.toFixed(2)}" rx="1" class="fc-trunk"/><circle cx="${20-dx}" cy="${dy}" r="${q}" class="fc-${c}"/><circle cx="${20+dx}" cy="${dy}" r="${q}" class="fc-${c}"/><circle cx="20" cy="${top.toFixed(2)}" r="${q}" class="fc-${c}"/></svg>`;
+}
+function fcLoad(){ try{ const o=JSON.parse(localStorage.getItem(FOCUS_KEY)||'null'); return o&&typeof o==='object'&&o.id&&['work','break','ready'].includes(o.phase)?o:null; }catch(e){ return null; } }
+function fcSave(){ try{ if(fs) localStorage.setItem(FOCUS_KEY,JSON.stringify(fs)); else localStorage.removeItem(FOCUS_KEY); }catch(e){} }
+const fcLeft=()=>!fs||fs.phase==='ready'?0:fs.paused?fs.paused:(fs.ends-Date.now())/1000;
+function fcChime(){
+  if(!appState.settings.focusSound) return;
+  try{
+    fcAudio=fcAudio||new (window.AudioContext||window.webkitAudioContext)(); if(fcAudio.state==='suspended') fcAudio.resume();
+    [[659,0],[880,.22]].forEach(([f,t])=>{ const o=fcAudio.createOscillator(), g=fcAudio.createGain(), at=fcAudio.currentTime+t;
+      o.frequency.value=f; g.gain.setValueAtTime(.0001,at); g.gain.exponentialRampToValueAtTime(.18,at+.03); g.gain.exponentialRampToValueAtTime(.0001,at+.7);
+      o.connect(g).connect(fcAudio.destination); o.start(at); o.stop(at+.75); });
+  }catch(e){}
+}
+function fcAlert(title,body,toast){
+  fcChime(); showToast(toast,{timeout:9000});
+  if(document.hidden||!document.hasFocus()) notify(title,body,{tag:'focus'});
+}
+/* Tras cambiar el temporizador: guarda, ajusta el reloj de fondo y repinta lo que dependa de él */
+function fcSync(paint=true){
+  fcSave();
+  const run=!!fs&&fs.phase!=='ready'&&!fs.paused;
+  if(run&&!fcWorker){
+    try{ fcWorker=new Worker(URL.createObjectURL(new Blob(['setInterval(()=>postMessage(0),1000)'],{type:'text/javascript'}))); fcWorker.onmessage=fcTick; } /* un Worker no se ralentiza con la ventana minimizada */
+    catch(e){ const id=setInterval(fcTick,1000); fcWorker={terminate(){ clearInterval(id); }}; }
+  }
+  if(!run&&fcWorker){ fcWorker.terminate(); fcWorker=null; }
+  document.body.classList.toggle('focusing',!!fs);
+  fcRenderWidget();
+  if(paint){ if(drag.kind||document.querySelector('dialog[open]')) renderPending=true; else renderApp(); renderFocus(); }
+}
+function fcRenderWidget(){
+  const w=$('focusWidget'); fcLastP=-1;
+  if(!fs){ w.hidden=true; w.replaceChildren(); if(FC_TITLE.test(document.title)) document.title=fcBaseTitle; return; }
+  w.hidden=false; w.className='fc-widget pc-only '+(fs.phase==='work'?'':fs.phase);
+  const tree=el('div','fc-wtree'), info=el('button','fc-winfo'), acts=el('div','fc-wacts');
+  info.type='button'; info.title='Abrir Concentración'; info.addEventListener('click',openFocus);
+  info.append(el('span','fc-time',fs.phase==='ready'?'¿Otro?':fcClock(fcLeft())),el('span','fc-wsub',fcSub()));
+  fcButtons(acts,true);
+  w.replaceChildren(tree,info,acts); fcPaint();
+}
+const fcSub=()=>{ const n=fs.title||'Sin tarea concreta'; return fs.phase==='break'?`Descanso. Después: ${n}`:fs.phase==='ready'?n:(fs.paused?'En pausa · ':'')+n; };
+function fcButtons(box,icons){
+  const b=(label,cls,title,fn,icon)=>btn(icons?'':label,icons?'ghost icon':'small '+cls,title,fn,icon);
+  if(fs.phase==='work'){
+    box.append(b(fs.paused?'Seguir':'Pausa','secondary',fs.paused?'Seguir':'Pausar',fcPause,fs.paused?'play':'pause'));
+    const f=fs.itemId&&findItem(fs.itemId);
+    if(f&&f.it.status!=='done') box.append(b('Tarea hecha','secondary','Terminar y marcar la tarea como hecha',fcDone,'check'));
+    box.append(b('Terminar','secondary','Terminar y guardar el tiempo',()=>fcStop(),'x'));
+  }else if(fs.phase==='break') box.append(b('Saltar descanso','secondary','Saltar el descanso',fcSkip,'skip'),b('Cerrar','secondary','Cerrar',fcClose,'x'));
+  else box.append(b('Empezar','','Empezar otra sesión',fcAgain,'play'),b('Cerrar','secondary','Cerrar',fcClose,'x'));
+}
+function fcPaint(){
+  if(!fs) return;
+  const left=fcLeft(), p=fs.phase==='ready'?1:fs.phase==='work'?1-left/fs.planned:1, q=Math.round(p*50)/50;
+  document.querySelectorAll('.fc-time').forEach(t=>{ if(fs.phase!=='ready') t.textContent=fcClock(left); });
+  if(q!==fcLastP){ fcLastP=q; document.querySelectorAll('.fc-wtree').forEach(t=>{ t.innerHTML=treeSvg(q,appState.focus.length); }); }
+  if(!FC_TITLE.test(document.title)) fcBaseTitle=document.title;
+  const base=fcBaseTitle;
+  document.title=fs.phase==='ready'?base:`${fs.paused?'⏸':fs.phase==='work'?'⏱':'☕'} ${fcClock(left)} · ${fs.title?short(fs.title,30):base}`;
+}
+function fcStart(itemId='',quiet){
+  const f=itemId?findItem(itemId):null;
+  if(fs&&fs.phase==='work'){ if(fs.itemId===itemId&&itemId){ openFocus(); return; } fcLog(fcWorked(),false,true); }
+  const planned=appState.settings.focusWork*60, now=Date.now();
+  try{ fcAudio=fcAudio||new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+  fs={id:newId(),phase:'work',itemId:f?f.it.id:'',pid:f?f.p.id:'',title:f?f.it.title:'',pname:f?f.p.name:'',start:now,ends:now+planned*1000,paused:0,planned};
+  fcSync();
+  if(!quiet) showToast(`🌳 ${appState.settings.focusWork} minutos${f?`: ${short(f.it.title)}`:''}`,{timeout:3500});
+}
+const fcWorked=()=>Math.min(fs.planned,Math.round(fs.planned-fcLeft()));
+function fcLog(sec,full,quiet){
+  if(sec<60&&!full) { if(!quiet) showToast('Menos de 1 minuto: no se ha anotado',{icon:'clock'}); return false; }
+  const before=fcOn(todayStr()).reduce((a,x)=>a+x.sec,0)/60, goal=appState.settings.focusGoal;
+  appState.focus=normalizeFocus([...appState.focus,{id:fs.id,at:new Date(fs.start).toISOString(),sec,itemId:fs.itemId,pid:fs.pid,title:fs.title,pname:fs.pname,full}]);
+  save();
+  if(before<goal&&before+sec/60>=goal&&!document.hidden) shootConfetti();
+  return true;
+}
+function fcPause(){
+  if(!fs||fs.phase!=='work') return;
+  if(fs.paused){ fs.ends=Date.now()+fs.paused*1000; fs.paused=0; }
+  else fs.paused=Math.max(1,fcLeft());
+  fcSync(false); renderFocus();
+}
+function fcStop(){
+  if(!fs||fs.phase!=='work') return;
+  const sec=fcWorked(), ok=fcLog(sec,false); fs=null; fcSync();
+  if(ok) showToast(`🌳 Guardados ${fcDur(sec)}`,{timeout:5000});
+}
+function fcDone(){
+  if(!fs||fs.phase!=='work') return;
+  const id=fs.itemId; fcStop();
+  const f=findItem(id); if(f&&f.it.status!=='done') setItemStatus(f.it,'done');
+}
+function fcClose(){ fs=null; fcSync(); }
+function fcSkip(){ if(!fs) return; fs={...fs,phase:'ready',paused:0}; fcSync(false); renderFocus(); }
+function fcAgain(){ const id=fs&&fs.itemId, f=id&&findItem(id); fs=null; fcStart(f&&f.it.status!=='done'?id:''); }
+function fcComplete(){
+  const cur=fcLoad(), now=Date.now();
+  if(!cur||cur.id!==fs.id||cur.phase!==fs.phase){ fs=cur; fcSync(); return; } /* ya lo ha terminado otra ventana */
+  if(fs.phase==='work'){
+    const end=fs.ends; fcLog(fs.planned,true);
+    const full=fcOn(todayStr()).filter(x=>x.full).length, long=full>0&&full%4===0, mins=long?appState.settings.focusLong:appState.settings.focusBreak;
+    const next=end+mins*60000, title=fs.title, sec=fs.planned;
+    fs=next>now?{...fs,id:newId(),phase:'break',start:end,ends:next,planned:mins*60,paused:0}:{...fs,id:newId(),phase:'ready',paused:0};
+    fcSync();
+    fcAlert('Sesión terminada',`${title?title+'. ':''}${fcDur(sec)}. Toca descansar ${mins} minutos.`,`🌳 Árbol plantado: ${fcDur(sec)}. Descanso de ${mins} minutos`);
+  }else{
+    fs={...fs,phase:'ready',paused:0}; fcSync();
+    fcAlert('Descanso terminado',fs.title?`¿Seguimos con ${fs.title}?`:'¿Empezamos otra sesión?','Descanso terminado');
+  }
+}
+function fcTick(){ if(!fs||fs.phase==='ready'||fs.paused) return; if(fcLeft()<=0) fcComplete(); else fcPaint(); }
+
+function openFocus(){
+  if(isMobile()||document.querySelector('dialog[open]')) return;
+  closeDrawer(); closeSheet(); $('focusModal').showModal(); renderFocus();
+}
+function fcTaskSelect(){
+  const sel=el('select'); sel.id='fcTask'; sel.append(opt('','Sin tarea concreta'));
+  const open=(it)=>it.status!=='done';
+  const today=todayEntries().filter(e=>open(e.it));
+  const grp=(label,list)=>{ if(!list.length) return; const g=document.createElement('optgroup'); g.label=label; list.forEach(it=>g.append(opt(it.id,short(it.title,70)))); sel.append(g); };
+  grp('Hoy',today.map(e=>e.it));
+  const seen=new Set(today.map(e=>e.it.id));
+  appState.projects.forEach(p=>grp(p.name,p.items.filter(it=>open(it)&&!seen.has(it.id))));
+  return sel;
+}
+function renderFocusNow(){
+  const box=$('fcNow'); box.replaceChildren();
+  const row=el('div','fc-now'+(fs?' on':''));
+  if(fs){
+    const tree=el('div','fc-wtree'), info=el('div'); info.style.cssText='flex:1 1 200px;min-width:0';
+    info.append(el('span','fc-time',fs.phase==='ready'?'¿Otra sesión?':fcClock(fcLeft())),el('span','fc-wsub',fcSub()));
+    const acts=el('div','fc-wacts'); acts.style.gap='6px'; fcButtons(acts,false);
+    row.append(tree,info,acts); box.append(row); fcLastP=-1; fcPaint(); return;
+  }
+  const f1=el('div','field grow'), l1=el('label','','Tarea'); l1.htmlFor='fcTask'; f1.append(l1,fcTaskSelect());
+  const f2=el('div','field'), l2=el('label','','Minutos'); l2.htmlFor='fcMin';
+  const inp=el('input'); inp.type='number'; inp.id='fcMin'; inp.min=1; inp.max=180; inp.value=appState.settings.focusWork;
+  inp.addEventListener('change',()=>{ appState.settings.focusWork=clamp(parseInt(inp.value,10)||25,1,180); inp.value=appState.settings.focusWork; save(); });
+  f2.append(l2,inp);
+  row.append(f1,f2,btn('Empezar','','Empezar a contar',()=>{ inp.dispatchEvent(new Event('change')); fcStart($('fcTask').value,true); },'play'));
+  box.append(row);
+}
+function fcStreak(){
+  const days=new Set(appState.focus.map(x=>ymd(new Date(x.at)))); let n=0, d=new Date();
+  if(!days.has(ymd(d))) d=addDays(d,-1);
+  for(;;){ const wd=d.getDay(), has=days.has(ymd(d)); if(has) n++; else if(wd!==0&&wd!==6) break; d=addDays(d,-1); if(n>3650||d.getTime()<Date.parse('2020-01-01')) break; } /* los fines de semana sin sesiones no cortan la racha */
+  return n;
+}
+function renderFocus(){
+  if(!$('focusModal').open) return;
+  renderFocusNow();
+  const st=appState.settings, t=todayStr(), td=fcOn(t), tSec=td.reduce((a,x)=>a+x.sec,0), mon=weekStart(new Date()), mStr=ymd(mon);
+  const wk=appState.focus.filter(x=>ymd(new Date(x.at))>=mStr), wSec=wk.reduce((a,x)=>a+x.sec,0), streak=fcStreak();
+  const tile=(label,val,extra)=>{ const c=el('div','fc-tile'); c.append(el('span','',label),el('strong','',val)); if(extra) c.append(extra); return c; };
+  const m=el('div','fc-meter'), mi=document.createElement('i'), pct=Math.min(100,Math.round(tSec/60/st.focusGoal*100)); mi.style.width=pct+'%'; m.append(mi); m.title=`${pct} % del objetivo de ${st.focusGoal} minutos`;
+  $('fcTiles').replaceChildren(tile('Hoy',tSec?fcDur(tSec):'0 min',m),tile('Esta semana',wSec?fcDur(wSec):'0 min'),tile('Días seguidos',String(streak)));
+  const wrap=$('fcWeek'); wrap.replaceChildren();
+  const names=['L','M','X','J','V','S','D'];
+  names.forEach((nm,i)=>{
+    const day=ymd(addDays(mon,i)), list=fcOn(day), c=el('div','fc-day'+(day===t?' today':'')), grove=el('div','fc-grove');
+    c.append(el('b','',`${nm} ${parseYMD(day).getDate()}`));
+    list.forEach((x,j)=>{ const sp=el('span'); sp.innerHTML=treeSvg(x.full?1:.25+.75*Math.min(1,x.sec/(25*60)),j); sp.title=`${x.title||'Sin tarea concreta'}: ${fcDur(x.sec)}`; grove.append(sp); });
+    c.append(grove); const sum=list.reduce((a,x)=>a+x.sec,0); if(sum) c.append(el('em','',fcDur(sum)));
+    wrap.append(c);
+  });
+  document.querySelectorAll('#fcRangeSeg button').forEach(b=>b.classList.toggle('active',b.dataset.r===fcRange));
+  const now=new Date(), from=fcRange==='week'?mStr:fcRange==='month'?ymd(new Date(now.getFullYear(),now.getMonth(),1)):ymd(new Date(now.getFullYear(),0,1));
+  const inR=appState.focus.filter(x=>ymd(new Date(x.at))>=from), bars=$('fcBars'); bars.replaceChildren();
+  if(!inR.length) bars.append(el('p','hint','Todavía no hay tiempo anotado en este periodo.'));
+  else{
+    const add=(mp,k,name,x)=>{ const e=mp.get(k)||{name,sec:0}; e.sec+=x.sec; mp.set(k,e); }, byP=new Map(), byT=new Map();
+    inR.forEach(x=>{ const pr=appState.projects.find(q=>q.id===x.pid); add(byP,x.pid||'-',x.pid?(pr?pr.name:x.pname||'Sin título'):'Sin tarea concreta',x); if(x.itemId) add(byT,x.itemId,x.title,x); });
+    const list=(mp,title,max)=>{ const a=[...mp.values()].sort((x,y)=>y.sec-x.sec), rest=a.slice(max), top=a.slice(0,max); if(rest.length) top.push({name:`Otras ${rest.length}`,sec:rest.reduce((s,x)=>s+x.sec,0)});
+      if(title) bars.append(el('p','hint',title)); const mx=Math.max(...top.map(x=>x.sec));
+      top.forEach(x=>{ const r=el('div','fc-bar'), tr=el('span','fc-track'), i=document.createElement('i'); i.style.width=Math.max(2,x.sec/mx*100)+'%'; tr.append(i); const n=el('span','',x.name); n.title=x.name; r.append(n,tr,el('span','',fcDur(x.sec))); bars.append(r); }); };
+    list(byP,'Por proyecto',8); if(byT.size) list(byT,'Por tarea',8);
+  }
+  const ses=$('fcSessions'); ses.replaceChildren();
+  if(!td.length) ses.append(el('p','hint','Hoy aún no hay sesiones.'));
+  [...td].reverse().forEach(x=>{
+    const r=el('div','fc-ses'), hm=d=>d.toTimeString().slice(0,5), a=new Date(x.at), b=new Date(a.getTime()+x.sec*1000), tm=el('time','',`${hm(a)}–${hm(b)}`), n=el('span','',x.title||'Sin tarea concreta'); n.title=n.textContent;
+    r.append(tm,n,el('span','m',fcDur(x.sec)),btn('','ghost danger icon small','Borrar esta sesión',()=>{ if(!confirm('¿Borrar esta sesión?')) return; appState.focus=appState.focus.filter(y=>y.id!==x.id); save(); renderFocus(); renderPending=true; },'trash'));
+    ses.append(r);
+  });
+  $('fcBreak').value=st.focusBreak; $('fcLong').value=st.focusLong; $('fcGoal').value=st.focusGoal; $('fcSound').checked=st.focusSound; $('fcCsvBtn').disabled=!appState.focus.length;
+}
+function focusCsv(){
+  const q=v=>{ let t=String(v??''); if(/^[=+\-@]/.test(t)) t="'"+t; return /[;"\n\r]/.test(t)?`"${t.replace(/"/g,'""')}"`:t; }, rows=[['Fecha','Inicio','Minutos','Tarea','Proyecto','Sesión completa'].join(';')];
+  appState.focus.forEach(x=>{ const d=new Date(x.at); rows.push([ymd(d),d.toTimeString().slice(0,5),(x.sec/60).toFixed(1).replace('.',','),q(x.title||'Sin tarea concreta'),q(x.pname),x.full?'Sí':'No'].join(';')); });
+  return '\ufeff'+rows.join('\r\n')+'\r\n';
 }
 
 /* ---- Papelera: lo borrado se guarda TRASH_DAYS días y se sincroniza como el archivo ---- */
@@ -4501,14 +4821,14 @@ function mergeStates(local,remote){
     else if(w.kind==='x'){ const e=clone(w.entry); e.item=item; trash.push(e); }
     else (pMap.get(w.pid)||projects[0]).items.push(item);
   });
-  return normalizeState({version:STATE_VERSION,activeId:local.activeId,projects,tags,settings:local.settings,archive,trash,deleted:del});
+  return normalizeState({version:STATE_VERSION,activeId:local.activeId,projects,tags,settings:local.settings,archive,trash,focus:mergeFocus(local.focus,remote.focus),deleted:del});
 }
 /* Un dispositivo recién estrenado (sin datos propios) adopta lo de GitHub tal cual, para no sumar un proyecto vacío */
 function isPristine(st){
   return st.projects.length===1&&!st.projects[0].items.length&&st.projects[0].name==='Mi proyecto principal'&&!st.archive.length&&!(st.trash||[]).length
     &&!Object.keys(st.deleted).length&&st.tags.every(t=>!t.updatedAt);
 }
-function adoptRemote(remote,local){ const st=clone(remote); st.settings=local.settings; st.activeId=st.projects[0].id; return normalizeState(st); }
+function adoptRemote(remote,local){ const st=clone(remote); st.settings=local.settings; st.focus=local.focus; st.activeId=st.projects[0].id; return normalizeState(st); }
 let renderPending=false;
 function applyMerged(st){
   appState=st; baseSigs=sigsOf(indexState(st)); undoStack.length=0; selected.clear(); suppressConfetti=true;
@@ -5173,6 +5493,14 @@ $('archBannerOpenBtn').addEventListener('click',()=>openArchive());
 $('archBannerSnoozeBtn').addEventListener('click',()=>{ appState.settings.archiveSnooze=addDays(new Date(),7).toISOString(); save(); renderApp(); });
 $('openArchiveBtn').addEventListener('click',()=>openArchive());
 $('openTrashBtn').addEventListener('click',()=>openTrash());
+$('openFocusBtn').addEventListener('click',()=>openFocus());
+['fcCloseBtn','fcDoneBtn'].forEach(id=>$(id).addEventListener('click',()=>$('focusModal').close()));
+$('focusModal').addEventListener('close',()=>{ if(renderPending&&!document.querySelector('dialog[open]')){ renderPending=false; renderApp(); } });
+$('fcRangeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b){ fcRange=b.dataset.r; renderFocus(); } });
+$('fcCsvBtn').addEventListener('click',()=>downloadText(`concentracion-${todayStr()}.csv`,focusCsv()));
+[['fcBreak','focusBreak',5,1,60],['fcLong','focusLong',15,1,90],['fcGoal','focusGoal',100,10,960]].forEach(([id,k,d,a,b])=>$(id).addEventListener('change',e=>{ appState.settings[k]=clamp(parseInt(e.target.value,10)||d,a,b); e.target.value=appState.settings[k]; save(); renderFocus(); }));
+$('fcSound').addEventListener('change',e=>{ appState.settings.focusSound=e.target.checked; save(); });
+window.addEventListener('storage',e=>{ if(e.key===FOCUS_KEY){ fs=fcLoad(); fcSync(); } });
 ['trashCloseBtn','trashDoneBtn'].forEach(id=>$(id).addEventListener('click',()=>$('trashModal').close()));
 $('trashSearch').addEventListener('input',renderTrash);
 $('trashEmptyBtn').addEventListener('click',()=>trashPurge(appState.trash.map(a=>a.item.id)));
@@ -5190,7 +5518,7 @@ $('importFile').addEventListener('change',async e=>{
     const n=d.projects.reduce((a,p)=>a+p.items.length,0);
     if(confirm(`El archivo contiene ${pl(d.projects.length,'proyecto','proyectos')} y ${pl(n,'elemento','elementos')}.\n\n«Aceptar» los FUSIONA con lo que ya tienes: no se pierde nada y, en cada tarea, prevalece la versión más reciente.\n«Cancelar» te permite, en su lugar, sustituirlo todo.`)){ importMerge(d); return; }
     if(!confirm('¿Sustituir todos los proyectos, tareas y etiquetas actuales por los del archivo? (podrás deshacerlo)')) return;
-    commit('📥 Datos importados',()=>{ d.settings=appState.settings; d.deleted=Object.assign({},appState.deleted,d.deleted); appState=d; selected.clear(); suppressConfetti=true; });
+    commit('📥 Datos importados',()=>{ d.settings=appState.settings; d.focus=mergeFocus(appState.focus,d.focus); d.deleted=Object.assign({},appState.deleted,d.deleted); appState=d; selected.clear(); suppressConfetti=true; });
   }catch(err){ alert('No se ha podido importar. Comprueba que sea una copia de seguridad JSON exportada desde esta app.'); }
   finally{ e.target.value=''; }
 });
@@ -5232,6 +5560,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='/'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); $('searchFilter').focus(); $('searchFilter').select(); }
   else if(e.key.toLowerCase()==='p'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); openPlanner(); }
   else if(e.key==='['&&!typing&&!e.ctrlKey&&!e.metaKey&&!isMobile()){ e.preventDefault(); toggleSide(); }
+  else if(e.key.toLowerCase()==='f'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!isMobile()){ e.preventDefault(); openFocus(); }
   else if(e.key==='?'&&!typing&&!e.ctrlKey&&!e.metaKey){ e.preventDefault(); $('openHelpBtn').click(); }
   else if((e.key==='q'||e.key==='Q'||e.key==='n'||e.key==='N')&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); if(isMobile()) openQuickAdd(); else { $('qaInput').focus(); window.scrollTo({top:0}); } }
   else if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toLowerCase()==='z'&&!typing){ e.preventDefault(); undo(); }
@@ -5259,7 +5588,9 @@ function syncControls(){
   MONTHS.forEach((m,i)=>$('recYearMonth').append(opt(String(i),m)));
   WD_ORDER.forEach(d=>$('recNthWd').append(opt(String(d),WD_LONG[d])));
   syncControls(); applyTheme(); applySide();
+  fs=fcLoad();
   renderApp();
+  if(fs){ fcSync(false); fcTick(); }
   autoArchive();
   purgeTrash();
   drainNotifActions();
@@ -5276,7 +5607,7 @@ function syncControls(){
   setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
   window.addEventListener('online',()=>syncNow());
-  window.__revisor={get state(){return appState;},habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
+  window.__revisor={get state(){return appState;},habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>

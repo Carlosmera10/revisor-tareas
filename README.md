@@ -15,6 +15,7 @@ Gestor personal de proyectos y tareas, instalable como app (PWA) en el PC (Chrom
 - **Repetitivas**: al completarlas, la misma tarea pasa a su siguiente fecha.
 - **Archivo**: las finalizadas se archivan solas y la app recuerda revisarlas pasados 1, 3 o 6 meses.
 - **Papelera**: lo borrado (tareas, proyectos y tareas del archivo) se guarda 30 días, se sincroniza y se puede restaurar.
+- **Concentración (solo PC, tecla `F`)**: temporizador por tarea con un árbol que crece, sin penalizar. Guarda el tiempo trabajado aunque termines antes, lo suma por tarea y proyecto, y exporta las sesiones a Excel. Estos datos no se sincronizan.
 - **Correos a tareas (solo PC)**: soltar un `.msg` de Outlook o un `.eml`, o pegar un correo, crea la tarea.
 - **Buscador en todo**, selección múltiple, mover y duplicar, deshacer (`Ctrl+Z`), modo oscuro y barra lateral plegable.
 - **Enviar a Habitica** desde la ficha, con dificultad, plazo y recordatorios para la app móvil.
