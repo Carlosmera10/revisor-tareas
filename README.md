@@ -52,7 +52,7 @@ Cómo funciona:
 
 ## Enviar a Habitica
 
-En la ficha, el botón **Habitica** guarda la tarea y crea (o actualiza) un To-Do en Habitica con el título, el plazo, la dificultad y los recordatorios que elijas. Las notas solo se copian si marcas «Copiar las notas».
+En la ficha, el botón **Habitica** guarda la tarea y crea (o actualiza) un To-Do en Habitica con el título, el plazo, la dificultad, las sub-tareas (como lista de comprobación) y los recordatorios que elijas. Las notas solo se copian si marcas «Copiar las notas». Al actualizar, la lista de Habitica se sustituye por la de Revisor.
 
 - **Conexión**: «Ajustes y avisos» → «Habitica», con el ID de usuario y el token de API. Se guardan **solo en el `localStorage` de cada dispositivo** (`revisorGeneral_v9_habitica`) y no entran en las copias ni en la sincronización.
 - **Dificultad**: se propone según la prioridad (Normal → Fácil, Alta → Intermedia, Urgente → Difícil).

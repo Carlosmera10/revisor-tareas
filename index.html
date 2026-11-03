@@ -1313,6 +1313,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
     <div class="chips" id="habChips" role="group" aria-labelledby="habRemLbl"></div>
     <div class="hab-rems" id="habRems"></div>
   </div>
+  <label class="check-line" id="habSubsLine"><input type="checkbox" id="habSubs"> Copiar las sub-tareas</label>
   <label class="check-line" id="habNotesLine"><input type="checkbox" id="habNotes"> Copiar las notas</label>
   <p id="habMsg" class="hab-msg" role="alert" hidden></p>
   <div class="modal-footer">
@@ -1359,7 +1360,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   <details class="help-sec"><summary><svg class="ic"><use href="#i-refresh"/></svg>Sincronizar el PC y el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>En «Ajustes y avisos» → «Sincronización» pegas un <strong>token de GitHub</strong> y eliges una <strong>contraseña de cifrado</strong>. Ahí mismo está «Cómo crear el token de GitHub», paso a paso.</li><li>Tus tareas se guardan <strong>cifradas</strong> en un Gist secreto de tu cuenta de GitHub. Sin la contraseña no se pueden leer, y el token y la contraseña solo se guardan en el dispositivo donde los escribes.</li><li>Haz lo mismo en el otro dispositivo, con <strong>el mismo token y la misma contraseña</strong>. Si la contraseña se pierde, no se puede recuperar la copia de GitHub (los datos de cada dispositivo siguen intactos).</li><li>Sincroniza al abrir la app, unos segundos después de cada cambio y cada pocos minutos. En cada tarea, proyecto o etiqueta prevalece la versión modificada más tarde, y los borrados también se propagan.</li><li>No se sincronizan los ajustes, el orden de proyectos y tareas ni la interfaz. Sí se sincroniza el archivo.</li><li>Si ves un punto rojo en «Ajustes y avisos», la sincronización está en pausa (token caducado, contraseña incorrecta…): ábrelo para ver el motivo.</li><li>Sin conexión o sin GitHub: «Enviar al otro dispositivo» genera un archivo que se fusiona con «Importar».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-send"/></svg>Enviar a Habitica<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Conecta tu cuenta en «Ajustes y avisos» → «Habitica». Ahí mismo está dónde encontrar el ID de usuario y el token. Se guardan solo en cada dispositivo.</li><li>En la ficha, pulsa <strong>Habitica</strong>: se guarda la tarea y eliges la dificultad y los recordatorios. Se crea como To-Do con el título y el plazo; las notas solo si marcas «Copiar las notas». Si ya estaba enviada, el mismo botón la actualiza.</li><li><strong>Para que el móvil avise</strong>: la app de Habitica programa los recordatorios al arrancar con la tarea ya descargada. Tras enviar, ábrela en el móvil hasta que aparezca la tarea, ciérrala del todo (deslizándola desde las apps recientes) y ábrela otra vez. También vale abrir el To-Do en Habitica y guardarlo.</li><li>Los recordatorios de la tarea solo suenan en el móvil donde esté la app de Habitica; la web de Habitica no los muestra.</li><li>Una tarea repetitiva se envía con su próxima fecha. Cuando pase a la siguiente, pulsa de nuevo Habitica. Si el To-Do ya no existe o está completado, se crea otro.</li><li>Enviar no enlaza las dos apps: completar o cambiar la tarea aquí no cambia nada en Habitica hasta que la actualices.</li></ul></div></details>
+    <div class="help-body"><ul><li>Conecta tu cuenta en «Ajustes y avisos» → «Habitica». Ahí mismo está dónde encontrar el ID de usuario y el token. Se guardan solo en cada dispositivo.</li><li>En la ficha, pulsa <strong>Habitica</strong>: se guarda la tarea y eliges la dificultad y los recordatorios. Se crea como To-Do con el título, el plazo y las sub-tareas (como lista de comprobación, con las hechas ya marcadas); las notas solo si marcas «Copiar las notas». Si ya estaba enviada, el mismo botón la actualiza.</li><li><strong>Para que el móvil avise</strong>: la app de Habitica programa los recordatorios al arrancar con la tarea ya descargada. Tras enviar, ábrela en el móvil hasta que aparezca la tarea, ciérrala del todo (deslizándola desde las apps recientes) y ábrela otra vez. También vale abrir el To-Do en Habitica y guardarlo.</li><li>Los recordatorios de la tarea solo suenan en el móvil donde esté la app de Habitica; la web de Habitica no los muestra.</li><li>Una tarea repetitiva se envía con su próxima fecha. Cuando pase a la siguiente, pulsa de nuevo Habitica. Si el To-Do ya no existe o está completado, se crea otro.</li><li>Enviar no enlaza las dos apps: completar o cambiar la tarea aquí no cambia nada en Habitica hasta que la actualices.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-monitor-down"/></svg>Instalar la app<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>PC (Chrome)</strong>: pulsa «Instalar app» en la barra lateral o el icono de instalar de la barra de direcciones. Si no aparece: menú ⋮ → «Transmitir, guardar y compartir» → «Instalar página como aplicación».</li><li><strong>Android (Chrome)</strong>: menú ⋮ → «Añadir a pantalla de inicio» → «Instalar».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-keyboard"/></svg>Atajos de teclado<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -3435,12 +3436,13 @@ async function habApi(cfg,method,path,body){
 }
 /* La app de Android lee la hora del recordatorio como hora local, ignorando la zona: se envía la hora de reloj tal cual, con Z.
    El plazo es un instante: se envía a mediodía local para que caiga en el mismo día en cualquier cliente. */
-function habPayload(it,{diff,rems,notes},isNew){
+function habPayload(it,{diff,rems,notes,subs},isNew){
   const p={text:it.title,priority:Number(diff),reminders:rems.map(r=>{ const t=`${r.d}T${r.t}:00.000Z`; return {id:r.id,startDate:t,time:t}; })};
   if(isNew) p.type='todo';
   const due=parseYMD(it.dueDate);
   if(due){ due.setHours(12,0,0,0); p.date=due.toISOString(); } else if(!isNew) p.date=null;
   if(notes) p.notes=it.notes;
+  if(subs) p.checklist=it.subtasks.map(s=>({text:s.title,completed:!!s.done}));
   return p;
 }
 const habRemTs=r=>{ const d=parseYMD(r.d); if(!d||!/^\d{2}:\d{2}$/.test(r.t||'')) return NaN; const [h,m]=r.t.split(':').map(Number); return new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,m).getTime(); };
@@ -3493,6 +3495,7 @@ function openHabModal(id){
   $('habDue').textContent=(it.dueDate?'Plazo: '+fmtDate(it.dueDate,true):'Sin plazo')+(sent&&sent.at?` · Enviada el ${fmtDate(ymd(new Date(sent.at)),true)}`:'');
   $('habDiff').value=sent?sent.diff:HAB_PRIO[it.priority];
   $('habNotes').checked=false; $('habNotesLine').hidden=!it.notes.trim();
+  $('habSubs').checked=true; $('habSubsLine').hidden=!it.subtasks.length;
   $('habSendBtn').disabled=false; habMsg('');
   renderHabRems();
   $('habModal').showModal();
@@ -3504,7 +3507,7 @@ async function sendHab(){
   const rems=ctx.rems.filter(r=>r.d||r.t);
   if(rems.some(r=>isNaN(habRemTs(r)))){ habMsg('Completa la fecha y la hora de cada recordatorio.'); return; }
   if(rems.some(r=>habRemTs(r)<=Date.now())){ habMsg('Hay un recordatorio con una fecha que ya ha pasado.'); return; }
-  const opt={diff:$('habDiff').value,rems,notes:$('habNotes').checked&&!$('habNotesLine').hidden}, oldId=f.it.habitica&&f.it.habitica.id;
+  const opt={diff:$('habDiff').value,rems,notes:$('habNotes').checked&&!$('habNotesLine').hidden,subs:$('habSubs').checked&&!$('habSubsLine').hidden}, oldId=f.it.habitica&&f.it.habitica.id;
   $('habSendBtn').disabled=true; $('habSendLbl').textContent=oldId?'Actualizando…':'Enviando…'; habMsg('');
   try{
     let task=null;
