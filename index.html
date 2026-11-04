@@ -301,7 +301,17 @@ body.cal-mode .list-head{display:none}
 .meta-link{display:inline-flex;align-items:center;gap:6px;margin-top:2px;font-size:.88rem;color:var(--accent);text-decoration:none;width:fit-content}
 .meta-link:hover{text-decoration:underline}
 .subtasks-preview{font-size:.88rem}
-.subtasks-preview strong{font-weight:600;color:var(--muted)}
+.st-head{display:inline-flex;align-items:center;gap:4px;padding:2px 6px 2px 0;margin:0;background:none;border:0;border-radius:6px;box-shadow:none;color:var(--muted);font:inherit;font-weight:600;cursor:pointer;min-height:0}
+.st-head:hover,.st-head:active,.st-head:focus{background:none;color:var(--ink);box-shadow:none;transform:none}
+.st-head:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.st-head .ic{transition:transform .15s;color:var(--faint)}
+.st-head[aria-expanded=true] .ic{transform:rotate(90deg)}
+.subtasks-preview.folded .st-inline-list,.st-list.folded{display:none}
+@media(max-width:760px){.st-head{min-height:36px}}
+#modSubToggle{font-size:.9rem;color:var(--ink);align-self:flex-start;justify-self:start;width:fit-content;justify-content:flex-start}
+#modSubToggle:disabled{cursor:default;opacity:1;background:none;color:var(--ink)}
+#modSubToggle:disabled .ic{display:none}
+#modSubCount{color:var(--muted);font-weight:500}
 .st-inline-list{list-style:none;padding:0;margin:4px 0 0;display:flex;flex-direction:column;gap:3px}
 .st-inline-list label{display:flex;align-items:center;gap:7px;color:var(--ink);cursor:pointer;width:fit-content}
 .st-inline-list label.done span{text-decoration:line-through;color:var(--faint)}
@@ -1141,7 +1151,7 @@ body.focusing main{padding-bottom:96px}
     <input type="url" id="modLink" placeholder="https://...">
   </div>
   <div class="field">
-    <span class="flabel">Sub-tareas</span>
+    <button type="button" class="st-head" id="modSubToggle" aria-expanded="true" aria-controls="modSubtasks"><svg class="ic sm"><use href="#i-chev-right"/></svg><span>Sub-tareas</span> <span id="modSubCount"></span></button>
     <ul class="st-list" id="modSubtasks"></ul>
     <div class="row" style="gap:6px">
       <input type="text" id="modNewSubtask" placeholder="Añade una sub-tarea y pulsa Intro" style="flex:1" autocomplete="off">
@@ -1274,6 +1284,20 @@ body.focusing main{padding-bottom:96px}
     <div class="field" style="max-width:280px">
       <label for="setBackupDays">Recordármelo cada (días)</label>
       <input type="number" id="setBackupDays" min="1" max="60">
+    </div>
+    <div id="abBlock" class="pc-only" hidden>
+      <h4 style="margin:18px 0 4px;font-size:.95rem">Copia automática en una carpeta</h4>
+      <p class="hint" id="abStatus" style="margin-top:0"></p>
+      <div class="row" style="margin-top:10px">
+        <button type="button" id="abPickBtn" class="small">Elegir carpeta</button>
+        <button type="button" id="abNowBtn" class="secondary small">Guardar ahora</button>
+        <button type="button" id="abOffBtn" class="ghost small">Quitar</button>
+      </div>
+      <div class="grid-fields" id="abOpts" style="max-width:420px">
+        <div class="field"><label for="abDays">Frecuencia</label><select id="abDays"><option value="1">Cada día</option><option value="3">Cada 3 días</option><option value="7">Cada semana</option></select></div>
+        <div class="field"><label for="abKeep">Conservar</label><select id="abKeep"><option value="10">Las últimas 10</option><option value="30">Las últimas 30</option><option value="90">Las últimas 90</option><option value="0">Todas</option></select></div>
+      </div>
+      <p class="hint">Crea una carpeta propia, por ejemplo «Copias Revisor» dentro de Documentos u OneDrive: Chrome puede rechazar esas carpetas principales. La copia se hace con la app abierta y el archivo no va cifrado.</p>
     </div>
   </section>
   <section class="set-sec" id="syncSec">
@@ -1493,7 +1517,7 @@ body.focusing main{padding-bottom:96px}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-bell"/></svg>Avisos<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Actívalos en «Ajustes y avisos» → «Activar notificaciones».</li><li>Cada tarea tiene su propio campo «Aviso». Las que no tienen hora usan la «Hora del aviso en tareas sin hora».</li><li>Los avisos llegan mientras la app esté abierta, aunque esté minimizada. Si estaba cerrada, verás los pendientes al abrirla.</li><li>La notificación trae dos botones: <strong>Hecha</strong> (o «Retomar» / «Ya ha respondido») y <strong>Aplazar 1 h</strong>, que vuelve a avisar en una hora sin cambiar la fecha de la tarea. Si la app está cerrada, el botón se aplica al abrirla.</li><li>En el ordenador, con la app instalada, el icono muestra el <strong>número de tareas de hoy y vencidas</strong>. Se actualiza mientras la app está abierta. En Android no hay número: el sistema pone un punto cuando hay notificaciones.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-save"/></svg>Copias de seguridad<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Los datos se guardan en este navegador. Haz copias con «Exportar» (en el móvil: «Más» → «Exportar copia»).</li><li>«Importar» te deja elegir entre <strong>fusionar</strong> la copia con lo actual (no se pierde nada; en cada tarea prevalece la versión más reciente) o <strong>sustituir</strong> todo. Las dos se pueden deshacer.</li><li>La app te recuerda hacer copia cada cierto número de días; se cambia en «Ajustes y avisos».</li></ul></div></details>
+    <div class="help-body"><ul><li>Los datos se guardan en este navegador. Haz copias con «Exportar» (en el móvil: «Más» → «Exportar copia»).</li><li class="pc-only">En el ordenador, «Ajustes y avisos» → «Copias de seguridad» → «Elegir carpeta» guarda la copia sola con la app abierta. Para recuperar una, usa «Importar».</li><li>«Importar» te deja elegir entre <strong>fusionar</strong> la copia con lo actual (no se pierde nada; en cada tarea prevalece la versión más reciente) o <strong>sustituir</strong> todo. Las dos se pueden deshacer.</li><li>La app te recuerda hacer copia cada cierto número de días; se cambia en «Ajustes y avisos».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-refresh"/></svg>Sincronizar el PC y el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>En «Ajustes y avisos» → «Sincronización» pegas un <strong>token de GitHub</strong> y eliges una <strong>contraseña de cifrado</strong>. Ahí mismo está «Cómo crear el token de GitHub», paso a paso.</li><li>Tus tareas se guardan <strong>cifradas</strong> en un Gist secreto de tu cuenta de GitHub. Sin la contraseña no se pueden leer, y el token y la contraseña solo se guardan en el dispositivo donde los escribes.</li><li>Haz lo mismo en el otro dispositivo, con <strong>el mismo token y la misma contraseña</strong>. Si la contraseña se pierde, no se puede recuperar la copia de GitHub (los datos de cada dispositivo siguen intactos).</li><li>Sincroniza al abrir la app, unos segundos después de cada cambio y cada pocos minutos. En cada tarea, proyecto o etiqueta prevalece la versión modificada más tarde, y los borrados también se propagan.</li><li>No se sincronizan los ajustes, el orden de proyectos y tareas ni la interfaz. Sí se sincroniza el archivo.</li><li>Si ves un punto rojo en «Ajustes y avisos», la sincronización está en pausa (token caducado, contraseña incorrecta…): ábrelo para ver el motivo.</li><li>Sin conexión o sin GitHub: «Enviar al otro dispositivo» genera un archivo que se fusiona con «Importar».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-send"/></svg>Enviar a Habitica<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1512,7 +1536,7 @@ const KEY='revisorGeneral_v9', UI_KEY='revisorGeneral_v9_ui', OLD_KEYS=['revisor
 /* Almacenamiento: IndexedDB (sin el límite de ~5 MB de localStorage, que comparten otras apps del mismo origen) */
 const IDB_NAME='revisorTareas_db', IDB_STORE='kv', IDB_KEY='state', MIG_KEY='revisorGeneral_v9_idb', SYNC_KEY='revisorGeneral_v9_sync';
 const STATE_VERSION=14, TOMB_DAYS=180, TRASH_DAYS=30, ACT_KEY='notifActions', FOCUS_KEY='revisorGeneral_v9_focus', FOCUS_MAX=20000;
-let fs=null, fcIdx=null, fcIdxOf=null, fcWorker=null, fcRange='week', fcAudio=null, fcBaseTitle='', fcLastP=-1;
+let modSubFold=false, fs=null, fcIdx=null, fcIdxOf=null, fcWorker=null, fcRange='week', fcAudio=null, fcBaseTitle='', fcLastP=-1;
 const LABEL={pending:'En proceso',paused:'Pausada',done:'Finalizada'};
 const STATUS_ICON={pending:'play',paused:'pause',done:'check-circle'};
 const PRIO_WEIGHT={urgente:3,alta:2,normal:1};
@@ -1726,6 +1750,9 @@ function normalizeSettings(s){
     archiveReview:['0','1','3','6'].includes(String(s.archiveReview))?String(s.archiveReview):'3',
     archiveNotified:validIso(s.archiveNotified)?s.archiveNotified:'',
     archiveSnooze:validIso(s.archiveSnooze)?s.archiveSnooze:'',
+    autoBackupAt:validIso(s.autoBackupAt)?s.autoBackupAt:'',
+    autoBackupDays:[1,3,7].includes(+s.autoBackupDays)?+s.autoBackupDays:1,
+    autoBackupKeep:[0,10,30,90].includes(+s.autoBackupKeep)&&s.autoBackupKeep!==''&&s.autoBackupKeep!=null?+s.autoBackupKeep:30,
     focusWork:clamp(parseInt(s.focusWork,10)||25,1,180),
     focusBreak:clamp(parseInt(s.focusBreak,10)||5,1,60),
     focusLong:clamp(parseInt(s.focusLong,10)||15,1,90),
@@ -1803,7 +1830,7 @@ function loadLegacy(){
   return null;
 }
 function loadUI(){
-  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true,compact:true};
+  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true,compact:true,subFold:[]};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
@@ -1818,11 +1845,20 @@ function loadUI(){
       d.sideCollapsed=u.sideCollapsed===true;
       d.cmOpen=u.cmOpen!==false;
       d.compact=u.compact!==false;
+      if(Array.isArray(u.subFold)) d.subFold=u.subFold.filter(x=>typeof x==='string').slice(-1000);
     }
   }catch(e){}
   if(!LABEL[d.status]) d.status='';
   if(!PRIO_WEIGHT[d.priority]) d.priority='';
   return d;
+}
+/* Sub-tareas plegadas: la elección es de cada dispositivo y no cuenta como cambio de la tarea */
+const subFolded=id=>ui.subFold.includes(id);
+function setSubFold(id,v){
+  ui.subFold=ui.subFold.filter(x=>x!==id); if(v) ui.subFold.push(id);
+  if(ui.subFold.length>1000) ui.subFold=ui.subFold.slice(-1000);
+  saveUI();
+  document.querySelectorAll('.subtasks-preview').forEach(b=>{ if(b.dataset.id!==id) return; b.classList.toggle('folded',v); b.querySelector('.st-head').setAttribute('aria-expanded',String(!v)); });
 }
 function saveUI(){ try{ localStorage.setItem(UI_KEY,JSON.stringify(ui)); }catch(e){} }
 
@@ -2585,12 +2621,75 @@ function backupDue(){
   return daysSince(s.lastBackup||s.since)>=s.backupDays;
 }
 function renderBackupBanner(){
-  const s=appState.settings, due=backupDue();
+  const s=appState.settings, snoozed=s.backupSnooze&&Date.now()<Date.parse(s.backupSnooze), abAsk=abNeed&&!!abDir&&!snoozed, abFail=!!abErr&&!!abDir&&!snoozed, due=backupDue()||abAsk||abFail;
   $('backupBanner').hidden=!due;
-  if(due) $('backupBannerText').textContent=s.lastBackup
+  $('bannerExportBtn').textContent=abAsk?'Permitir la copia':'Exportar ahora';
+  if(abAsk) $('backupBannerText').textContent=`Chrome necesita tu permiso para seguir guardando la copia automática en «${abDir.name}».`;
+  else if(abFail) $('backupBannerText').textContent=`No se ha podido guardar la copia automática: ${abErr}`;
+  else if(due) $('backupBannerText').textContent=s.lastBackup
     ?`Hace ${daysSince(s.lastBackup)} días que no exportas una copia de seguridad. Tus datos solo están guardados en este navegador.`
     :'Aún no has exportado ninguna copia de seguridad. Tus datos solo están guardados en este navegador.';
   $('backupInfo').textContent=s.lastBackup?`Última copia de seguridad: ${relDays(s.lastBackup)} (${new Date(s.lastBackup).toLocaleDateString('es-ES')})`:'Última copia de seguridad: nunca';
+}
+/* ---- Copia automática en una carpeta del PC (File System Access). La carpeta se recuerda en IndexedDB, en este dispositivo ---- */
+const AB_KEY='backupDir', AB_RE=/^revisor-auto-\d{4}-\d{2}-\d{2}\.json$/;
+let abDir=null, abNeed=false, abBusy=false, abErr='', abRetry=0;
+const abSupported=()=>typeof window.showDirectoryPicker==='function'&&!isMobile();
+const abDue=()=>{ const s=appState.settings; return !!abDir&&totalItems()>0&&(!s.autoBackupAt||daysSince(s.autoBackupAt)>=s.autoBackupDays); };
+function abMsg(e){
+  const n=e&&e.name;
+  if(n==='NotFoundError') return 'la carpeta ya no existe o se ha movido. Elige otra en «Ajustes y avisos».';
+  if(n==='QuotaExceededError') return 'no queda espacio en el disco.';
+  if(n==='NotAllowedError'||n==='SecurityError') return 'Chrome no permite usar esa carpeta.';
+  if(n==='NoModificationAllowedError'||n==='InvalidModificationError') return 'el archivo está bloqueado por otro programa.';
+  return (e&&e.message)||'error desconocido.';
+}
+async function abPrune(){
+  const keep=appState.settings.autoBackupKeep; if(!keep) return;
+  const names=[]; for await(const [name,h] of abDir.entries()) if(h.kind==='file'&&AB_RE.test(name)) names.push(name);
+  for(const name of names.sort().slice(0,Math.max(0,names.length-keep))) await abDir.removeEntry(name); /* solo sus propios archivos; nunca las copias manuales */
+}
+async function abRun(ask=false){
+  if(!abDir||abBusy||!totalItems()) return false;
+  abBusy=true;
+  try{
+    let perm=await abDir.queryPermission({mode:'readwrite'});
+    if(perm!=='granted'&&ask) perm=await abDir.requestPermission({mode:'readwrite'});
+    if(perm!=='granted'){ abNeed=true; return false; }
+    abNeed=false;
+    const fh=await abDir.getFileHandle(`revisor-auto-${todayStr()}.json`,{create:true}), w=await fh.createWritable();
+    await w.write(JSON.stringify(appState,null,2)); await w.close(); /* Chrome escribe en un temporal: si falla, no estropea la copia anterior */
+    const s=appState.settings, now=new Date().toISOString(); s.autoBackupAt=now; s.lastBackup=now; s.backupSnooze=''; abErr=''; abRetry=0;
+    save();
+    try{ await abPrune(); }catch(e){}
+    return true;
+  }catch(e){ abErr=abMsg(e); return false; }
+  finally{ abBusy=false; renderBackupBanner(); if($('settingsModal').open) renderAbSection(); }
+}
+function abTick(){ if(abDue()&&Date.now()>=abRetry){ abRetry=Date.now()+3600000; abRun(); } } /* si falla, reintenta cada hora */
+async function abPick(){
+  try{
+    const d=await window.showDirectoryPicker({id:'revisorBackup',mode:'readwrite',startIn:'documents'});
+    await idbPut(AB_KEY,d);
+    abDir=d; abErr=''; abNeed=false; abRetry=0; appState.settings.autoBackupAt=''; save();
+    await abRun(true);
+  }catch(e){ if(e&&e.name==='AbortError') return; abErr=`No se ha podido usar esa carpeta: ${abMsg(e)}`; }
+  renderAbSection(); renderBackupBanner();
+}
+async function abOff(){ abDir=null; abErr=''; abNeed=false; appState.settings.autoBackupAt=''; save(); try{ await idbPut(AB_KEY,null); }catch(e){} renderAbSection(); renderBackupBanner(); }
+function renderAbSection(){
+  const ok=abSupported(); $('abBlock').hidden=!ok; if(!ok) return;
+  const s=appState.settings, on=!!abDir;
+  let txt='Desactivada. Elige una carpeta y la app guardará allí la copia sola.';
+  if(on){
+    txt=`Carpeta: «${abDir.name}». `+(s.autoBackupAt?`Última copia: ${relDays(s.autoBackupAt)}, a las ${new Date(s.autoBackupAt).toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'})}.`:'Todavía sin copia.');
+    if(abNeed) txt+=' Falta tu permiso: pulsa «Guardar ahora».';
+    if(abErr) txt+=` No se ha podido guardar: ${abErr}`;
+  }else if(abErr) txt=abErr;
+  $('abStatus').textContent=txt;
+  $('abPickBtn').textContent=on?'Cambiar carpeta':'Elegir carpeta';
+  $('abNowBtn').hidden=$('abOffBtn').hidden=$('abOpts').hidden=!on;
+  $('abDays').value=String(s.autoBackupDays); $('abKeep').value=String(s.autoBackupKeep);
 }
 function exportData(){
   appState.settings.lastBackup=new Date().toISOString(); appState.settings.backupSnooze='';
@@ -2816,8 +2915,11 @@ function createCard(sl,p,ctx){
 
   if(sl.subtasks.length){
     const stDone=sl.subtasks.filter(t=>t.done).length;
-    const box=el('div','subtasks-preview');
-    box.append(el('strong','',`Sub-tareas ${stDone}/${sl.subtasks.length}`));
+    const folded=subFolded(sl.id), box=el('div','subtasks-preview'+(folded?' folded':'')), stHead=el('button','st-head');
+    box.dataset.id=sl.id; stHead.type='button'; stHead.setAttribute('aria-expanded',String(!folded)); stHead.title='Plegar o desplegar las sub-tareas';
+    stHead.append(ic('chev-right','sm'),el('span','',`Sub-tareas ${stDone}/${sl.subtasks.length}`));
+    stHead.addEventListener('click',e=>{ e.stopPropagation(); setSubFold(sl.id,!subFolded(sl.id)); });
+    box.append(stHead);
     const ul=el('ul','st-inline-list');
     sl.subtasks.forEach(st=>{
       const li=el('li'), lab=el('label',st.done?'done':'');
@@ -3138,7 +3240,13 @@ function renderTagPicker(){
     box.append(b);
   });
 }
+function paintSubHead(){
+  const n=tempSubtasks.length, fold=modSubFold&&n>0, b=$('modSubToggle');
+  b.disabled=!n; b.setAttribute('aria-expanded',String(!fold)); $('modSubtasks').classList.toggle('folded',fold);
+  $('modSubCount').textContent=n?`${tempSubtasks.filter(t=>t.done).length}/${n}`:'';
+}
 function renderTempSubtasks(){
+  paintSubHead();
   const list=$('modSubtasks'); list.replaceChildren();
   tempSubtasks.forEach((st,idx)=>{
     const li=el('li','st-item');
@@ -3185,7 +3293,7 @@ function openModal(item=null){
     $('modTitle').value=item.title; tempItemTags=item.tags.filter(id=>getTag(id));
     $('modPriority').value=item.priority; $('modDate').value=item.dueDate; $('modTime').value=item.dueTime;
     $('modReminder').value=item.reminder; $('modLink').value=item.link; $('modNotes').value=item.notes;
-    tempSubtasks=clone(item.subtasks); editingRecOcc=item.recurrence?item.recurrence.occurrence:1; editingHistory=item.history;
+    tempSubtasks=clone(item.subtasks); modSubFold=subFolded(item.id); editingRecOcc=item.recurrence?item.recurrence.occurrence:1; editingHistory=item.history;
     $('modWaitFor').value=item.waitingFor; $('modFollowUp').value=item.followUp;
     $('modStatus').value=item.status; $('modPauseNote').value=item.pauseNote||''; $('modResumeAt').value=item.resumeAt||'';
     const ft=fcByItem().get(item.id); $('modFocusLine').hidden=!ft; $('modFocusLine').textContent=ft?`Concentración: ${fcDur(ft.sec)} en ${pl(ft.n,'sesión','sesiones')}`:'';
@@ -3196,7 +3304,7 @@ function openModal(item=null){
     $('modStatus').value='pending';
     if(['today','tomorrow','week'].includes(ui.mode)) $('modDate').value=ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):todayStr();
     tempItemTags=ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
-    tempSubtasks=[]; editingRecOcc=1; editingHistory=[]; recToForm(null,$('modDate').value);
+    tempSubtasks=[]; modSubFold=false; editingRecOcc=1; editingHistory=[]; recToForm(null,$('modDate').value);
   }
   tempComments=[]; cmEditId=null; cmExpanded.clear(); $('cmInput').value=''; $('cmDrop').hidden=true;
   placeCmPane(); applyCmOpen();
@@ -5250,7 +5358,7 @@ function checkBackupNotify(){
 }
 function overdueSig(){ return appState.projects.map(p=>p.items.filter(i=>isOverdue(i)||isSnoozed(i)||followDue(i)||resumeDue(i)).map(i=>i.id).join(',')).join('|'); }
 function tick(){
-  checkReminders(); checkBackupNotify(); checkArchiveNotify();
+  abTick(); checkReminders(); checkBackupNotify(); checkArchiveNotify();
   const busy=drag.kind||document.querySelector('dialog[open]');
   if(busy) return;
   if(renderPending){ renderPending=false; renderApp(); return; }
@@ -5300,6 +5408,7 @@ function renderSettings(){
   $('setArchiveDays').value=appState.settings.archiveDays; $('setArchiveReview').value=appState.settings.archiveReview;
   const s=appState.settings;
   $('setBackupInfo').textContent=s.lastBackup?`Última copia: ${relDays(s.lastBackup)} (${new Date(s.lastBackup).toLocaleString('es-ES')}).`:'Todavía no has exportado ninguna copia.';
+  renderAbSection();
   renderSyncSection();
   renderHabSection();
   let inst;
@@ -5377,9 +5486,10 @@ $('itemModal').addEventListener('keydown',e=>{
   else if(e.key==='Enter'&&e.target.id==='modTitle'){ e.preventDefault(); saveModal(); }
 });
 $('modNewSubtask').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.ctrlKey&&!e.metaKey){ e.preventDefault(); e.stopPropagation(); $('modAddSubtaskBtn').click(); } });
+$('modSubToggle').addEventListener('click',()=>{ modSubFold=!modSubFold; if(editingItemId) setSubFold(editingItemId,modSubFold); paintSubHead(); });
 $('modAddSubtaskBtn').addEventListener('click',()=>{
   const v=$('modNewSubtask').value.trim(); if(!v) return;
-  tempSubtasks.push({id:newId(),title:v,done:false}); $('modNewSubtask').value=''; renderTempSubtasks(); $('modNewSubtask').focus();
+  tempSubtasks.push({id:newId(),title:v,done:false}); modSubFold=false; $('modNewSubtask').value=''; renderTempSubtasks(); $('modNewSubtask').focus();
 });
 /* Comentarios */
 $('cmToggle').addEventListener('click',()=>setCmOpen(!ui.cmOpen));
@@ -5546,7 +5656,12 @@ $('bulkNoneBtn').addEventListener('click',()=>{ selected.clear(); renderApp(); }
 $('bulkExitBtn').addEventListener('click',()=>setSelectMode(false));
 
 $('exportBtn').addEventListener('click',exportData);
-$('bannerExportBtn').addEventListener('click',exportData);
+$('bannerExportBtn').addEventListener('click',()=>{ if(abNeed&&abDir) abRun(true); else exportData(); });
+$('abPickBtn').addEventListener('click',abPick);
+$('abNowBtn').addEventListener('click',()=>abRun(true));
+$('abOffBtn').addEventListener('click',abOff);
+$('abDays').addEventListener('change',e=>{ appState.settings.autoBackupDays=+e.target.value; save(); });
+$('abKeep').addEventListener('change',e=>{ appState.settings.autoBackupKeep=+e.target.value; save(); });
 $('archBannerOpenBtn').addEventListener('click',()=>openArchive());
 $('archBannerSnoozeBtn').addEventListener('click',()=>{ appState.settings.archiveSnooze=addDays(new Date(),7).toISOString(); save(); renderApp(); });
 $('openArchiveBtn').addEventListener('click',()=>openArchive());
@@ -5649,6 +5764,7 @@ function syncControls(){
   fs=fcLoad();
   renderApp();
   if(fs){ fcSync(false); fcTick(); }
+  if(storeMode==='idb'&&typeof window.showDirectoryPicker==='function') idbGet(AB_KEY).then(d=>{ abDir=d||null; abTick(); }).catch(()=>{});
   autoArchive();
   purgeTrash();
   drainNotifActions();
@@ -5665,7 +5781,7 @@ function syncControls(){
   setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
   window.addEventListener('online',()=>syncNow());
-  window.__revisor={get state(){return appState;},habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
+  window.__revisor={get state(){return appState;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>

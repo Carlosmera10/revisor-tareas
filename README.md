@@ -14,6 +14,7 @@ Gestor personal de proyectos y tareas, instalable como app (PWA) en el PC (Chrom
 - **Planificador** (tecla `P`): repasa las tareas en proceso como tarjetas, de la fecha más antigua a la más lejana.
 - **Añadir escribiendo en español** (teclas `Q` / `N`): entiende fechas, horas, repeticiones, `#proyecto`, `@etiqueta` y `!alta` / `!urgente`.
 - **Repetitivas**: al completarlas, la misma tarea pasa a su siguiente fecha.
+- **Sub-tareas plegables**: en la tarjeta y en la ficha, pulsando su título. La elección es de cada dispositivo.
 - **Archivo**: las finalizadas se archivan solas y la app recuerda revisarlas pasados 1, 3 o 6 meses.
 - **Papelera**: lo borrado (tareas, proyectos y tareas del archivo) se guarda 30 días, se sincroniza y se puede restaurar.
 - **Concentración (solo PC, tecla `F`)**: temporizador por tarea con un árbol que crece, sin penalizar. Guarda el tiempo trabajado aunque termines antes, lo suma por tarea y proyecto, y exporta las sesiones a Excel. Estos datos no se sincronizan.
@@ -34,6 +35,7 @@ Gestor personal de proyectos y tareas, instalable como app (PWA) en el PC (Chrom
 - En **IndexedDB** del navegador (`revisorTareas_db`), sin el límite de ~5 MB de `localStorage`. Los datos de versiones anteriores se migran solos la primera vez, sin borrar nada de golpe (las claves antiguas se limpian pasado un día).
 - Los ajustes de la interfaz y los de sincronización de cada dispositivo van en `localStorage` con claves propias (`revisorGeneral_v9_*`).
 - Usa «Exportar» para hacer copias de seguridad en un archivo JSON.
+- **Copia automática (solo PC)**: en «Ajustes y avisos» → «Copias de seguridad» → «Elegir carpeta», la app guarda `revisor-auto-AAAA-MM-DD.json` con la frecuencia elegida mientras está abierta, conserva las últimas 10, 30 o 90 y no toca otros archivos. Chrome puede volver a pedir permiso tras reiniciarse. El archivo no va cifrado y se recupera con «Importar».
 
 ## Sincronizar el PC y el móvil
 
