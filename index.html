@@ -530,7 +530,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
 .nav-count:empty{display:none}
 
 /* Elementos solo para móvil (ocultos en escritorio) */
-.bottom-nav,.scrim,.sheet,#filtersToggle,.more-btn{display:none}
+.bottom-nav,.scrim,.sheet,#filtersToggle,#compactBtn,.more-btn,.cmp-dot,.cmp-date{display:none}
 .sheet[hidden],.scrim[hidden]{display:none!important}
 
 @media(max-width:760px){
@@ -558,10 +558,13 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   .progress{margin-top:10px}
   .banner{font-size:.88rem;padding:10px 12px}
   .toolbar{padding:8px;gap:8px;margin-bottom:12px}
-  .search-wrap{min-width:0;flex:1 1 calc(100% - 140px)}
+  .search-wrap{min-width:0;flex:1 1 calc(100% - 184px)}
   #filtersToggle{flex:0 0 auto}
-  #filtersToggle{display:inline-flex}
-  body:not(.filters-open) .toolbar .tool-row:first-child>:not(.search-wrap):not(#filtersToggle){display:none}
+  #filtersToggle{display:inline-flex;padding-inline:10px}
+  .search-wrap input{padding-right:4px}
+  #compactBtn{display:inline-flex;flex:0 0 auto;width:38px;height:38px}
+  #compactBtn[hidden]{display:none}
+  body:not(.filters-open) .toolbar .tool-row:first-child>:not(.search-wrap):not(#filtersToggle):not(#compactBtn){display:none}
   body:not(.filters-open) .toolbar .tool-row.split{display:none}
   .toolbar .tool-row:first-child select{flex:1 1 46%;min-width:0;font-size:.86rem;padding:8px 6px}
   .tool-row.split,.tool-row.split>.row{width:100%}
@@ -580,6 +583,27 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   .slide.swipe-done::after{content:"Soltar: hecha";background:var(--done)}
   .slide.swipe-later::after{content:"Soltar: aplazar";background:var(--high)}
   .badges-row{gap:5px}
+  /* Vista compacta: una línea por tarea (punto de prioridad, título y fecha). Con .open es la tarjeta normal */
+  body.cmp-view #slides.list-view{gap:6px}
+  .cmp{cursor:pointer}
+  .slide.cmp:not(.open){padding:8px 12px;contain-intrinsic-size:auto 40px}
+  .slide.cmp:not(.open) .slide-top{align-items:center}
+  .slide.cmp:not(.open) input.sel-check{margin-top:0}
+  .slide.cmp:not(.open) :is(.done-check,.drag-handle,.slide-controls,.badges-row,.subtasks-preview,.meta-preview,.meta-link){display:none}
+  .slide.cmp:not(.open) .slide-header{flex-wrap:nowrap}
+  .slide.cmp:not(.open) .slide-title,.arch-row.cmp:not(.open) .arch-title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.95rem}
+  .cmp:not(.open) .cmp-dot,.cmp:not(.open) .cmp-date{display:block;flex:0 0 auto}
+  .cmp-dot{width:9px;height:9px;border-radius:50%;background:var(--line-strong)}
+  .cmp-dot.alta{background:var(--high)}
+  .cmp-dot.urgente{background:var(--urgent)}
+  .cmp-date{font-size:.76rem;font-weight:600;color:var(--muted);white-space:nowrap}
+  .cmp-date.today{color:var(--warn)}
+  .cmp-date.overdue{color:var(--urgent)}
+  .cmp-line{display:flex;align-items:center;gap:8px;min-width:0}
+  .slide.cmp:not(.done) .slide-title:hover{color:var(--ink);text-decoration:none}
+  .arch-row.cmp{align-items:stretch}
+  .arch-row.cmp:not(.open){padding:8px 12px;margin-top:6px}
+  .arch-row.cmp:not(.open) :is(.badges-row,.arch-extra,.meta-preview,.arch-acts){display:none}
   .kanban-view .slide-top{flex-direction:row}
   /* Kanban en horizontal, como Trello: una columna por pantalla, se pasa deslizando */
   #slides.kanban-view{display:flex;grid-template-columns:none;gap:10px;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;margin:0 -12px;padding:0 12px 6px;scroll-padding:0 12px;scrollbar-width:none;align-items:flex-start}
@@ -722,6 +746,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
 
 /* ===== Concentración (pomodoro): solo en el PC ===== */
 @media(max-width:760px){.pc-only{display:none!important}}
+@media(min-width:761px){.mobile-only{display:none!important}}
 :root{--tree-a:#2f8f5b;--tree-b:#4c9f70;--tree-c:#1f7a56;--trunk:#8a6a4a;--soil:#d9dee6}
 :root[data-theme=dark]{--tree-a:#3aa874;--tree-b:#5cb98a;--tree-c:#2c8f66;--trunk:#a78660;--soil:#2a3246}
 .fc-tree{display:block;width:100%;height:100%}
@@ -919,6 +944,7 @@ body.focusing main{padding-bottom:96px}
       <div class="tool-row">
         <div class="search-wrap"><svg class="ic sm"><use href="#i-search"/></svg><input type="search" id="searchFilter" placeholder="Buscar (pulsa / )" aria-label="Buscar"></div>
         <button type="button" id="filtersToggle" class="secondary toggle" aria-expanded="false"><svg class="ic sm"><use href="#i-filter"/></svg><span id="filtersToggleText">Filtros</span></button>
+        <button type="button" id="compactBtn" class="secondary icon toggle" title="Vista compacta" aria-label="Vista compacta" aria-pressed="true"><svg class="ic sm"><use href="#i-list"/></svg></button>
         <span class="tb-break" aria-hidden="true"></span>
         <select id="projectFilter" aria-label="Filtrar por proyecto" hidden></select>
         <select id="statusFilter" aria-label="Filtrar por estado">
@@ -1455,7 +1481,7 @@ body.focusing main{padding-bottom:96px}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pencil"/></svg>Notas con formato<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Las notas admiten formato sencillo; míralo con «Vista previa»:</p><ul><li><code>**negrita**</code> y <code>*cursiva*</code></li><li><code>[texto](https://…)</code> para un enlace</li><li><code>- elemento</code> al principio de línea para una lista</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-menu"/></svg>En el móvil<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>En la lista, desliza una tarjeta <strong>a la derecha</strong> para marcarla como hecha y <strong>a la izquierda</strong> para aplazarla.</li><li>Mantén pulsada el asa para reordenar.</li><li><strong>Kanban</strong>: las columnas van una al lado de otra; desliza a los lados o pulsa las pestañas de arriba para cambiar de columna. Para pasar una tarjeta a otra columna, arrástrala desde el asa hasta la pestaña o hasta el borde de la pantalla.</li><li>El botón de los tres puntos de cada tarjeta abre sus acciones; «Más», en la barra inferior, el resto de opciones.</li></ul></div></details>
+    <div class="help-body"><ul><li>En la lista, desliza una tarjeta <strong>a la derecha</strong> para marcarla como hecha y <strong>a la izquierda</strong> para aplazarla.</li><li>Mantén pulsada el asa para reordenar.</li><li><strong>Kanban</strong>: las columnas van una al lado de otra; desliza a los lados o pulsa las pestañas de arriba para cambiar de columna. Para pasar una tarjeta a otra columna, arrástrala desde el asa hasta la pestaña o hasta el borde de la pantalla.</li><li>El botón de los tres puntos de cada tarjeta abre sus acciones; «Más», en la barra inferior, el resto de opciones.</li><li class="mobile-only"><strong>Vista compacta</strong>: cada tarea ocupa una línea, con su título, su fecha y un punto de color con la prioridad. Púlsala para desplegar la tarjeta y otra vez para plegarla; dentro, «⋯» → «Editar» abre la ficha y el asa la reordena. El botón junto a «Filtros» cambia entre la vista compacta y la normal, y la app recuerda tu elección.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-archive"/></svg>Archivo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Las tareas finalizadas se <strong>archivan solas</strong> pasados 7 días (se cambia en «Ajustes y avisos» → «Archivo»). También puedes archivar una ya: icono de archivo en la tarjeta (en el móvil, «⋯» → «Archivar ya»).</li><li>Las repetitivas no se archivan: pasan a su siguiente fecha.</li><li>Pasados tres meses (o uno, o seis, según elijas) te aviso con un aviso en la cabecera y una notificación para que revises las archivadas.</li><li>En el <strong>Archivo</strong> (barra lateral) puedes, por cada tarea: <strong>Copiar</strong> su texto para documentarla, <strong>Conservar</strong> (no vuelve a preguntar), <strong>Volver a abrir</strong> (vuelve a su proyecto como pendiente) o <strong>Eliminar</strong> definitivamente.</li><li>«Descargar como texto» guarda en un archivo .md todas las pendientes de revisar, con sus notas y sub-tareas.</li><li>El archivo va incluido en las copias de seguridad.</li></ul></div></details>
   <details class="help-sec pc-only"><summary><svg class="ic"><use href="#i-timer"/></svg>Concentración (solo en el ordenador)<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1777,7 +1803,7 @@ function loadLegacy(){
   return null;
 }
 function loadUI(){
-  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true};
+  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true,compact:true};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
@@ -1791,6 +1817,7 @@ function loadUI(){
       if(['auto','light','dark'].includes(u.theme)) d.theme=u.theme;
       d.sideCollapsed=u.sideCollapsed===true;
       d.cmOpen=u.cmOpen!==false;
+      d.compact=u.compact!==false;
     }
   }catch(e){}
   if(!LABEL[d.status]) d.status='';
@@ -1937,7 +1964,7 @@ let editingItemId=null, tempSubtasks=[], tempTags=[], tempItemTags=[], tempComme
 let recDays=[], recDirty=false, editingRecOcc=1, editingHistory=[];
 let drag={kind:null,id:null};
 let stDragIdx=null;
-let selectMode=false; const selected=new Set();
+let selectMode=false; const selected=new Set(), expanded=new Set();
 let lastVisibleIds=[];
 const lastPctByKey={}; let suppressConfetti=true;
 const undoStack=[];
@@ -2227,18 +2254,29 @@ const rangePending=mode=>rangeEntries(mode).filter(e=>e.it.status!=='done').leng
 function switchToView(mode){
   closeDrawer();
   if(ui.mode===mode) return;
-  ui.mode=mode; saveUI(); selected.clear(); suppressConfetti=true; renderApp(); window.scrollTo(0,0);
+  ui.mode=mode; saveUI(); selected.clear(); expanded.clear(); suppressConfetti=true; renderApp(); window.scrollTo(0,0);
 }
 const switchToToday=()=>switchToView('today');
 function switchToProject(id){ kbIndex=0;
   closeDrawer();
   if(!isDayView()&&appState.activeId===id) return;
-  ui.mode='project'; saveUI(); appState.activeId=id; selected.clear(); suppressConfetti=true; save(); renderApp(); window.scrollTo(0,0);
+  ui.mode='project'; saveUI(); appState.activeId=id; selected.clear(); expanded.clear(); suppressConfetti=true; save(); renderApp(); window.scrollTo(0,0);
 }
 
 /* ================= Móvil: menú lateral, hoja de acciones y gestos ================= */
 const mqMobile=window.matchMedia?matchMedia('(max-width:760px)'):{matches:false,addEventListener(){}};
 const isMobile=()=>mqMobile.matches;
+/* Vista compacta (solo móvil): las tareas desplegadas se recuerdan al repintar, hasta cambiar de vista */
+const compactOn=()=>isMobile()&&ui.compact;
+function toggleOpen(id,node){ if(!expanded.delete(id)) expanded.add(id); node.classList.toggle('open',expanded.has(id)); }
+function cmpDot(it){ const d=el('span','cmp-dot '+it.priority); d.setAttribute('role','img'); d.setAttribute('aria-label','Prioridad '+PRIO_LABEL[it.priority].toLowerCase()); d.title=PRIO_LABEL[it.priority]; return d; }
+function cmpDate(it){
+  const d=effDate(it); if(!d) return null;
+  const t=todayStr(), done=it.status==='done', over=!done&&(d===it.dueDate?isOverdue(it):d<t);
+  let txt=d===t?'Hoy':d===ymd(addDays(new Date(),1))?'Mañana':fmtDate(d);
+  if(it.dueTime&&d===it.dueDate) txt+=', '+it.dueTime;
+  return el('span','cmp-date'+(over?' overdue':!done&&d===t?' today':''),txt);
+}
 function syncScrim(){ $('scrim').hidden=!(document.body.classList.contains('drawer-open')||document.body.classList.contains('qa-open')||!$('sheet').hidden); }
 function openDrawer(){ closeSheet(); document.body.classList.add('drawer-open'); syncScrim(); }
 function closeDrawer(){ document.body.classList.remove('drawer-open'); syncScrim(); }
@@ -2626,6 +2664,7 @@ function renderSearchMore(words){
   if(arch.length){
     const h=el('div','search-more-head'); h.append(ic('archive','sm'),document.createTextNode('En el archivo '),el('span','n',`(${arch.length})`)); box.append(h);
     arch.slice(0,8).forEach(a=>{
+      if(compactOn()){ box.append(archRow(a,false)); return; }
       const b=el('button','arch-hit'); b.type='button';
       b.append(el('span','',a.item.title),el('small','',`${a.pname} · hecha el ${archFmt(a.item.completedAt)}`));
       b.addEventListener('click',()=>openArchive(ui.search));
@@ -2665,6 +2704,14 @@ function createCard(sl,p,ctx){
   const mobile=isMobile();
   const canDrag=!selectMode&&!mobile, canReorder=!selectMode&&ctx.manual;
   if(mobile&&!selectMode&&!ctx.colStatus) attachSwipe(card,sl);
+  const cmp=compactOn()&&!ctx.colStatus;
+  if(cmp){
+    card.classList.add('cmp');
+    if(!selectMode){
+      card.classList.toggle('open',expanded.has(sl.id));
+      card.addEventListener('click',e=>{ if(!e.target.closest('button,select,input,a,label')) toggleOpen(sl.id,card); });
+    }
+  }
   if(canDrag){
     card.draggable=true;
     card.addEventListener('dragstart',e=>{
@@ -2712,7 +2759,8 @@ function createCard(sl,p,ctx){
 
   const content=el('div','slide-content');
   const header=el('div','slide-header');
-  header.append(btn(sl.title,'slide-title',null,()=>selectMode?toggleSel(sl.id):openModal(sl)));
+  header.append(btn(sl.title,'slide-title',null,()=>selectMode?toggleSel(sl.id):cmp?toggleOpen(sl.id,card):openModal(sl)));
+  if(cmp){ header.prepend(cmpDot(sl)); const cd=cmpDate(sl); if(cd) header.append(cd); }
   const badges=el('div','badges-row');
   if(sl.priority!=='normal') badges.append(el('span','prio prio-'+sl.priority,PRIO_LABEL[sl.priority]));
   const db=dateBadge(sl); if(db) badges.append(db);
@@ -2983,6 +3031,9 @@ function renderApp(){
   { const t=todayStr(); let n=0; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status==='pending'&&!isSnoozed(it)&&!isWaiting(it)&&(!it.dueDate||it.dueDate<t)) n++; }));
     $('planBadge').textContent=n?String(n):''; $('planBadge').title=n?pl(n,'tarea sin fecha o vencida','tareas sin fecha o vencidas'):''; }
   $('filtersToggle').classList.toggle('active',nf>0||document.body.classList.contains('filters-open'));
+  document.body.classList.toggle('cmp-view',compactOn());
+  $('compactBtn').hidden=ui.mode==='calendar'||(!td&&ui.view==='kanban');
+  $('compactBtn').classList.toggle('active',ui.compact); $('compactBtn').setAttribute('aria-pressed',String(ui.compact));
   renderBulkBar();
   lastOverdueSig=overdueSig();
 }
@@ -3482,7 +3533,13 @@ function archMatches(a,words){
 function archRow(a,pending){
   const it=a.item, row=el('div','arch-row');
   const main=el('div','arch-main');
-  main.append(el('strong','arch-title',it.title));
+  const title=el('strong','arch-title',it.title);
+  if(compactOn()){
+    const line=el('div','cmp-line'), done=el('span','cmp-date',archFmt(it.completedAt));
+    line.append(cmpDot(it),title,done); main.append(line);
+    row.classList.add('cmp'); row.classList.toggle('open',expanded.has(it.id));
+    row.addEventListener('click',e=>{ if(!e.target.closest('button,a')) toggleOpen(it.id,row); });
+  } else main.append(title);
   const meta=el('div','badges-row');
   meta.append(badge('proj','folder',a.pname||'Sin título'));
   meta.append(badge('','check-circle','Hecha el '+archFmt(it.completedAt)));
@@ -5446,6 +5503,7 @@ $('viewKanbanBtn').addEventListener('click',()=>{ ui.view='kanban'; saveUI(); re
 { let t=null; $('slides').addEventListener('scroll',()=>{ const b=kbBoard(); if(!b||!isMobile()||b.classList.contains('kb-dragging')) return; clearTimeout(t); t=setTimeout(()=>{ kbIndex=kbCurrent(b); kbMarkTab(kbIndex); },60); },{passive:true}); }
 window.addEventListener('resize',()=>{ if(kbBoard()&&isMobile()) kbGo(kbIndex,false); });
 $('selectModeBtn').addEventListener('click',()=>setSelectMode(!selectMode));
+$('compactBtn').addEventListener('click',()=>{ ui.compact=!ui.compact; saveUI(); renderApp(); });
 $('schedBtn').addEventListener('click',()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); });
 
 $('bulkStatus').addEventListener('change',e=>{

@@ -10,6 +10,7 @@ Gestor personal de proyectos y tareas, instalable como app (PWA) en el PC (Chrom
 - **Estados**: En proceso, Pausada y Finalizada. Una pausada puede llevar «Retomar el día»: esa fecha vuelve a «Hoy» y avisa. Además, la marca aparte «En espera de…» para lo que depende de otra persona (vuelve a «Hoy» el día de reclamar).
 - **Las finalizadas, siempre al final** de la lista, sea cual sea el orden elegido.
 - **Vistas**: Hoy, Mañana, Próximos 7 días, Calendario (mes/semana en el PC; semana + día en el móvil), En espera y cada proyecto, en lista o Kanban.
+- **Vista compacta en el móvil**: cada tarea en una línea (título, fecha y punto de prioridad); se despliega al tocarla. El botón junto a «Filtros» cambia entre compacta y normal.
 - **Planificador** (tecla `P`): repasa las tareas en proceso como tarjetas, de la fecha más antigua a la más lejana.
 - **Añadir escribiendo en español** (teclas `Q` / `N`): entiende fechas, horas, repeticiones, `#proyecto`, `@etiqueta` y `!alta` / `!urgente`.
 - **Repetitivas**: al completarlas, la misma tarea pasa a su siguiente fecha.
