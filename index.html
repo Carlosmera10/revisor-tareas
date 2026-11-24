@@ -851,6 +851,18 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   .kanban-col h3{display:none}
 }
 .fc-mode{margin-bottom:12px}
+
+/* ===== Kanban en el ordenador: moverse en horizontal ===== */
+.kb-nav{display:none}
+@media(min-width:761px){
+  #slides.kanban-view.kb-scroll{overflow-x:auto;padding-bottom:8px}
+  #slides.kanban-view.pannable{cursor:grab}
+  #slides.kanban-view.panning{cursor:grabbing;user-select:none}
+  #slides.kanban-view.panning .slide{cursor:grabbing}
+  .kb-nav{position:fixed;z-index:60;width:40px;height:40px;min-height:0;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;background:var(--panel);color:var(--ink);border:1px solid var(--line-strong);box-shadow:0 4px 14px rgba(10,16,30,.18)}
+  .kb-nav:hover{background:var(--hover);color:var(--ink)}
+  .kb-nav[hidden]{display:none}
+}
 </style>
 </head>
 <body>
@@ -1043,6 +1055,8 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
       <span id="countLabel"></span>
     </div>
     <p class="hint" id="dragHint"></p>
+    <button type="button" id="kbPrev" class="kb-nav" title="Columnas anteriores (tecla ←)" aria-label="Columnas anteriores" hidden><svg class="ic"><use href="#i-chev-left"/></svg></button>
+    <button type="button" id="kbNext" class="kb-nav" title="Columnas siguientes (tecla →)" aria-label="Columnas siguientes" hidden><svg class="ic"><use href="#i-chev-right"/></svg></button>
     <div id="kbBy" class="kb-by" hidden><span class="lbl">Columnas</span><div class="seg" role="group" aria-label="Columnas del Kanban"><button type="button" data-by="status">Por estado</button><button type="button" data-by="section">Por sección</button></div></div>
     <div id="kbTabs" class="kb-tabs" role="tablist" aria-label="Columnas" hidden></div>
     <div id="slides" class="list-view"></div>
@@ -1536,7 +1550,7 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   <details class="help-sec" open><summary><svg class="ic"><use href="#i-checks"/></svg>Proyectos y tareas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Crea un proyecto con el <strong>+</strong> junto a «Proyectos». Para cambiarle el nombre, pulsa sobre el título.</li><li>Arrastra un proyecto en la barra lateral para reordenarlo.</li><li>Si el nombre de un proyecto empieza por un emoji (por ejemplo «📊 Productividad»), se usa como su icono. En el ordenador, el botón junto al título de la barra lateral (o la tecla <kbd>[</kbd>) la pliega y deja solo los iconos con sus números.</li><li>Cada tarea está <strong>En proceso</strong>, <strong>Pausada</strong> o <strong>Finalizada</strong>. Una pausada sigue en su proyecto, pero no sale en Hoy, Mañana, Próximos 7 días ni en el planificador, y no avisa. En la ficha puedes anotar el motivo.</li><li>«En espera de…» es aparte: para cuando dependes de otra persona y quieres reclamarle en una fecha.</li><li>Para moverla a otro proyecto, suéltala sobre él en la barra lateral, o usa «Mover o duplicar».</li><li>En la ficha, las etiquetas se marcan y desmarcan pulsándolas; puedes poner varias.</li><li>Las sub-tareas se reordenan arrastrando desde el asa o con las flechas.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pin"/></svg>Fijadas y secciones<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Fijar arriba</strong>: con el <strong>icono de la chincheta</strong> de la tarjeta (en el móvil, «⋯» → «Fijar arriba»). La tarea sale resaltada arriba de su proyecto y en «Hoy», en el grupo «Fijadas», aunque no tenga fecha. Al finalizarla deja de estar fijada.</li><li><strong>Secciones</strong>: dividen un proyecto en partes. Créalas con «Añadir sección», al final de la lista (en el móvil también en «Más»). Pulsa el nombre para plegarla o desplegarla.</li><li>Para meter una tarea en una sección: arrástrala sobre otra tarea de la sección o sobre su título, usa el campo «Sección» de la ficha o escribe <code>/Nombre</code> al añadirla. El <strong>+</strong> de la sección añade una tarea en ella.</li><li>En el ordenador, al pasar el ratón por la sección aparecen los botones para renombrarla, subirla, bajarla o eliminarla. En el móvil, en su «⋯». Al eliminarla, sus tareas pasan a «Sin sección».</li><li>En el <strong>Kanban</strong>, «Columnas» permite ver las columnas por estado o por sección. Arrastrar entre columnas cambia el estado o la sección.</li><li>Las secciones se sincronizan; plegarlas y la forma del Kanban son de cada dispositivo.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Fijar arriba</strong>: con el <strong>icono de la chincheta</strong> de la tarjeta (en el móvil, «⋯» → «Fijar arriba»). La tarea sale resaltada arriba de su proyecto y en «Hoy», en el grupo «Fijadas», aunque no tenga fecha. Al finalizarla deja de estar fijada.</li><li><strong>Secciones</strong>: dividen un proyecto en partes. Créalas con «Añadir sección», al final de la lista (en el móvil también en «Más»). Pulsa el nombre para plegarla o desplegarla.</li><li>Para meter una tarea en una sección: arrástrala sobre otra tarea de la sección o sobre su título, usa el campo «Sección» de la ficha o escribe <code>/Nombre</code> al añadirla. El <strong>+</strong> de la sección añade una tarea en ella.</li><li>En el ordenador, al pasar el ratón por la sección aparecen los botones para renombrarla, subirla, bajarla o eliminarla. En el móvil, en su «⋯». Al eliminarla, sus tareas pasan a «Sin sección».</li><li>En el <strong>Kanban</strong>, «Columnas» permite ver las columnas por estado o por sección. Arrastrar entre columnas cambia el estado o la sección.</li><li class="pc-only">Si en el ordenador no caben todas las columnas: usa las <strong>flechas ‹ ›</strong> de los lados o las teclas <strong>← →</strong>, arrastra el fondo del tablero con el ratón, o lleva una tarjeta al borde y el tablero avanzará solo.</li><li>Las secciones se sincronizan; plegarlas y la forma del Kanban son de cada dispositivo.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-plus"/></svg>Añadir escribiendo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Escribe la tarea en el campo de arriba (en el móvil, con el botón <strong>+</strong>) y pulsa <kbd>Intro</kbd>. Lo que reconozca aparece debajo; pulsa la <strong>×</strong> de una ficha si no quieres que lo interprete.</p><ul><li><strong>Fecha:</strong> hoy, mañana, pasado mañana, el lunes, el próximo viernes, la semana que viene, el mes que viene, fin de semana, fin de mes, en 3 días, dentro de 2 semanas, el día 15, 15/11, 3 de diciembre, 25 oct.</li><li><strong>Hora:</strong> a las 10, a las 9:30, 17h, a las 5 de la tarde, esta tarde, mañana por la mañana, a mediodía. Con hora, la tarea avisa a esa hora.</li><li><strong>Repetición:</strong> cada día, cada lunes y jueves, días laborables, cada semana, cada mes el día 6, el día 6 de cada mes, cada 2 semanas, cada año.</li><li><strong>Proyecto:</strong> <code>#Trabajo</code> (sin el emoji; vale la primera palabra si no hay duda).</li><li><strong>Sección:</strong> <code>/Datos</code>, dentro del proyecto indicado o del actual.</li><li><strong>Etiqueta:</strong> <code>@Revisión</code>. Si no existe, se crea.</li><li><strong>Prioridad:</strong> <code>!alta</code>, <code>!urgente</code>, o <code>!!</code> (alta) y <code>!!!</code> (urgente).</li><li>Ejemplo: «Informe provincial mañana a las 10 #Trabajo !alta @Revisión».</li><li><kbd>Mayús</kbd>+<kbd>Intro</kbd> o «Ficha» abren la ficha completa con lo que hayas escrito. Tecla <kbd>Q</kbd> para ir al campo.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-mail"/></svg>Correos a tareas (ordenador)<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1546,7 +1560,7 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Cuando una tarea dependa de otra persona, pulsa el reloj de arena de la tarjeta (en el móvil, «⋯» → «Poner en espera…») o rellena «En espera de» en la ficha.</li><li>Indica de quién y cuándo reclamar. La tarea sale de Hoy, Mañana, Próximos 7 días y del planificador hasta ese día.</li><li>Ese día vuelve a «Hoy», en «Para reclamar», y recibes un aviso a la «Hora del aviso en tareas sin hora».</li><li>La vista <strong>En espera</strong> de la barra lateral las reúne por persona. Cuando te contesten, «Ya ha respondido».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado (o la sección, si eliges «Columnas: Por sección»).</li><li>El buscador ignora las tildes y busca en todo: primero en la vista actual y, debajo, en el resto de proyectos (también las repetitivas ocultas) y en el archivo. Vista, orden y filtros se recuerdan.</li><li>En <strong>Hoy</strong>, <strong>Mañana</strong>, <strong>Próximos 7 días</strong> y <strong>Calendario</strong>, «Filtros» permite ver un solo proyecto. Lo que añadas con ese filtro puesto va a ese proyecto.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado (o la sección, si eliges «Columnas: Por sección»).</li><li>La vista Lista o Kanban se recuerda por separado en el ordenador y en el móvil (o en una ventana estrecha).</li><li>El buscador ignora las tildes y busca en todo: primero en la vista actual y, debajo, en el resto de proyectos (también las repetitivas ocultas) y en el archivo. Vista, orden y filtros se recuerdan.</li><li>En <strong>Hoy</strong>, <strong>Mañana</strong>, <strong>Próximos 7 días</strong> y <strong>Calendario</strong>, «Filtros» permite ver un solo proyecto. Lo que añadas con ese filtro puesto va a ese proyecto.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Calendario</strong>: en el ordenador, vista de mes o de semana (con horas de 8 a 22); en el móvil, la semana arriba y el día elegido por horas. Muestra las tareas en proceso con fecha (las repetitivas, en su próxima fecha y con el icono de repetir; las vencidas, en el día de hoy, en rojo y con su fecha original) y, en azul, las que están en espera, en su día de reclamar. Arrastra una tarea a otro día u hora para cambiarla (en el móvil, mantenla pulsada); pulsa un hueco vacío para crear una tarea ahí.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1886,13 +1900,16 @@ function loadLegacy(){
   return null;
 }
 function loadUI(){
-  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true,compact:true,subFold:[],secFold:[],kbBy:{}};
+  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true,compact:true,subFold:[],secFold:[],kbBy:{},viewPC:'list',viewM:'list'};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
       if(['project','today','tomorrow','week','waiting','calendar'].includes(u.mode)) d.mode=u.mode;
       if(['month','week'].includes(u.calView)) d.calView=u.calView;
       if(['list','kanban'].includes(u.view)) d.view=u.view;
+      /* La vista se recuerda por separado en el ordenador y en el móvil (o ventana estrecha); la primera vez se parte de la que había */
+      d.viewPC=['list','kanban'].includes(u.viewPC)?u.viewPC:d.view; d.viewM=['list','kanban'].includes(u.viewM)?u.viewM:d.view;
+      d.view=window.matchMedia&&matchMedia('(max-width:760px)').matches?d.viewM:d.viewPC;
       if(['manual','priority','dateAsc','dateDesc'].includes(u.sort)) d.sort=u.sort;
       ['search','status','tag','priority','project'].forEach(k=>{ if(typeof u[k]==='string') d[k]=u[k]; });
       if(d.status==='review') d.status='paused';
@@ -2434,7 +2451,7 @@ function openMoreSheet(){
   const p=currentProject(), sched=p.items.filter(isSnoozed).length;
   openSheet('Más opciones',[
     {label:selectMode?'Terminar la selección':'Seleccionar varias',icon:'square-check',fn:()=>setSelectMode(!selectMode)},
-    !isDayView()?{label:ui.view==='kanban'?'Ver como lista':'Ver como Kanban',icon:ui.view==='kanban'?'list':'columns',fn:()=>{ ui.view=ui.view==='kanban'?'list':'kanban'; saveUI(); renderApp(); }}:null,
+    !isDayView()?{label:ui.view==='kanban'?'Ver como lista':'Ver como Kanban',icon:ui.view==='kanban'?'list':'columns',fn:()=>{ setView(ui.view==='kanban'?'list':'kanban'); }}:null,
     !isDayView()?{label:'Añadir sección',icon:'plus',fn:()=>addSection(p.id)}:null,
     !isDayView()&&(sched||ui.showScheduled)?{label:ui.showScheduled?'Ocultar programadas':'Ver programadas',note:String(sched),icon:'clock',fn:()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); }}:null,
     {label:'Etiquetas',icon:'tag',fn:()=>$('openTagsBtn').click()},
@@ -2522,6 +2539,25 @@ function kbKeyFn(p){ if(kbMode(p)==='status') return i=>i.status; const v=new Se
 function kbAssign(it,p,key){
   if(kbMode(p)==='status'){ if(it.status===key) return; const s=applyStatus(it,p,key,true); return s?spawnMsg(s):undefined; }
   it.section=key;
+}
+/* ===== Kanban en el ordenador: flechas, teclado, arrastrar el fondo y avance automático al arrastrar una tarjeta ===== */
+function kbPc(){ const b=kbBoard(); return b&&!isMobile()&&b.scrollWidth>b.clientWidth+2?b:null; }
+function kbStepPc(dir){
+  const b=kbPc(); if(!b) return;
+  const br=b.getBoundingClientRect(), x=b.scrollLeft, pos=c=>c.getBoundingClientRect().left-br.left+x;
+  const cols=[...b.children].filter(c=>c.classList.contains('kanban-col')).map(pos);
+  const t=dir>0?(cols.find(v=>v>x+4)??b.scrollWidth):([...cols].reverse().find(v=>v<x-4)??0);
+  b.scrollTo({left:t,behavior:reducedMotion()?'auto':'smooth'});
+}
+function kbNavPaint(){
+  const P=$('kbPrev'), N=$('kbNext'), b=kbPc(), any=kbBoard();
+  if(any) any.classList.toggle('pannable',!!b);
+  if(!b){ P.hidden=N.hidden=true; return; }
+  const r=b.getBoundingClientRect(), top=Math.max(r.top,0), bot=Math.min(r.bottom,innerHeight);
+  if(bot-top<80){ P.hidden=N.hidden=true; return; }
+  const y=Math.round((top+bot)/2-20)+'px';
+  P.style.top=N.style.top=y; P.style.left=Math.round(r.left-20)+'px'; N.style.left=Math.round(Math.min(r.right-20,document.documentElement.clientWidth-46))+'px';
+  P.hidden=b.scrollLeft<4; N.hidden=b.scrollLeft+b.clientWidth>=b.scrollWidth-4;
 }
 function kbBoard(){ const b=$('slides'); return b.classList.contains('kanban-view')?b:null; }
 function kbColWidth(b){ const c=b.querySelector('.kanban-col'); return c?c.getBoundingClientRect().width+10:b.clientWidth; }
@@ -3235,7 +3271,8 @@ function renderApp(){
 
   const manual=ui.sort==='manual'&&!td;
   const w=searchWords(), s=sorter();
-  const list=$('slides'); list.replaceChildren(); list.style.gridTemplateColumns=''; list.classList.remove('many');
+  const list=$('slides'); list.replaceChildren(); list.style.gridTemplateColumns=''; list.classList.remove('many','kb-scroll','pannable','panning');
+  requestAnimationFrame(kbNavPaint);
   $('viewSeg').hidden=td;
   $('viewListBtn').classList.toggle('active',ui.view==='list');
   $('viewKanbanBtn').classList.toggle('active',ui.view==='kanban');
@@ -3314,7 +3351,7 @@ function renderApp(){
       const cols=kbCols(p), byStatus=kbMode(p)==='status', keyOf=kbKeyFn(p), kbc={};
       kbCount=cols.length; if(kbIndex>=kbCount) kbIndex=0;
       const addCol=!byStatus&&!isMobile()&&!selectMode;
-      if(!byStatus){ list.style.gridTemplateColumns=`repeat(${cols.length+(addCol?1:0)},minmax(250px,1fr))`; list.classList.toggle('many',cols.length+(addCol?1:0)>4); }
+      if(!byStatus){ list.style.gridTemplateColumns=`repeat(${cols.length+(addCol?1:0)},minmax(250px,1fr))`; list.classList.toggle('many',cols.length+(addCol?1:0)>4); list.classList.add('kb-scroll'); }
       cols.forEach(({key:status,title})=>{
         const items=pinFirst(visible.filter(i=>keyOf(i)===status)); kbc[status]=items.length;
         const col=el('div','kanban-col'); col.dataset.col=status;
@@ -5720,7 +5757,7 @@ $('bnMore').addEventListener('click',()=>$('sheet').hidden?openMoreSheet():close
 $('scrim').addEventListener('click',()=>{ closeDrawer(); closeSheet(); closeQuickAdd(); });
 $('filtersToggle').addEventListener('click',()=>{ const on=document.body.classList.toggle('filters-open'); $('filtersToggle').setAttribute('aria-expanded',on?'true':'false'); renderApp(); });
 ['openTagsBtn','openSettingsBtn','openHelpBtn','newProjectBtn'].forEach(id=>$(id).addEventListener('click',closeDrawer));
-mqMobile.addEventListener('change',()=>{ closeDrawer(); closeSheet(); renderApp(); });
+mqMobile.addEventListener('change',()=>{ ui.view=isMobile()?ui.viewM:ui.viewPC; closeDrawer(); closeSheet(); renderApp(); });
 $('planBtn').addEventListener('click',openPlanner);
 $('todayBtn').addEventListener('click',switchToToday);
 $('tomorrowBtn').addEventListener('click',()=>switchToView('tomorrow'));
@@ -5883,8 +5920,37 @@ $('tagFilter').addEventListener('change',e=>{ ui.tag=e.target.value; saveUI(); r
 $('priorityFilter').addEventListener('change',e=>{ ui.priority=e.target.value; saveUI(); renderApp(); });
 $('sortSelect').addEventListener('change',e=>{ ui.sort=e.target.value; saveUI(); renderApp(); });
 $('clearFiltersBtn').addEventListener('click',()=>{ ui.search=ui.status=ui.tag=ui.priority=ui.project=''; saveUI(); syncControls(); renderApp(); });
-$('viewListBtn').addEventListener('click',()=>{ ui.view='list'; saveUI(); renderApp(); });
-$('viewKanbanBtn').addEventListener('click',()=>{ ui.view='kanban'; saveUI(); renderApp(); });
+function setView(v){ ui.view=v; if(isMobile()) ui.viewM=v; else ui.viewPC=v; saveUI(); renderApp(); }
+$('viewListBtn').addEventListener('click',()=>setView('list'));
+$('viewKanbanBtn').addEventListener('click',()=>setView('kanban'));
+$('kbPrev').addEventListener('click',()=>kbStepPc(-1));
+$('kbNext').addEventListener('click',()=>kbStepPc(1));
+$('slides').addEventListener('scroll',()=>{ if(!isMobile()) kbNavPaint(); },{passive:true});
+window.addEventListener('scroll',()=>{ if(!isMobile()&&kbBoard()) kbNavPaint(); },{passive:true});
+window.addEventListener('resize',()=>{ if(!isMobile()) kbNavPaint(); });
+{ /* Arrastrar el fondo del tablero con el ratón para desplazarlo */
+  const b=$('slides'); let pan=null;
+  b.addEventListener('pointerdown',e=>{
+    if(e.pointerType!=='mouse'||e.button!==0||!kbPc()||e.target.closest('.slide,button,a,input,select,textarea,label')) return;
+    pan={x:e.clientX,l:b.scrollLeft,id:e.pointerId,moved:false}; e.preventDefault();
+  });
+  window.addEventListener('pointermove',e=>{
+    if(!pan||e.pointerId!==pan.id) return;
+    const dx=e.clientX-pan.x; if(!pan.moved&&Math.abs(dx)<4) return;
+    if(!pan.moved){ pan.moved=true; b.classList.add('panning'); }
+    b.scrollLeft=pan.l-dx;
+  });
+  const stop=()=>{ if(!pan) return; pan=null; b.classList.remove('panning'); };
+  window.addEventListener('pointerup',stop); window.addEventListener('pointercancel',stop); window.addEventListener('blur',stop);
+}
+/* Al arrastrar una tarjeta cerca del borde del tablero, este avanza solo */
+document.addEventListener('dragover',e=>{
+  if(drag.kind!=='item') return; const b=kbPc(); if(!b) return;
+  const r=b.getBoundingClientRect(), Z=80; if(e.clientY<r.top||e.clientY>r.bottom) return;
+  const L=e.clientX-r.left, Rt=r.right-e.clientX;
+  if(L<Z&&L>-60) b.scrollLeft-=Math.ceil((Z-Math.max(0,L))/2.5);
+  else if(Rt<Z&&Rt>-60) b.scrollLeft+=Math.ceil((Z-Math.max(0,Rt))/2.5);
+});
 { let t=null; $('slides').addEventListener('scroll',()=>{ const b=kbBoard(); if(!b||!isMobile()||b.classList.contains('kb-dragging')) return; clearTimeout(t); t=setTimeout(()=>{ kbIndex=kbCurrent(b); kbMarkTab(kbIndex); },60); },{passive:true}); }
 window.addEventListener('resize',()=>{ if(kbBoard()&&isMobile()) kbGo(kbIndex,false); });
 $('selectModeBtn').addEventListener('click',()=>setSelectMode(!selectMode));
@@ -6024,6 +6090,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='/'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); $('searchFilter').focus(); $('searchFilter').select(); }
   else if(e.key.toLowerCase()==='p'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); openPlanner(); }
   else if(e.key==='['&&!typing&&!e.ctrlKey&&!e.metaKey&&!isMobile()){ e.preventDefault(); toggleSide(); }
+  else if((e.key==='ArrowLeft'||e.key==='ArrowRight')&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!e.shiftKey&&kbPc()){ e.preventDefault(); kbStepPc(e.key==='ArrowRight'?1:-1); }
   else if(e.key.toLowerCase()==='f'&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!isMobile()){ e.preventDefault(); openFocus(); }
   else if(e.key==='?'&&!typing&&!e.ctrlKey&&!e.metaKey){ e.preventDefault(); $('openHelpBtn').click(); }
   else if((e.key==='q'||e.key==='Q'||e.key==='n'||e.key==='N')&&!typing&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ e.preventDefault(); if(isMobile()) openQuickAdd(); else { $('qaInput').focus(); window.scrollTo({top:0}); } }
@@ -6072,7 +6139,7 @@ function syncControls(){
   setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
   window.addEventListener('online',()=>syncNow());
-  window.__revisor={get state(){return appState;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
+  window.__revisor={get state(){return appState;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,kbStepPc,kbPc,setView,get ui(){return ui;},fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>
