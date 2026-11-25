@@ -20,7 +20,7 @@ Gestor personal de proyectos y tareas, instalable como app (PWA) en el PC (Chrom
 - **Fijadas**: con la chincheta, una tarea sale resaltada arriba de su proyecto y en «Hoy» (grupo «Fijadas»), aunque no tenga fecha.
 - **Secciones**: dividen un proyecto en partes plegables. Las tareas se pasan arrastrando, desde la ficha o escribiendo `/Sección`. El Kanban puede tener columnas por estado o por sección; en el ordenador, si no caben, se recorre con las flechas ‹ ›, las teclas ← →, arrastrando el fondo o llevando una tarjeta al borde.
 - **Vista Lista o Kanban**: se recuerda por separado en el ordenador y en el móvil.
-- **Concentración (solo PC, tecla `F`)**: temporizador por tarea con un árbol que crece, sin penalizar. Guarda el tiempo trabajado aunque termines antes, lo suma por tarea y proyecto, y exporta las sesiones a Excel. Tiene también un cronómetro libre que, al terminar, reparte el tiempo en pomodoros. Estos datos no se sincronizan.
+- **Concentración (solo PC, tecla `F`)**: temporizador por tarea con un árbol que crece, sin penalizar. Guarda el tiempo trabajado aunque termines antes, lo suma por tarea y proyecto, y exporta las sesiones a Excel. Tiene también un cronómetro libre que, al terminar, reparte el tiempo en pomodoros. Con Chrome o Edge de escritorio, el temporizador se puede ver en una **ventana flotante** siempre encima de las demás aplicaciones. Estos datos no se sincronizan.
 - **Correos a tareas (solo PC)**: soltar un `.msg` de Outlook o un `.eml`, o pegar un correo, crea la tarea.
 - **Buscador en todo**, selección múltiple, mover y duplicar, deshacer (`Ctrl+Z`), modo oscuro y barra lateral plegable.
 - **Enviar a Habitica** desde la ficha, con dificultad, plazo y recordatorios para la app móvil.
