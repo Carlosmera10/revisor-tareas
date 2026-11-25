@@ -477,15 +477,55 @@ textarea.inactive{display:none}
 .tag-edit-row{display:flex;gap:8px;align-items:center;padding:8px;background:var(--subtle);border-radius:8px;margin-bottom:8px;border:1px solid var(--line);flex-wrap:wrap}
 .tag-edit-row input.tag-emoji{width:70px;flex:none;text-align:center}
 .tag-edit-row input.tag-name{flex:1;min-width:120px}
-.rule-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:10px;background:var(--subtle);border:1px solid var(--line);border-radius:8px;margin-bottom:8px}
-.rule-card.err{border-color:var(--danger);background:var(--danger-soft)}
-.rule-f{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;min-width:0}
-.rule-l{font-weight:600;font-size:.85rem}
-.rule-f.full,.rule-row{grid-column:1/-1}
-.rule-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end}
+.rule-l{font-weight:600;font-size:.88rem}
 .rule-tags{display:flex;flex-wrap:wrap;gap:6px}
 .rule-tags .tag-chip{font-size:.82rem;padding:3px 10px}
-@media(max-width:760px){.rule-card,.rule-row{grid-template-columns:minmax(0,1fr)}.rule-row>button{justify-self:end}}
+.rule-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.rule-match{display:flex;align-items:center;gap:8px;margin:14px 0 0;padding:9px 12px;border:1px solid var(--subtle-line);border-radius:8px;background:var(--subtle);color:var(--ink-2);font-size:.88rem}
+.rule-match .ic{color:var(--muted)}
+.rules-head{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;margin-bottom:10px}
+.set-sec .rules-head h3{margin:0}
+.rules-head .row{gap:8px;flex-wrap:wrap}
+.count-pill{font-size:.75rem;font-weight:700;background:var(--chip);color:var(--chip-ink);border-radius:99px;padding:1px 8px}
+.rules-list{border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.86rem}
+.rules-list.no-rules{border:0;border-radius:0}
+.rules-list.no-rules .hint{margin:0;padding:0;background:none;text-align:left}
+.rl-head,.rl-row{display:grid;grid-template-columns:minmax(0,1.4fr) 16px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 6px 8px 12px}
+.rl-head{background:var(--subtle);border-bottom:1px solid var(--line);font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;padding-top:6px;padding-bottom:6px}
+.rl-row+.rl-row{border-top:1px solid var(--subtle-line)}
+.rl-cond{display:flex;flex-direction:column;gap:5px;min-width:0}
+.rl-line{display:flex;flex-wrap:wrap;align-items:center;gap:4px;min-width:0}
+.rl-k{color:var(--muted);width:68px;flex:none}
+.rl-or{color:var(--faint)}
+.rl-w{background:var(--chip);color:var(--chip-ink);border-radius:5px;padding:1px 7px;font-weight:600;overflow-wrap:anywhere;min-width:0}
+.rl-w.rl-s{background:var(--wait-bg);color:var(--wait-ink)}
+.rl-arrow{color:var(--faint)}
+.rl-act{display:flex;flex-wrap:wrap;gap:5px;align-items:center;min-width:0}
+.rl-act .rl-arrow{display:none}
+.rl-b{display:inline-flex;align-items:center;gap:4px;border-radius:6px;padding:2px 8px;font-weight:600;font-size:.8rem;overflow-wrap:anywhere;min-width:0}
+.rl-proj{background:var(--accent-soft);color:var(--accent-ink)}
+.rl-alta{background:var(--high-soft);color:var(--warn)}
+.rl-urgente{background:var(--urgent-soft);color:var(--urgent)}
+.rl-btns{display:flex;gap:2px}
+:root[data-theme=dark] .rl-b[style]{filter:brightness(.86) saturate(.85)}
+@media(max-width:760px){#ruleModal .rule-grid{grid-template-columns:minmax(0,1fr);gap:0}
+  #ruleModal .rule-grid .field{margin:10px 0 0}
+  #ruleModal .modal-footer>span{margin-right:auto}
+  .rl-head{display:none}
+  .rl-row{grid-template-columns:minmax(0,1fr) auto;row-gap:6px;padding-right:2px}
+  .rl-row>.rl-arrow{display:none}
+  .rl-cond{grid-column:1;grid-row:1}
+  .rl-act{grid-column:1;grid-row:2}
+  .rl-act .rl-arrow{display:inline-block}
+  .rl-btns{grid-column:2;grid-row:1/3}
+  .rl-btns button.icon{width:40px;height:40px}
+  .rl-k{width:auto}
+  #rulesSec{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+  .rules-head,.rules-head .row{display:contents}
+  .rules-head h3{flex:1;min-width:0}
+  #addRuleBtn{order:1} .rl-long{display:none}
+  .rules-list{order:2;flex:1 1 100%}
+  #rulesApplyBtn{order:3;flex:1 1 100%;background:var(--panel);border-color:var(--line-strong);color:var(--ink)}}
 .tag-uses{font-size:.8rem;color:var(--muted);min-width:64px;text-align:right}
 .set-sec{border-top:1px solid var(--line);padding:16px 0}
 .set-sec:first-of-type{border-top:0}
@@ -1328,19 +1368,27 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   </div>
 </dialog>
 
-<!-- Reglas automáticas -->
-<dialog id="rulesModal" style="max-width:760px" aria-labelledby="rulesHeading">
+<!-- Reglas automáticas: crear o editar una regla (la lista está en «Ajustes y avisos») -->
+<dialog id="ruleModal" style="max-width:640px" aria-labelledby="ruleHeading">
   <div class="modal-header">
-    <h2 id="rulesHeading"><svg class="ic lg"><use href="#i-sliders"/></svg>Reglas automáticas</h2>
-    <button type="button" class="ghost icon" id="rulesCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
+    <h2 id="ruleHeading"><svg class="ic lg"><use href="#i-pencil"/></svg><span id="ruleHeadingTxt">Editar regla</span></h2>
+    <button type="button" class="ghost icon" id="ruleCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
   </div>
-  <div id="rulesList" style="margin-bottom:16px"></div>
-  <button type="button" id="addRuleBtn" class="secondary" style="width:100%"><svg class="ic sm"><use href="#i-plus"/></svg>Crear regla</button>
+  <div class="grid-fields rule-grid">
+    <div class="field"><label for="ruleWords">Si contiene</label><input type="text" id="ruleWords" placeholder="calor, 49H, estrés térmico" autocomplete="off"></div>
+    <div class="field"><label for="ruleSenders">Y viene de (correos)</label><input type="text" id="ruleSenders" placeholder="@mites.gob.es, Ana García" autocomplete="off"></div>
+  </div>
+  <div class="field"><span class="rule-l" id="ruleTagsLbl">Poner las etiquetas</span><div class="rule-tags" id="ruleTags" role="group" aria-labelledby="ruleTagsLbl"></div></div>
+  <div class="grid-fields rule-grid">
+    <div class="field"><label for="ruleProj">Mover al proyecto</label><select id="ruleProj"></select></div>
+    <div class="field"><label for="rulePrio">Prioridad</label><select id="rulePrio"><option value="">Sin cambiar la prioridad</option><option value="alta">Alta</option><option value="urgente">Urgente</option></select></div>
+  </div>
+  <p class="rule-match" id="ruleMatch" hidden></p>
   <div class="modal-footer">
-    <button type="button" class="ghost" id="rulesApplyBtn"><svg class="ic sm"><use href="#i-checks"/></svg>Aplicar a las tareas en proceso</button>
+    <span><button type="button" class="ghost danger" id="ruleDeleteBtn"><svg class="ic sm"><use href="#i-trash"/></svg>Eliminar regla</button></span>
     <div class="row">
-      <button type="button" class="secondary" id="rulesCancelBtn">Cancelar</button>
-      <button type="button" id="saveRulesBtn"><svg class="ic sm"><use href="#i-check"/></svg>Guardar reglas</button>
+      <button type="button" class="secondary" id="ruleCancelBtn">Cancelar</button>
+      <button type="button" id="ruleSaveBtn"><svg class="ic sm"><use href="#i-check"/></svg>Guardar regla</button>
     </div>
   </div>
 </dialog>
@@ -1391,6 +1439,16 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
       <label for="setDefaultHour">Hora del aviso en tareas sin hora</label>
       <input type="time" id="setDefaultHour">
     </div>
+  </section>
+  <section class="set-sec" id="rulesSec">
+    <div class="rules-head">
+      <h3><svg class="ic"><use href="#i-tag"/></svg>Reglas automáticas<span class="count-pill" id="rulesCount" hidden></span></h3>
+      <div class="row">
+        <button type="button" class="ghost small" id="rulesApplyBtn"><svg class="ic sm"><use href="#i-checks"/></svg>Aplicar a las tareas en proceso</button>
+        <button type="button" class="small" id="addRuleBtn"><svg class="ic sm"><use href="#i-plus"/></svg><span>Crear<span class="rl-long"> regla</span></span></button>
+      </div>
+    </div>
+    <div id="rulesList" class="rules-list"></div>
   </section>
   <section class="set-sec">
     <h3><svg class="ic"><use href="#i-save"/></svg>Copias de seguridad</h3>
@@ -1610,7 +1668,7 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-mail"/></svg>Correos a tareas (ordenador)<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Arrastra un correo de Outlook</strong> a la ventana de la app y suéltalo: se abre la ficha con el asunto como título y, en las notas, el remitente, la fecha, los destinatarios, los nombres de los adjuntos y el texto. Elige fecha y proyecto y guarda.</li><li>Si sueltas varios correos a la vez, se crean directamente en el proyecto en el que estás.</li><li>También vale un archivo <strong>.eml</strong> (por ejemplo, un correo guardado desde el nuevo Outlook o desde el navegador).</li><li><strong>Desde Gmail</strong> no se puede arrastrar el correo de la lista (Gmail solo entrega un enlace). Abre el correo, pulsa los tres puntos <strong>⋮</strong> junto a «Responder» → <strong>«Descargar mensaje»</strong> y arrastra a la app el archivo .eml descargado (desde el aviso de descargas de Chrome o desde la carpeta Descargas). También vale «Reenviar» y pegar, como se explica abajo.</li><li><strong>Copiar con remitente y fecha</strong>: abre el correo, pulsa «Reenviar», haz clic en el texto, <kbd>Ctrl</kbd>+<kbd>A</kbd> y <kbd>Ctrl</kbd>+<kbd>C</kbd>, descarta el reenvío y pega en la app. El bloque «De / Enviado / Para / Asunto» que añade Outlook se reconoce aunque tu firma vaya delante.</li><li><strong>Pegar</strong>: copia el texto de un correo (con sus líneas «De:», «Enviado:», «Asunto:», o sin ellas) y pulsa <kbd>Ctrl</kbd>+<kbd>V</kbd> en la app, fuera de cualquier campo, o pégalo en «Añadir tarea». Un texto de una sola línea se queda en «Añadir tarea» como siempre.</li><li>Se quitan los «RE:», «RV:» y «FW:» del asunto. Los adjuntos no se guardan (solo sus nombres) y el texto muy largo se recorta.</li><li>El correo no sale de tu ordenador: todo se lee dentro de la app.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sliders"/></svg>Reglas automáticas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li>Ponen solas <strong>etiquetas</strong>, el <strong>proyecto</strong> o la <strong>prioridad</strong> a las tareas nuevas según lo que digan. Se crean en «Etiquetas» → <strong>«Reglas automáticas»</strong> (en el móvil: «Más» → «Reglas automáticas»).</li><li><strong>Si contiene</strong>: palabras o frases separadas por comas. Basta con una. No importan las mayúsculas ni las tildes, y cuentan como palabra entera («calor» no salta con «caloría»).</li><li><strong>Y viene de</strong> (solo correos): <code>@dominio.es</code> para cualquier dirección de ese dominio, una dirección completa o un nombre. Si rellenas las dos cosas, tienen que cumplirse las dos; si solo rellenas el remitente, se aplica a todos sus correos.</li><li><strong>En los correos</strong> solo se mira el asunto, el remitente y el principio del texto, hasta la parte citada de mensajes anteriores (o unos 1.000 caracteres). No se busca en todo el cuerpo.</li><li><strong>En las demás tareas</strong> se mira el título y, en la ficha, también las notas.</li><li>Se aplican al <strong>crear</strong> una tarea: al soltar o pegar correos, al añadir escribiendo y en la ficha de una tarea nueva. Lo que ponen se ve antes de guardar: en «Añadir escribiendo» salen como fichas con borde discontinuo (pulsa la <strong>×</strong> para no aplicarla) y en la ficha aparecen ya marcadas. Si quitas una etiqueta o cambias el proyecto o la prioridad a mano, la regla no lo vuelve a cambiar.</li><li>Lo que escribas tú manda: un <code>#proyecto</code> o un <code>!alta</code> en «Añadir escribiendo» gana a la regla.</li><li>Si se cumplen varias reglas, se ponen todas sus etiquetas, el proyecto de la primera que lo indique y la prioridad más alta. La prioridad nunca se baja.</li><li>Las tareas que ya tienes no cambian solas. Para aplicar las reglas a las que están en proceso, pulsa <strong>«Aplicar a las tareas en proceso»</strong>: te dice cuántas cambian antes de hacerlo, y se puede deshacer.</li><li>Las reglas se guardan con tus datos: van en las copias de seguridad y se sincronizan entre dispositivos.</li></ul></div></details>
+    <div class="help-body"><ul><li>Ponen solas <strong>etiquetas</strong>, el <strong>proyecto</strong> o la <strong>prioridad</strong> a las tareas nuevas según lo que digan. Están en «Ajustes y avisos» → <strong>«Reglas automáticas»</strong>, una por fila (también se llega desde «Etiquetas» → «Reglas automáticas» y, en el móvil, desde «Más» → «Reglas automáticas»). «Crear regla» o el lápiz de una fila abren su ventana; la regla se guarda al pulsar «Guardar regla». Mientras escribes, la ventana dice cuántas tareas en proceso la cumplen.</li><li><strong>Si contiene</strong>: palabras o frases separadas por comas. Basta con una. No importan las mayúsculas ni las tildes, y cuentan como palabra entera («calor» no salta con «caloría»).</li><li><strong>Y viene de</strong> (solo correos): <code>@dominio.es</code> para cualquier dirección de ese dominio, una dirección completa o un nombre. Si rellenas las dos cosas, tienen que cumplirse las dos; si solo rellenas el remitente, se aplica a todos sus correos.</li><li><strong>En los correos</strong> solo se mira el asunto, el remitente y el principio del texto, hasta la parte citada de mensajes anteriores (o unos 1.000 caracteres). No se busca en todo el cuerpo.</li><li><strong>En las demás tareas</strong> se mira el título y, en la ficha, también las notas.</li><li>Se aplican al <strong>crear</strong> una tarea: al soltar o pegar correos, al añadir escribiendo y en la ficha de una tarea nueva. Lo que ponen se ve antes de guardar: en «Añadir escribiendo» salen como fichas con borde discontinuo (pulsa la <strong>×</strong> para no aplicarla) y en la ficha aparecen ya marcadas. Si quitas una etiqueta o cambias el proyecto o la prioridad a mano, la regla no lo vuelve a cambiar.</li><li>Lo que escribas tú manda: un <code>#proyecto</code> o un <code>!alta</code> en «Añadir escribiendo» gana a la regla.</li><li>Si se cumplen varias reglas, se ponen todas sus etiquetas, el proyecto de la primera que lo indique y la prioridad más alta. La prioridad nunca se baja.</li><li>Las tareas que ya tienes no cambian solas. Para aplicar las reglas a las que están en proceso, pulsa <strong>«Aplicar a las tareas en proceso»</strong>: te dice cuántas cambian antes de hacerlo, y se puede deshacer.</li><li>Las reglas se guardan con tus datos: van en las copias de seguridad y se sincronizan entre dispositivos.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-message"/></svg>Comentarios de una tarea<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Cada ficha tiene <strong>Comentarios</strong>, como una conversación: cada uno va aparte, con su fecha y hora, del más antiguo al más reciente. En el ordenador están en un panel a la derecha de la ficha; en el móvil, al final de la ficha.</li><li>Pulsa el título «Comentarios» para desplegar u ocultar el panel. La app recuerda cómo lo dejaste.</li><li>Escribe y pulsa <kbd>Intro</kbd> o «Comentar» (<kbd>Mayús</kbd>+<kbd>Intro</kbd> para cambiar de línea). Se guarda en el momento, sin pulsar «Guardar» en la ficha.</li><li><strong>Correos</strong>: arrastra un correo de Outlook (o un archivo .eml) y suéltalo sobre la ficha abierta, o pulsa «Correo» para elegir el archivo. Queda como un comentario con el asunto, el remitente, los destinatarios, los nombres de los adjuntos y el texto, en la fecha en que se envió.</li><li>También puedes pegar un correo copiado (con sus líneas «De:», «Enviado:», «Asunto:») en el campo de comentario vacío, o con <kbd>Ctrl</kbd>+<kbd>V</kbd> en la ficha, fuera de los campos.</li><li>Con el lápiz editas un comentario (en los correos, su texto, por ejemplo para quitar el historial citado) y con la papelera lo borras.</li><li>Las tarjetas con comentarios muestran su número; púlsalo para abrir la ficha con el panel desplegado. El buscador también busca en los comentarios.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -2539,7 +2597,7 @@ function openMoreSheet(){
     !isDayView()?{label:'Añadir sección',icon:'plus',fn:()=>addSection(p.id)}:null,
     !isDayView()&&(sched||ui.showScheduled)?{label:ui.showScheduled?'Ocultar programadas':'Ver programadas',note:String(sched),icon:'clock',fn:()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); }}:null,
     {label:'Etiquetas',icon:'tag',fn:()=>$('openTagsBtn').click()},
-    {label:'Reglas automáticas',icon:'sliders',fn:openRulesModal},
+    {label:'Reglas automáticas',icon:'tag',fn:openRulesSettings},
     {label:'Ajustes y avisos',icon:'sliders',fn:()=>$('openSettingsBtn').click()},
     {label:'Archivo',icon:'archive',note:archivePending().length?pl(archivePending().length,'por revisar','por revisar'):String(appState.archive.length||''),fn:()=>openArchive()},
     {label:'Papelera',icon:'trash',note:String(appState.trash.length||''),fn:()=>openTrash()},
@@ -5540,68 +5598,101 @@ function openMoveModal(ids){
 function syncMoveBtn(){ const t=$('moveTarget').value; $('moveMoveBtn').disabled=!moveCtx||moveCtx.ids.every(id=>{ const p=findProjectOf(id); return !p||p.id===t; }); }
 
 /* ================= Pantalla de reglas automáticas ================= */
-let tempRules=[];
-const blankRule=()=>({id:newId(),wordsTxt:'',sendersTxt:'',tags:[],projectId:'',priority:'',updatedAt:''});
-function openRulesModal(){
-  if(document.querySelector('dialog[open]')) return;
-  tempRules=(appState.rules||[]).map(r=>({...clone(r),wordsTxt:r.words.join(', '),sendersTxt:r.senders.join(', ')}));
-  if(!tempRules.length) tempRules.push(blankRule());
-  renderRules(); $('rulesModal').showModal();
+/* Lista compacta de reglas, en «Ajustes y avisos» */
+function openRulesSettings(){
+  if(!$('settingsModal').open){ if(document.querySelector('dialog[open]')) return; renderSettings(); $('settingsModal').showModal(); }
+  else renderRulesSection();
+  requestAnimationFrame(()=>$('rulesSec').scrollIntoView({block:'start'}));
 }
-function renderRules(){
-  const list=$('rulesList'); list.replaceChildren();
-  tempRules.forEach((r,idx)=>{
-    const card=el('div','rule-card'+(r.err?' err':''));
-    const field=(label,inp,cls)=>{ const w=el('label','rule-f'+(cls?' '+cls:'')); w.append(el('span','rule-l',label),inp); return w; };
-    const words=el('input','rule-words'); words.type='text'; words.value=r.wordsTxt; words.placeholder='calor, 49H, estrés térmico';
-    words.addEventListener('input',()=>{ r.wordsTxt=words.value; });
-    const snd=el('input','rule-senders'); snd.type='text'; snd.value=r.sendersTxt; snd.placeholder='@mites.gob.es, Ana García';
-    snd.addEventListener('input',()=>{ r.sendersTxt=snd.value; });
-    const tags=el('div','rule-tags'); tags.setAttribute('role','group');
-    if(!appState.tags.length) tags.append(el('span','hint','No hay etiquetas.'));
-    appState.tags.forEach(t=>{
-      const b=btn('','tag-chip',null,()=>{ r.tags=r.tags.includes(t.id)?r.tags.filter(x=>x!==t.id):[...r.tags,t.id]; b.setAttribute('aria-pressed',r.tags.includes(t.id)?'true':'false'); });
-      if(t.emoji) b.append(document.createTextNode(t.emoji+' ')); else b.append(el('span','tag-dot'));
-      b.append(document.createTextNode(t.name)); b.style.backgroundColor=t.bg; b.style.color=t.text;
-      b.setAttribute('aria-pressed',r.tags.includes(t.id)?'true':'false');
-      tags.append(b);
-    });
-    const proj=el('select','rule-proj'); proj.append(opt('','Sin cambiar el proyecto')); appState.projects.forEach(p=>proj.append(opt(p.id,p.name||'Sin título')));
-    proj.value=projById(r.projectId)?r.projectId:''; proj.addEventListener('change',()=>{ r.projectId=proj.value; });
-    const prio=el('select','rule-prio'); prio.append(opt('','Sin cambiar la prioridad'),opt('alta','Alta'),opt('urgente','Urgente'));
-    prio.value=r.priority==='alta'||r.priority==='urgente'?r.priority:''; prio.addEventListener('change',()=>{ r.priority=prio.value; });
-    const row=el('div','rule-row');
-    row.append(field('Mover al proyecto',proj),field('Prioridad',prio),btn('','ghost danger icon','Eliminar regla',()=>{ tempRules.splice(idx,1); renderRules(); },'trash'));
-    card.append(field('Si contiene',words),field('Y viene de (correos)',snd),field('Poner las etiquetas',tags,'full'),row);
-    list.append(card);
+function renderRulesSection(){
+  const rules=appState.rules||[], list=$('rulesList'); list.replaceChildren();
+  $('rulesCount').textContent=String(rules.length); $('rulesCount').hidden=!rules.length;
+  $('rulesApplyBtn').hidden=!rules.length;
+  list.classList.toggle('no-rules',!rules.length);
+  if(!rules.length){ list.append(el('p','hint','No hay reglas.')); return; }
+  const head=el('div','rl-head'); head.setAttribute('aria-hidden','true');
+  head.append(el('span','','Si…'),el('span',''),el('span','','Entonces…'),el('span',''));
+  list.append(head);
+  const line=(k,vals,cls)=>{ const l=el('div','rl-line'); l.append(el('span','rl-k',k)); vals.forEach((v,i)=>{ if(i) l.append(el('span','rl-or','o')); l.append(el('span','rl-w'+(cls?' '+cls:''),v)); }); return l; };
+  rules.forEach(r=>{
+    const row=el('div','rl-row'), cond=el('div','rl-cond');
+    if(r.words.length) cond.append(line('Contiene',r.words));
+    if(r.senders.length) cond.append(line(r.words.length?'y viene de':'Viene de',r.senders,'rl-s'));
+    const act=el('div','rl-act'); act.append(ic('chev-right','sm rl-arrow'));
+    r.tags.forEach(id=>{ const t=getTag(id); if(!t) return; const b=el('span','rl-b',(t.emoji?t.emoji+' ':'')+t.name); b.style.backgroundColor=t.bg; b.style.color=t.text; act.append(b); });
+    const p=projById(r.projectId); if(p){ const b=el('span','rl-b rl-proj'); b.append(ic('folder','sm'),document.createTextNode(p.name||'Sin título')); act.append(b); }
+    if(r.priority) act.append(el('span','rl-b rl-'+r.priority,r.priority==='urgente'?'Prioridad urgente':'Prioridad alta'));
+    const btns=el('div','rl-btns');
+    btns.append(btn('','ghost icon','Editar regla',()=>openRuleEditor(r.id),'pencil'),btn('','ghost danger icon','Eliminar regla',()=>deleteRule(r.id),'trash'));
+    row.append(cond,ic('chev-right','rl-arrow'),act,btns);
+    list.append(row);
   });
-  if(!tempRules.length) list.append(el('p','hint','No hay reglas.'));
 }
-/* Reglas del formulario, ya limpias. Devuelve null (y marca la regla) si alguna está a medias. */
-function rulesFromForm(){
-  const out=[]; let bad=-1;
-  tempRules.forEach((r,i)=>{
-    const words=ruleList(r.wordsTxt), senders=ruleList(r.sendersTxt), tags=r.tags.filter(id=>getTag(id)), projectId=projById(r.projectId)?r.projectId:'', priority=r.priority;
-    const cond=words.length||senders.length, act=tags.length||projectId||priority;
-    r.err=false;
-    if(!cond&&!act) return;
-    if(!cond||!act){ r.err=true; if(bad<0) bad=i; return; }
-    const old=(appState.rules||[]).find(x=>x.id===r.id);
-    out.push({id:r.id,words,senders,tags,projectId,priority,updatedAt:old?old.updatedAt:''});
+/* Ventana para crear o editar una sola regla */
+let ruleEd=null;
+function openRuleEditor(id){
+  const r=id?(appState.rules||[]).find(x=>x.id===id):null;
+  if(id&&!r) return;
+  if(!r&&(appState.rules||[]).length>=RULE_MAX){ alert(`Como mucho puede haber ${RULE_MAX} reglas.`); return; }
+  ruleEd={id:r?r.id:newId(),isNew:!r,tags:r?r.tags.filter(t=>getTag(t)):[]};
+  $('ruleHeadingTxt').textContent=r?'Editar regla':'Nueva regla';
+  $('ruleWords').value=r?r.words.join(', '):''; $('ruleSenders').value=r?r.senders.join(', '):'';
+  const proj=$('ruleProj'); proj.replaceChildren(opt('','Sin cambiar el proyecto')); appState.projects.forEach(p=>proj.append(opt(p.id,p.name||'Sin título')));
+  proj.value=r&&projById(r.projectId)?r.projectId:'';
+  $('rulePrio').value=r&&(r.priority==='alta'||r.priority==='urgente')?r.priority:'';
+  $('ruleDeleteBtn').hidden=!r;
+  renderRuleTags(); ruleEd.snap=ruleFormSig(); updateRuleMatch();
+  $('ruleModal').showModal();
+  if(!isMobile()) $('ruleWords').focus();
+}
+const ruleFormSig=()=>JSON.stringify([$('ruleWords').value.trim(),$('ruleSenders').value.trim(),[...ruleEd.tags].sort(),$('ruleProj').value,$('rulePrio').value]);
+function renderRuleTags(){
+  const box=$('ruleTags'); box.replaceChildren();
+  if(!appState.tags.length){ box.append(el('span','hint','No hay etiquetas.')); return; }
+  appState.tags.forEach(t=>{
+    const b=btn('','tag-chip',null,()=>{ ruleEd.tags=ruleEd.tags.includes(t.id)?ruleEd.tags.filter(x=>x!==t.id):[...ruleEd.tags,t.id]; b.setAttribute('aria-pressed',ruleEd.tags.includes(t.id)?'true':'false'); });
+    if(t.emoji) b.append(document.createTextNode(t.emoji+' ')); else b.append(el('span','tag-dot'));
+    b.append(document.createTextNode(t.name)); b.style.backgroundColor=t.bg; b.style.color=t.text;
+    b.setAttribute('aria-pressed',ruleEd.tags.includes(t.id)?'true':'false');
+    box.append(b);
   });
-  if(bad>=0){
-    renderRules();
-    const r=tempRules[bad], card=$('rulesList').children[bad];
-    alert(`A la regla ${bad+1} le falta ${ruleList(r.wordsTxt).length||ruleList(r.sendersTxt).length?'qué poner: etiquetas, proyecto o prioridad':'cuándo aplicarse: palabras o remitente'}.`);
-    if(card){ card.scrollIntoView({block:'nearest'}); const f=card.querySelector('input'); if(f) f.focus(); }
-    return null;
-  }
-  return out;
 }
-function saveRules(){
-  const rules=rulesFromForm(); if(!rules) return;
-  $('rulesModal').close();
-  commit(null,()=>{ appState.rules=rules; return rules.length?`🏷️ ${pl(rules.length,'regla guardada','reglas guardadas')}`:'🏷️ Reglas guardadas'; });
+function ruleFromForm(){
+  const old=(appState.rules||[]).find(x=>x.id===ruleEd.id), pr=$('rulePrio').value;
+  return {id:ruleEd.id,words:ruleList($('ruleWords').value),senders:ruleList($('ruleSenders').value),tags:ruleEd.tags.filter(id=>getTag(id)),
+    projectId:projById($('ruleProj').value)?$('ruleProj').value:'',priority:pr==='alta'||pr==='urgente'?pr:'',updatedAt:old?old.updatedAt:''};
+}
+/* Cuántas tareas en proceso cumplen la condición de la regla que se está editando */
+function updateRuleMatch(){
+  const m=$('ruleMatch'), r=ruleFromForm();
+  if(!r.words.length&&!r.senders.length){ m.hidden=true; return; }
+  let n=0; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status==='done') return; const {text,mail}=itemRuleInput(it); if(matchRules(text,mail,[r]).length) n++; }));
+  m.replaceChildren(ic('search','sm'),document.createTextNode(n?`La ${n===1?'cumple':'cumplen'} ${pl(n,'tarea','tareas')} en proceso`:'No la cumple ninguna tarea en proceso'));
+  m.hidden=false;
+}
+let ruleMatchTimer=0;
+const ruleMatchSoon=()=>{ clearTimeout(ruleMatchTimer); ruleMatchTimer=setTimeout(updateRuleMatch,250); };
+function saveRule(){
+  const r=ruleFromForm(), cond=r.words.length||r.senders.length, act=r.tags.length||r.projectId||r.priority;
+  if(!cond||!act){ alert(`A la regla le falta ${cond?'qué hacer: etiquetas, proyecto o prioridad':'cuándo aplicarse: palabras o remitente'}.`); (cond?$('ruleProj'):$('ruleWords')).focus(); return; }
+  const isNew=ruleEd.isNew;
+  $('ruleModal').close();
+  commit(null,()=>{
+    const list=appState.rules||(appState.rules=[]), i=list.findIndex(x=>x.id===r.id);
+    if(i>=0){ if(ruleSig(list[i])===ruleSig(r)) return false; list[i]=r; } else list.push(r);
+    return isNew?'🏷️ Regla creada':'🏷️ Regla guardada';
+  });
+  renderRulesSection();
+}
+function tryCloseRule(){
+  if(ruleEd&&ruleFormSig()!==ruleEd.snap&&!confirm('¿Descartar los cambios de la regla?')) return;
+  $('ruleModal').close();
+}
+function deleteRule(id){
+  if(!confirm('¿Eliminar esta regla?')) return;
+  if($('ruleModal').open) $('ruleModal').close();
+  commit(null,()=>{ const n=(appState.rules||[]).length; appState.rules=(appState.rules||[]).filter(r=>r.id!==id); return appState.rules.length===n?false:'🏷️ Regla eliminada'; });
+  renderRulesSection();
 }
 /* Aplica unas reglas a una tarea: añade etiquetas, sube la prioridad y devuelve el proyecto al que moverla */
 function applyRulesTo(it,p,rules){
@@ -5612,16 +5703,15 @@ function applyRulesTo(it,p,rules){
   return tags.length||prio||move?{tags,prio,move}:null;
 }
 function applyRulesToExisting(){
-  const rules=rulesFromForm(); if(!rules) return;
+  const rules=appState.rules||[];
   if(!rules.length){ alert('No hay reglas que aplicar.'); return; }
   let total=0; const changes=[];
   appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status==='done') return; total++; const c=applyRulesTo(it,p,rules); if(c) changes.push({id:it.id,...c}); }));
   if(!changes.length){ alert(`Las reglas no cambian ninguna de las ${pl(total,'tarea','tareas')} en proceso.`); return; }
   const nMove=changes.filter(c=>c.move).length;
-  if(!confirm(`Las reglas cambian ${pl(changes.length,'tarea','tareas')} de ${total} en proceso${nMove?` (${nMove} cambian de proyecto)`:''}. Se guardan las reglas y se aplican. ¿Seguir?`)) return;
-  $('rulesModal').close();
+  if(!confirm(`Las reglas cambian ${pl(changes.length,'tarea','tareas')} de ${total} en proceso${nMove?` (${nMove} cambian de proyecto)`:''}. Se puede deshacer. ¿Aplicarlas?`)) return;
+  if($('settingsModal').open) $('settingsModal').close();
   commit(null,()=>{
-    appState.rules=rules;
     changes.forEach(c=>{
       const f=findItem(c.id); if(!f) return;
       f.it.tags=[...f.it.tags,...c.tags];
@@ -6144,6 +6234,7 @@ function renderSettings(){
   renderAbSection();
   renderSyncSection();
   renderHabSection();
+  renderRulesSection();
   let inst;
   if(isStandalone()) inst='Ya la estás usando como aplicación instalada.';
   else if(file) inst='Ábrela desde la web publicada para poder instalarla.';
@@ -6306,13 +6397,18 @@ $('tagCancelBtn').addEventListener('click',()=>$('tagModal').close());
 $('tagRulesBtn').addEventListener('click',()=>{
   const same=JSON.stringify(tempTags.filter(t=>t.name.trim()).map(t=>[t.id,t.name.trim(),t.emoji.trim(),t.bg,t.text]))===JSON.stringify(appState.tags.map(t=>[t.id,t.name,t.emoji,t.bg,t.text]));
   if(same) $('tagModal').close(); else saveTags();
-  openRulesModal();
+  if(!$('tagModal').open) openRulesSettings();
 });
-$('rulesCloseBtn').addEventListener('click',()=>$('rulesModal').close());
-$('rulesCancelBtn').addEventListener('click',()=>$('rulesModal').close());
-$('saveRulesBtn').addEventListener('click',saveRules);
+$('addRuleBtn').addEventListener('click',()=>openRuleEditor(''));
 $('rulesApplyBtn').addEventListener('click',applyRulesToExisting);
-$('addRuleBtn').addEventListener('click',()=>{ tempRules.push(blankRule()); renderRules(); const c=$('rulesList').lastElementChild; if(c){ c.scrollIntoView({block:'nearest'}); c.querySelector('input').focus(); } });
+$('ruleCloseBtn').addEventListener('click',tryCloseRule);
+$('ruleCancelBtn').addEventListener('click',tryCloseRule);
+$('ruleModal').addEventListener('cancel',e=>{ e.preventDefault(); tryCloseRule(); });
+$('ruleSaveBtn').addEventListener('click',saveRule);
+$('ruleDeleteBtn').addEventListener('click',()=>{ if(ruleEd&&!ruleEd.isNew) deleteRule(ruleEd.id); });
+$('ruleWords').addEventListener('input',ruleMatchSoon);
+$('ruleSenders').addEventListener('input',ruleMatchSoon);
+['ruleWords','ruleSenders'].forEach(id=>$(id).addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing){ e.preventDefault(); saveRule(); } }));
 $('saveTagsBtn').addEventListener('click',saveTags);
 
 $('moveTarget').addEventListener('change',syncMoveBtn);
@@ -6575,7 +6671,7 @@ function syncControls(){
   setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
   window.addEventListener('online',()=>syncNow());
-  window.__revisor={get state(){return appState;},fcPipOpen,get pipWin(){return pipWin;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,mailsToTasks,switchToTag,renderTagNav,matchRules,mailIntro,ruleOutcome,mailOutcome,openRulesModal,openModal,get tempItemTags(){return tempItemTags;},parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,kbStepPc,kbPc,setView,get ui(){return ui;},fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
+  window.__revisor={get state(){return appState;},fcPipOpen,get pipWin(){return pipWin;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,mailsToTasks,switchToTag,renderTagNav,matchRules,mailIntro,ruleOutcome,mailOutcome,openRulesSettings,openRuleEditor,renderRulesSection,openModal,get tempItemTags(){return tempItemTags;},parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,kbStepPc,kbPc,setView,get ui(){return ui;},fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>
