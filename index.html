@@ -863,6 +863,14 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   .kb-nav:hover{background:var(--hover);color:var(--ink)}
   .kb-nav[hidden]{display:none}
 }
+
+/* ===== Columnas plegadas del Kanban (ordenador) ===== */
+.kanban-col.folded{padding:8px 4px;align-items:stretch;min-width:0}
+.kb-unfold{writing-mode:vertical-rl;display:flex;align-items:center;gap:10px;background:none;border:0;box-shadow:none;color:var(--ink);font:inherit;font-weight:600;font-size:.92rem;padding:10px 0;cursor:pointer;min-height:0;width:100%;border-radius:8px}
+.kb-unfold:hover,.kb-unfold:focus{background:var(--hover);color:var(--ink);box-shadow:none;transform:none}
+.kb-unfold .nm{max-height:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kb-unfold .n{writing-mode:horizontal-tb;background:var(--chip);color:var(--chip-ink);border-radius:99px;padding:1px 7px;font-size:.78rem;font-variant-numeric:tabular-nums}
+.kanban-col h3 .kb-fold{margin-left:auto;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -1550,7 +1558,7 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   <details class="help-sec" open><summary><svg class="ic"><use href="#i-checks"/></svg>Proyectos y tareas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Crea un proyecto con el <strong>+</strong> junto a «Proyectos». Para cambiarle el nombre, pulsa sobre el título.</li><li>Arrastra un proyecto en la barra lateral para reordenarlo.</li><li>Si el nombre de un proyecto empieza por un emoji (por ejemplo «📊 Productividad»), se usa como su icono. En el ordenador, el botón junto al título de la barra lateral (o la tecla <kbd>[</kbd>) la pliega y deja solo los iconos con sus números.</li><li>Cada tarea está <strong>En proceso</strong>, <strong>Pausada</strong> o <strong>Finalizada</strong>. Una pausada sigue en su proyecto, pero no sale en Hoy, Mañana, Próximos 7 días ni en el planificador, y no avisa. En la ficha puedes anotar el motivo.</li><li>«En espera de…» es aparte: para cuando dependes de otra persona y quieres reclamarle en una fecha.</li><li>Para moverla a otro proyecto, suéltala sobre él en la barra lateral, o usa «Mover o duplicar».</li><li>En la ficha, las etiquetas se marcan y desmarcan pulsándolas; puedes poner varias.</li><li>Las sub-tareas se reordenan arrastrando desde el asa o con las flechas.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-pin"/></svg>Fijadas y secciones<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Fijar arriba</strong>: con el <strong>icono de la chincheta</strong> de la tarjeta (en el móvil, «⋯» → «Fijar arriba»). La tarea sale resaltada arriba de su proyecto y en «Hoy», en el grupo «Fijadas», aunque no tenga fecha. Al finalizarla deja de estar fijada.</li><li><strong>Secciones</strong>: dividen un proyecto en partes. Créalas con «Añadir sección», al final de la lista (en el móvil también en «Más»). Pulsa el nombre para plegarla o desplegarla.</li><li>Para meter una tarea en una sección: arrástrala sobre otra tarea de la sección o sobre su título, usa el campo «Sección» de la ficha o escribe <code>/Nombre</code> al añadirla. El <strong>+</strong> de la sección añade una tarea en ella.</li><li>En el ordenador, al pasar el ratón por la sección aparecen los botones para renombrarla, subirla, bajarla o eliminarla. En el móvil, en su «⋯». Al eliminarla, sus tareas pasan a «Sin sección».</li><li>En el <strong>Kanban</strong>, «Columnas» permite ver las columnas por estado o por sección. Arrastrar entre columnas cambia el estado o la sección.</li><li class="pc-only">Si en el ordenador no caben todas las columnas: usa las <strong>flechas ‹ ›</strong> de los lados o las teclas <strong>← →</strong>, arrastra el fondo del tablero con el ratón, o lleva una tarjeta al borde y el tablero avanzará solo.</li><li>Las secciones se sincronizan; plegarlas y la forma del Kanban son de cada dispositivo.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Fijar arriba</strong>: con el <strong>icono de la chincheta</strong> de la tarjeta (en el móvil, «⋯» → «Fijar arriba»). La tarea sale resaltada arriba de su proyecto y en «Hoy», en el grupo «Fijadas», aunque no tenga fecha. Al finalizarla deja de estar fijada.</li><li><strong>Secciones</strong>: dividen un proyecto en partes. Créalas con «Añadir sección», al final de la lista (en el móvil también en «Más»). Pulsa el nombre para plegarla o desplegarla; también «Sin sección».</li><li>Para meter una tarea en una sección: arrástrala sobre otra tarea de la sección o sobre su título, usa el campo «Sección» de la ficha o escribe <code>/Nombre</code> al añadirla. El <strong>+</strong> de la sección añade una tarea en ella.</li><li>En el ordenador, al pasar el ratón por la sección aparecen los botones para renombrarla, subirla, bajarla o eliminarla. En el móvil, en su «⋯». Al eliminarla, sus tareas pasan a «Sin sección».</li><li>En el <strong>Kanban</strong>, «Columnas» permite ver las columnas por estado o por sección. Arrastrar entre columnas cambia el estado o la sección.</li><li class="pc-only">En el ordenador, cada columna de sección se pliega con la flecha de su título y queda como una franja estrecha con su nombre y el número de tareas. Se despliega pulsándola. Se puede soltar una tarea encima. Plegar una sección en la lista también la pliega en el Kanban, y al revés.</li><li class="pc-only">Si en el ordenador no caben todas las columnas: usa las <strong>flechas ‹ ›</strong> de los lados o las teclas <strong>← →</strong>, arrastra el fondo del tablero con el ratón, o lleva una tarjeta al borde y el tablero avanzará solo.</li><li>Las secciones se sincronizan; plegarlas y la forma del Kanban son de cada dispositivo.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-plus"/></svg>Añadir escribiendo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Escribe la tarea en el campo de arriba (en el móvil, con el botón <strong>+</strong>) y pulsa <kbd>Intro</kbd>. Lo que reconozca aparece debajo; pulsa la <strong>×</strong> de una ficha si no quieres que lo interprete.</p><ul><li><strong>Fecha:</strong> hoy, mañana, pasado mañana, el lunes, el próximo viernes, la semana que viene, el mes que viene, fin de semana, fin de mes, en 3 días, dentro de 2 semanas, el día 15, 15/11, 3 de diciembre, 25 oct.</li><li><strong>Hora:</strong> a las 10, a las 9:30, 17h, a las 5 de la tarde, esta tarde, mañana por la mañana, a mediodía. Con hora, la tarea avisa a esa hora.</li><li><strong>Repetición:</strong> cada día, cada lunes y jueves, días laborables, cada semana, cada mes el día 6, el día 6 de cada mes, cada 2 semanas, cada año.</li><li><strong>Proyecto:</strong> <code>#Trabajo</code> (sin el emoji; vale la primera palabra si no hay duda).</li><li><strong>Sección:</strong> <code>/Datos</code>, dentro del proyecto indicado o del actual.</li><li><strong>Etiqueta:</strong> <code>@Revisión</code>. Si no existe, se crea.</li><li><strong>Prioridad:</strong> <code>!alta</code>, <code>!urgente</code>, o <code>!!</code> (alta) y <code>!!!</code> (urgente).</li><li>Ejemplo: «Informe provincial mañana a las 10 #Trabajo !alta @Revisión».</li><li><kbd>Mayús</kbd>+<kbd>Intro</kbd> o «Ficha» abren la ficha completa con lo que hayas escrito. Tecla <kbd>Q</kbd> para ir al campo.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-mail"/></svg>Correos a tareas (ordenador)<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -3099,6 +3107,7 @@ function createCard(sl,p,ctx){
 /* ================= Secciones ================= */
 const projById=id=>appState.projects.find(p=>p.id===id);
 const secFolded=id=>ui.secFold.includes(id);
+const foldKey=(p,sid)=>sid||'none:'+p.id; /* «Sin sección» se pliega por proyecto */
 function setSecFold(id,v){ ui.secFold=ui.secFold.filter(x=>x!==id); if(v) ui.secFold.push(id); if(ui.secFold.length>500) ui.secFold=ui.secFold.slice(-500); saveUI(); }
 /* Lista de un proyecto: fijadas arriba, después las tareas sin sección y luego cada sección */
 function renderProjectList(list,p,visible,manual){
@@ -3111,7 +3120,8 @@ function renderProjectList(list,p,visible,manual){
   const gh=(title,icon,cls,n)=>{ const h=el('div','group-title '+cls); h.append(ic(icon,'sm'),document.createTextNode(title+' '),el('span','n',`(${n})`)); return h; };
   blocks.forEach(b=>{
     if(b.kind==='pin') list.append(gh('Fijadas','pin','pingrp',b.items.length));
-    else if(b.kind==='loose'&&pins.length) list.append(gh(secs.length?'Sin sección':'Resto de tareas',secs.length?'inbox':'list','',b.items.length));
+    else if(b.kind==='loose'&&secs.length){ list.append(secHead(p,{id:'',name:'Sin sección'},b.items)); if(secFolded(foldKey(p,''))) return; }
+    else if(b.kind==='loose'&&pins.length) list.append(gh('Resto de tareas','list','',b.items.length));
     else if(b.kind==='sec'){
       list.append(secHead(p,b.sec,b.items));
       if(secFolded(b.sec.id)) return;
@@ -3135,15 +3145,15 @@ function secDropTarget(node,p,sid){
   node.addEventListener('drop',e=>{ if(drag.kind!=='item') return; e.preventDefault(); const id=drag.id; endDrag(); commit(null,()=>secDrop(p,id,sid)); });
 }
 function secHead(p,z,items){
-  const h=el('div','sec-head'); h.dataset.sec=z.id;
-  const fold=secFolded(z.id), tg=el('button','sec-toggle'); tg.type='button';
+  const h=el('div','sec-head'+(z.id?'':' sec-none')); h.dataset.sec=z.id;
+  const fk=foldKey(p,z.id), fold=secFolded(fk), tg=el('button','sec-toggle'); tg.type='button';
   tg.setAttribute('aria-expanded',String(!fold)); tg.title=fold?'Desplegar la sección':'Plegar la sección';
   tg.append(ic('chev-right','sm'),el('span','sec-name',z.name));
-  tg.addEventListener('click',()=>{ setSecFold(z.id,!secFolded(z.id)); renderApp(); });
+  tg.addEventListener('click',()=>{ setSecFold(fk,!secFolded(fk)); renderApp(); });
   const done=items.filter(i=>i.status==='done').length;
   const n=el('span','sec-n',done?`${done} de ${items.length}`:String(items.length)); n.title=done?`${done} finalizadas de ${items.length}`:pl(items.length,'tarea','tareas');
   h.append(tg,n,el('span','sec-line'));
-  if(!selectMode){
+  if(!selectMode&&z.id){
     const acts=el('div','sec-acts');
     acts.append(btn('','ghost icon small','Añadir una tarea a esta sección',()=>addToSection(p.id,z.id),'plus'));
     if(isMobile()) acts.append(btn('','ghost icon small','Opciones de la sección',()=>openSecSheet(p.id,z.id),'more'));
@@ -3351,11 +3361,27 @@ function renderApp(){
       const cols=kbCols(p), byStatus=kbMode(p)==='status', keyOf=kbKeyFn(p), kbc={};
       kbCount=cols.length; if(kbIndex>=kbCount) kbIndex=0;
       const addCol=!byStatus&&!isMobile()&&!selectMode;
-      if(!byStatus){ list.style.gridTemplateColumns=`repeat(${cols.length+(addCol?1:0)},minmax(250px,1fr))`; list.classList.toggle('many',cols.length+(addCol?1:0)>4); list.classList.add('kb-scroll'); }
+      const canFold=!byStatus&&!isMobile(), folded=k=>canFold&&secFolded(foldKey(p,k));
+      if(!byStatus){ list.style.gridTemplateColumns=[...cols.map(c=>folded(c.key)?'52px':'minmax(250px,1fr)'),...(addCol?['minmax(200px,1fr)']:[])].join(' '); list.classList.toggle('many',cols.length+(addCol?1:0)>4); list.classList.add('kb-scroll'); }
       cols.forEach(({key:status,title})=>{
         const items=pinFirst(visible.filter(i=>keyOf(i)===status)); kbc[status]=items.length;
         const col=el('div','kanban-col'); col.dataset.col=status;
-        const h3=el('h3'); h3.append(el('span','',title),document.createTextNode(`(${items.length})`)); col.append(h3);
+        const fk=foldKey(p,status);
+        if(folded(status)){
+          /* Plegada: una franja con el nombre en vertical y el número de tareas; se puede soltar encima */
+          col.classList.add('folded');
+          const u=el('button','kb-unfold'); u.type='button'; u.title=`Desplegar «${title}» (${pl(items.length,'tarea','tareas')})`; u.setAttribute('aria-expanded','false');
+          u.append(ic('chev-right','sm'),el('span','nm',title),el('span','n',String(items.length)));
+          u.addEventListener('click',()=>{ setSecFold(fk,false); renderApp(); });
+          col.append(u);
+          col.addEventListener('dragover',e=>{ if(drag.kind!=='item'||selectMode) return; e.preventDefault(); col.classList.add('drag-over'); });
+          col.addEventListener('dragleave',e=>{ if(col.contains(e.relatedTarget)) return; col.classList.remove('drag-over'); });
+          col.addEventListener('drop',e=>{ if(drag.kind!=='item') return; e.preventDefault(); const id=drag.id; endDrag(); commit(null,()=>moveToColumn(p,id,status)); });
+          list.append(col); return;
+        }
+        const h3=el('h3'); h3.append(el('span','',title),document.createTextNode(`(${items.length})`));
+        if(canFold){ const fb=btn('','ghost icon small kb-fold','Plegar la columna',()=>{ setSecFold(fk,true); renderApp(); },'chev-left'); fb.setAttribute('aria-expanded','true'); h3.append(fb); }
+        col.append(h3);
         col.addEventListener('dragover',e=>{ if(drag.kind!=='item'||selectMode) return; e.preventDefault(); col.classList.add('drag-over'); });
         col.addEventListener('dragleave',e=>{ if(col.contains(e.relatedTarget)) return; col.classList.remove('drag-over'); });
         col.addEventListener('drop',e=>{
