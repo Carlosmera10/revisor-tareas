@@ -97,7 +97,19 @@ body.selecting main{padding-bottom:150px}
 .nav-section{display:flex;align-items:center;justify-content:space-between;padding:20px 10px 6px;color:var(--nav-muted);font-size:.82rem;font-weight:600}
 .nav-section button{color:var(--nav-ink);background:transparent;width:28px;height:28px;padding:0}
 .nav-section button:hover{background:var(--nav-hover);color:#fff}
-#projectList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;flex:1}
+#projectList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;flex:none}
+.side-spacer{flex:1}
+#tagNavList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+#tagNavList li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--nav-ink);border:1px dashed transparent}
+#tagNavList li:hover{background:var(--nav-hover)}
+#tagNavList li.active{background:var(--nav-active);color:#fff;box-shadow:inset 3px 0 0 var(--tag-c,#8fa6ff)}
+#tagNavList li.drop-target{border-color:rgba(255,255,255,.35);background:var(--nav-hover)}
+body.dragging-item #tagNavList li{border-color:rgba(255,255,255,.18)}
+.tag-nav-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin:0 4px}
+.tag-head-dot{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:12px;vertical-align:middle;position:relative;top:-2px}
+.tag-head-dot.emo{width:auto;height:auto;top:0}
+.group-title .grp-link{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0;padding:0;font:inherit;font-weight:600;color:inherit;cursor:pointer}
+.group-title .grp-link:hover{color:var(--accent);text-decoration:underline}
 #projectList li{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;cursor:pointer;color:var(--nav-ink);border:1px dashed transparent}
 #projectList li:hover{background:var(--nav-hover)}
 #projectList li.active{background:var(--nav-active);color:#fff;box-shadow:inset 3px 0 0 #8fa6ff}
@@ -561,7 +573,7 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   .side-hint{display:none}
   .side-toggle{display:none}
   #projectList{flex:none}
-  #projectList li{padding:11px 10px}
+  #projectList li,#tagNavList li{padding:11px 10px}
   main{padding:0 12px calc(98px + env(safe-area-inset-bottom));max-width:none}
   body.selecting main{padding-bottom:calc(170px + env(safe-area-inset-bottom))}
   .page-head{padding:calc(12px + env(safe-area-inset-top)) 0 10px;margin-bottom:12px}
@@ -707,9 +719,11 @@ body.sync-error #openSettingsBtn::after{content:"";position:absolute;top:8px;rig
   body.side-collapsed .nav-label,body.side-collapsed .proj-name,body.side-collapsed .proj-tools,body.side-collapsed .proj-folder{display:none!important}
   body.side-collapsed .brand{flex-direction:column;gap:8px;padding:2px 0 12px}
   body.side-collapsed .side-toggle{margin:0}
-  body.side-collapsed .nav-item,body.side-collapsed #projectList li{justify-content:center;position:relative;padding:11px 0;gap:0}
+  body.side-collapsed .nav-item,body.side-collapsed #projectList li,body.side-collapsed #tagNavList li{justify-content:center;position:relative;padding:11px 0;gap:0}
+  body.side-collapsed .tag-nav-dot{width:16px;height:16px}
   body.side-collapsed .nav-item>.ic{width:26px;height:26px}
   body.side-collapsed .nav-item.active,body.side-collapsed #projectList li.active{box-shadow:inset 3px 0 0 #8fa6ff}
+  body.side-collapsed #tagNavList li.active{box-shadow:inset 3px 0 0 var(--tag-c,#8fa6ff)}
   body.side-collapsed .proj-emoji{font-size:1.55rem;width:auto}
   body.side-collapsed .proj-initial{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.1);color:#fff;font-weight:700;font-size:.95rem}
   body.side-collapsed .nav-count{position:absolute;top:1px;right:3px;margin:0;font-size:.64rem;line-height:16px;padding:0 5px;min-width:18px;text-align:center;background:#2a3655;color:#dfe5f5}
@@ -959,6 +973,9 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
     <button type="button" class="nav-item" id="waitingBtn" title="En espera"><svg class="ic"><use href="#i-hourglass"/></svg><span class="nav-label">En espera</span><span class="nav-count" id="waitingCount">0</span></button>
     <div class="nav-section"><span class="nav-label">Proyectos</span> <button type="button" id="newProjectBtn" title="Crear proyecto" aria-label="Crear proyecto"><svg class="ic sm"><use href="#i-plus"/></svg></button></div>
     <ul id="projectList"></ul>
+    <div class="nav-section" id="tagNavHead"><span class="nav-label">Etiquetas</span> <button type="button" id="tagNavFold" aria-expanded="true"><svg class="ic sm"><use href="#i-chev-down"/></svg></button></div>
+    <ul id="tagNavList"></ul>
+    <div class="side-spacer"></div>
         <div class="side-actions">
       <button type="button" class="nav-item pc-only" id="openFocusBtn" title="Concentración (tecla F)"><svg class="ic"><use href="#i-timer"/></svg><span class="nav-label">Concentración</span><span class="nav-count" id="focusCount"></span></button>
       <button type="button" class="nav-item" id="openArchiveBtn" title="Archivo"><svg class="ic"><use href="#i-archive"/></svg><span class="nav-label">Archivo</span><span class="nav-count" id="archiveCount"></span></button>
@@ -1599,7 +1616,7 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Cuando una tarea dependa de otra persona, pulsa el reloj de arena de la tarjeta (en el móvil, «⋯» → «Poner en espera…») o rellena «En espera de» en la ficha.</li><li>Indica de quién y cuándo reclamar. La tarea sale de Hoy, Mañana, Próximos 7 días y del planificador hasta ese día.</li><li>Ese día vuelve a «Hoy», en «Para reclamar», y recibes un aviso a la «Hora del aviso en tareas sin hora».</li><li>La vista <strong>En espera</strong> de la barra lateral las reúne por persona. Cuando te contesten, «Ya ha respondido».</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-list"/></svg>Lista, Kanban y filtros<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado (o la sección, si eliges «Columnas: Por sección»).</li><li>La vista Lista o Kanban se recuerda por separado en el ordenador y en el móvil (o en una ventana estrecha).</li><li>El buscador ignora las tildes y busca en todo: primero en la vista actual y, debajo, en el resto de proyectos (también las repetitivas ocultas) y en el archivo. Vista, orden y filtros se recuerdan.</li><li>En <strong>Hoy</strong>, <strong>Mañana</strong>, <strong>Próximos 7 días</strong> y <strong>Calendario</strong>, «Filtros» permite ver un solo proyecto. Lo que añadas con ese filtro puesto va a ese proyecto.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Lista</strong>: arrastra desde el asa para reordenar. Solo funciona con «Ordenar: Manual (arrastrar)».</li><li><strong>Kanban</strong>: arrastra entre columnas para cambiar el estado (o la sección, si eliges «Columnas: Por sección»).</li><li>La vista Lista o Kanban se recuerda por separado en el ordenador y en el móvil (o en una ventana estrecha).</li><li>El buscador ignora las tildes y busca en todo: primero en la vista actual y, debajo, en el resto de proyectos (también las repetitivas ocultas) y en el archivo. Vista, orden y filtros se recuerdan.</li><li>En <strong>Hoy</strong>, <strong>Mañana</strong>, <strong>Próximos 7 días</strong> y <strong>Calendario</strong>, «Filtros» permite ver un solo proyecto. Lo que añadas con ese filtro puesto va a ese proyecto.</li><li><strong>Etiquetas en la barra lateral</strong>: debajo de «Proyectos» están tus etiquetas, con el número de tareas en proceso de cada una. Pulsa una para ver sus tareas de todos los proyectos, agrupadas por proyecto; pulsa el nombre de un proyecto para ir a él. Lo que añadas desde esa vista se crea con la etiqueta puesta. Para ponerle una etiqueta a una tarea, arrástrala (o arrastra varias seleccionadas) hasta la etiqueta. La flecha junto a «Etiquetas» oculta o muestra la lista. En el móvil están en el menú que abre «Proyectos», en la barra inferior.</li><li><strong>Seleccionar varias</strong>: marca tarjetas y usa la barra inferior para cambiar estado, fecha, etiquetas o prioridad, mover, duplicar o borrar. <kbd>Esc</kbd> para terminar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-sun"/></svg>Hoy y planificador<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li><strong>Hoy</strong> reúne las tareas de todos los proyectos con fecha de hoy o vencidas. Las que no tienen fecha están en su proyecto y en el planificador.</li><li><strong>Mañana</strong> muestra lo que vence mañana, y <strong>Próximos 7 días</strong> las vencidas y lo que vence de hoy a dentro de seis días, agrupado por día. Las dos incluyen las repetitivas que siguen ocultas.</li><li>Suelta una tarea sobre «Hoy» o «Mañana» para ponerle esa fecha.</li><li><strong>Calendario</strong>: en el ordenador, vista de mes o de semana (con horas de 8 a 22); en el móvil, la semana arriba y el día elegido por horas. Muestra las tareas en proceso con fecha (las repetitivas, en su próxima fecha y con el icono de repetir; las vencidas, en el día de hoy, en rojo y con su fecha original) y, en azul, las que están en espera, en su día de reclamar. Arrastra una tarea a otro día u hora para cambiarla (en el móvil, mantenla pulsada); pulsa un hueco vacío para crear una tarea ahí.</li><li><strong>Planificar</strong> (tecla <kbd>P</kbd>) te enseña las tareas pendientes de todos los proyectos como tarjetas, de la fecha más antigua a la más lejana (las vencidas primero, las sin fecha al final) y, dentro de cada fecha, por prioridad.</li><li>Elige Hoy, Mañana, la semana que viene (lunes) o el mes siguiente (día 1), o <strong>pasa la tarjeta</strong> deslizándola a la izquierda (o con <kbd>→</kbd>) para dejarla como está. Deslizando a la derecha (o <kbd>←</kbd>) vuelves a la anterior.</li><li>Tras la última verás «Todo revisado»; pásala una vez más para cerrar.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-repeat"/></svg>Tareas repetitivas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1955,11 +1972,13 @@ function loadLegacy(){
   return null;
 }
 function loadUI(){
-  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true,compact:true,subFold:[],secFold:[],kbBy:{},viewPC:'list',viewM:'list'};
+  const d={mode:'project',view:'list',sort:'manual',search:'',status:'',tag:'',priority:'',project:'',showScheduled:false,theme:'auto',sideCollapsed:false,calView:'month',cmOpen:true,compact:true,subFold:[],secFold:[],kbBy:{},viewPC:'list',viewM:'list',tagView:'',tagsFold:false};
   try{
     const u=JSON.parse(localStorage.getItem(UI_KEY));
     if(u&&typeof u==='object'){
-      if(['project','today','tomorrow','week','waiting','calendar'].includes(u.mode)) d.mode=u.mode;
+      if(['project','today','tomorrow','week','waiting','calendar','tag'].includes(u.mode)) d.mode=u.mode;
+      if(typeof u.tagView==='string') d.tagView=u.tagView;
+      d.tagsFold=u.tagsFold===true;
       if(['month','week'].includes(u.calView)) d.calView=u.calView;
       if(['list','kanban'].includes(u.view)) d.view=u.view;
       /* La vista se recuerda por separado en el ordenador y en el móvil (o ventana estrecha); la primera vez se parte de la que había */
@@ -2145,7 +2164,7 @@ const getTag=id=>appState.tags.find(t=>t.id===id)||null;
 const findProjectOf=id=>appState.projects.find(p=>p.items.some(i=>i.id===id));
 const findItem=id=>{ const p=findProjectOf(id); return p?{p,it:p.items.find(i=>i.id===id)}:null; };
 const isToday=()=>ui.mode==='today';
-const DAY_MODES=['today','tomorrow','week','waiting','calendar'];
+const DAY_MODES=['today','tomorrow','week','waiting','calendar','tag'];
 const isDayView=()=>DAY_MODES.includes(ui.mode);
 
 /* ================= Avisos y deshacer ================= */
@@ -2426,7 +2445,10 @@ function rangeEntries(mode){
 /* Fecha que cuenta en las vistas: la de reclamar si está en espera y la de retomar si está pausada */
 const effDate=it=>isWaiting(it)?it.followUp:resumes(it)?it.resumeAt:it.dueDate;
 function waitingEntries(){ const out=[]; appState.projects.forEach(p=>p.items.forEach(it=>{ if(isWaiting(it)) out.push({p,it}); })); return out; }
-const viewEntries=mode=>mode==='today'?todayEntries():mode==='waiting'?waitingEntries():rangeEntries(mode);
+/* Vista de una etiqueta: sus tareas de todos los proyectos (sin las repetitivas que siguen ocultas) */
+function tagEntries(id=ui.tagView){ const out=[]; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.tags.includes(id)&&!isSnoozed(it)) out.push({p,it}); })); return out; }
+const tagOpenCount=id=>{ let n=0; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.tags.includes(id)&&it.status!=='done'&&!isSnoozed(it)) n++; })); return n; };
+const viewEntries=mode=>mode==='today'?todayEntries():mode==='waiting'?waitingEntries():mode==='tag'?tagEntries():rangeEntries(mode);
 const rangePending=mode=>rangeEntries(mode).filter(e=>e.it.status!=='done').length;
 function switchToView(mode){
   closeDrawer();
@@ -2434,6 +2456,11 @@ function switchToView(mode){
   ui.mode=mode; saveUI(); selected.clear(); expanded.clear(); suppressConfetti=true; renderApp(); window.scrollTo(0,0);
 }
 const switchToToday=()=>switchToView('today');
+function switchToTag(id){
+  closeDrawer();
+  if(ui.mode==='tag'&&ui.tagView===id) return;
+  ui.mode='tag'; ui.tagView=id; saveUI(); selected.clear(); expanded.clear(); suppressConfetti=true; renderApp(); window.scrollTo(0,0);
+}
 function switchToProject(id){ kbIndex=0;
   closeDrawer();
   if(!isDayView()&&appState.activeId===id) return;
@@ -2701,7 +2728,7 @@ function renderSidebar(){
   $('todayCount').title=pl(tp,'tarea pendiente para hoy o vencida','tareas pendientes para hoy o vencidas');
   $('bnTodayCount').textContent=tp&&!isToday()?String(tp):'';
   $('bnToday').classList.toggle('active',isToday());
-  $('bnProjects').classList.toggle('active',!isDayView());
+  $('bnProjects').classList.toggle('active',!isDayView()||ui.mode==='tag');
   $('tomorrowBtn').classList.toggle('active',ui.mode==='tomorrow');
   $('weekBtn').classList.toggle('active',ui.mode==='week');
   $('waitingBtn').classList.toggle('active',ui.mode==='waiting');
@@ -2764,6 +2791,36 @@ function renderSidebar(){
     });
     list.append(li);
   });
+  renderTagNav();
+}
+/* Color de la etiqueta aclarado, para que se vea sobre la barra lateral oscura */
+function tagNavColor(hex){ const n=parseInt(String(hex).slice(1),16); if(isNaN(n)) return '#cdd4e4'; const m=c=>Math.round(c+(255-c)*.45); return `rgb(${m(n>>16&255)},${m(n>>8&255)},${m(n&255)})`; }
+function renderTagNav(){
+  const ul=$('tagNavList'), has=appState.tags.length>0, fold=!!ui.tagsFold;
+  $('tagNavHead').hidden=!has; ul.hidden=!has||fold; ul.replaceChildren();
+  const fb=$('tagNavFold'); fb.setAttribute('aria-expanded',String(!fold));
+  fb.title=fold?'Mostrar las etiquetas':'Ocultar las etiquetas'; fb.setAttribute('aria-label',fb.title);
+  fb.querySelector('use').setAttribute('href',fold?'#i-chev-right':'#i-chev-down');
+  if(!has||fold) return;
+  appState.tags.forEach(t=>{
+    const active=ui.mode==='tag'&&ui.tagView===t.id, n=tagOpenCount(t.id), c=tagNavColor(t.text);
+    const li=el('li',active?'active':''); li.tabIndex=0; li.style.setProperty('--tag-c',c);
+    li.title=`${t.name}: ${pl(n,'tarea en proceso','tareas en proceso')}`;
+    if(t.emoji) li.append(el('span','proj-emoji',t.emoji)); else { const d=el('span','tag-nav-dot'); d.style.background=c; li.append(d); }
+    li.append(el('span','proj-name',t.name),el('span','nav-count',n?String(n):''));
+    li.addEventListener('click',()=>switchToTag(t.id));
+    li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); switchToTag(t.id); } });
+    /* Soltar una tarea encima le pone la etiqueta */
+    li.addEventListener('dragover',e=>{ if(drag.kind!=='item') return; e.preventDefault(); e.dataTransfer.dropEffect='move'; li.classList.add('drop-target'); });
+    li.addEventListener('dragleave',e=>{ if(li.contains(e.relatedTarget)) return; li.classList.remove('drop-target'); });
+    li.addEventListener('drop',e=>{
+      if(drag.kind!=='item') return; e.preventDefault();
+      const ids=selected.has(drag.id)?[...selected]:[drag.id]; endDrag();
+      commit(null,()=>{ let k=0; ids.forEach(id=>{ const f=findItem(id); if(f&&!f.it.tags.includes(t.id)){ f.it.tags.push(t.id); k++; } });
+        return k?`🏷️ «${t.name}» puesta a ${pl(k,'tarea','tareas')}`:false; });
+    });
+    ul.append(li);
+  });
 }
 
 /* ================= Selects auxiliares ================= */
@@ -2785,7 +2842,7 @@ function renderProjectFilter(){
 function renderTagFilter(){
   fillTagSelect($('tagFilter'),'Todas las etiquetas',{none:'Sin etiqueta'});
   if(ui.tag&&ui.tag!=='__none'&&!getTag(ui.tag)){ ui.tag=''; saveUI(); }
-  $('tagFilter').value=ui.tag;
+  $('tagFilter').value=ui.tag; $('tagFilter').hidden=ui.mode==='tag';
 }
 
 /* ================= Copia de seguridad ================= */
@@ -2883,12 +2940,14 @@ const PROJ_FILTER_MODES=['today','tomorrow','week','calendar'];
 const projFilter=()=>PROJ_FILTER_MODES.includes(ui.mode)?ui.project:'';
 /* Proyecto de las tareas nuevas: el filtrado, para que no desaparezcan de la vista al crearlas */
 const addTarget=()=>appState.projects.find(p=>p.id===projFilter())||currentProject();
-const isFiltered=()=>!!(ui.search.trim()||ui.status||ui.tag||ui.priority||projFilter());
+const tagFilt=()=>ui.mode==='tag'?'':ui.tag;
+const isFiltered=()=>!!(ui.search.trim()||ui.status||tagFilt()||ui.priority||projFilter());
 function matches(sl,words){
   if(!ui.showScheduled&&isSnoozed(sl)) return false;
   if(ui.status==='waiting'){ if(!isWaiting(sl)) return false; } else if(ui.status&&sl.status!==ui.status) return false;
   if(ui.priority&&sl.priority!==ui.priority) return false;
-  if(ui.tag==='__none'){ if(sl.tags.length) return false; } else if(ui.tag&&!sl.tags.includes(ui.tag)) return false;
+  const tf=tagFilt();
+  if(tf==='__none'){ if(sl.tags.length) return false; } else if(tf&&!sl.tags.includes(tf)) return false;
   if(words.length){
     const tagNames=sl.tags.map(getTag).filter(Boolean).map(t=>t.name);
     const hay=norm([sl.title,sl.notes,...tagNames,...sl.subtasks.map(s=>s.title),...sl.comments.map(cmHay)].join('\n'));
@@ -3082,7 +3141,7 @@ function createCard(sl,p,ctx){
     cmb.addEventListener('click',f); cmb.addEventListener('keydown',e=>{ if(e.key==='Enter') f(e); });
     badges.append(cmb);
   }
-  appState.tags.filter(t=>sl.tags.includes(t.id)).forEach(tag=>{
+  appState.tags.filter(t=>sl.tags.includes(t.id)&&!(ui.mode==='tag'&&t.id===ui.tagView)).forEach(tag=>{
     const tb=el('span','tag-badge');
     if(tag.emoji) tb.append(document.createTextNode(tag.emoji+' ')); else tb.append(el('span','tag-dot'));
     tb.append(document.createTextNode(tag.name));
@@ -3293,10 +3352,14 @@ function renderHeader(entries){
   $('projectHead').hidden=td; $('todayHead').hidden=!td;
   if(td){
     const long=d=>{ const s=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}); return s.charAt(0).toUpperCase()+s.slice(1); };
-    const title={today:'Hoy',tomorrow:'Mañana',week:'Próximos 7 días',waiting:'En espera',calendar:'Calendario'}[ui.mode];
+    const tg=ui.mode==='tag'&&getTag(ui.tagView);
+    const title=tg?tg.name:{today:'Hoy',tomorrow:'Mañana',week:'Próximos 7 días',waiting:'En espera',calendar:'Calendario'}[ui.mode];
     $('todayTitle').textContent=title;
+    if(tg){ const d=el('span','tag-head-dot'); if(tg.emoji) d.textContent=tg.emoji; else d.style.background=tg.text; if(tg.emoji) d.classList.add('emo'); $('todayTitle').prepend(d); }
     const wn=waitingEntries(), wd=wn.filter(e=>followDue(e.it)).length;
-    $('todayDate').textContent=ui.mode==='calendar'?'':ui.mode==='waiting'?(wn.length?pl(wn.length,'tarea','tareas')+' pendientes de otras personas'+(wd?`, ${wd} para reclamar`:''):'Tareas que dependen de otras personas'):ui.mode==='today'?long(new Date()):ui.mode==='tomorrow'?long(addDays(new Date(),1)):`Del ${fmtDate(todayStr(),true)} al ${fmtDate(ymd(addDays(new Date(),6)),true)}`;
+    if(tg){ const open=entries.filter(i=>i.status!=='done'), np=new Set(tagEntries().filter(e=>e.it.status!=='done').map(e=>e.p.id)).size;
+      $('todayDate').textContent=open.length?`${pl(open.length,'tarea','tareas')} en proceso en ${pl(np,'proyecto','proyectos')}`:'Ninguna tarea en proceso'; }
+    else $('todayDate').textContent=ui.mode==='calendar'?'':ui.mode==='waiting'?(wn.length?pl(wn.length,'tarea','tareas')+' pendientes de otras personas'+(wd?`, ${wd} para reclamar`:''):'Tareas que dependen de otras personas'):ui.mode==='today'?long(new Date()):ui.mode==='tomorrow'?long(addDays(new Date(),1)):`Del ${fmtDate(todayStr(),true)} al ${fmtDate(ymd(addDays(new Date(),6)),true)}`;
     document.title=title+' · Revisor de tareas';
   } else {
     const p=currentProject();
@@ -3304,7 +3367,7 @@ function renderHeader(entries){
     document.title=`${p.name} · Revisor de tareas`;
   }
   const total=entries.length, done=entries.filter(i=>i.status==='done').length, pct=total?Math.round(done/total*100):0;
-  const key=td?'__'+ui.mode:currentProject().id;
+  const key=td?'__'+ui.mode+(ui.mode==='tag'?ui.tagView:''):currentProject().id;
   const prev=lastPctByKey[key];
   if(!suppressConfetti&&total>0&&pct===100&&prev!==undefined&&prev<100) shootConfetti();
   lastPctByKey[key]=pct; suppressConfetti=false;
@@ -3322,6 +3385,7 @@ function renderHeader(entries){
   }
 }
 function renderApp(){
+  if(ui.mode==='tag'&&!getTag(ui.tagView)){ ui.mode='project'; saveUI(); }
   if($('itemModal').open) renderComments();
   const td=isDayView();
   [...selected].forEach(id=>{ if(!findProjectOf(id)) selected.delete(id); });
@@ -3366,6 +3430,9 @@ function renderApp(){
       const people=[...new Set(vis.filter(e=>!followDue(e.it)).map(e=>e.it.waitingFor))].sort((a,b)=>a.localeCompare(b,'es'));
       people.forEach(n=>groups.push({title:'Esperando a '+n,icon:'hourglass',cls:'',items:vis.filter(e=>!followDue(e.it)&&e.it.waitingFor===n)}));
     }
+    else if(ui.mode==='tag'){
+      groups=appState.projects.map(p=>{ const pe=projEmoji(p.name); return {title:pe.rest||p.name||'Sin título',icon:'folder',emoji:pe.emoji,cls:'projgrp',pid:p.id,items:pinFirst(vis.filter(e=>e.p===p).map(e=>e.it)).map(it=>({p,it}))}; });
+    }
     else {
       groups=[{title:'Vencidas',icon:'alert-circle',cls:'overdue',items:vis.filter(e=>effDate(e.it)<t)}];
       for(let i=0;i<7;i++){
@@ -3374,20 +3441,23 @@ function renderApp(){
         groups.push({title:lbl,icon:i===0?'sun':i===1?'sunrise':'calendar',cls:'',items:vis.filter(e=>effDate(e.it)===d)});
       }
     }
-    $('listHeaderTitle').textContent='Tareas de todos los proyectos';
+    $('listHeaderTitle').textContent=ui.mode==='tag'?'Tareas con esta etiqueta':'Tareas de todos los proyectos';
     $('countLabel').textContent=pl(vis.length,'tarea','tareas')+(isFiltered()?` (de ${pool.length})`:'');
     list.className='list-view';
     const emptyMsg={today:['No tienes nada para hoy','No hay tareas con fecha de hoy ni vencidas. Usa «Planificar» para repartir el trabajo.'],
       tomorrow:['No tienes nada para mañana','Ninguna tarea vence mañana.'],
       week:['Semana despejada','No hay tareas vencidas ni con fecha en los próximos 7 días.'],
-      waiting:['No esperas a nadie','Cuando una tarea dependa de otra persona, ábrela y rellena «En espera de».']}[ui.mode];
+      waiting:['No esperas a nadie','Cuando una tarea dependa de otra persona, ábrela y rellena «En espera de».'],
+      tag:['Ninguna tarea con esta etiqueta','Pónsela desde la ficha de una tarea, o arrastra la tarea hasta la etiqueta en la barra lateral.']}[ui.mode];
     if(!vis.length&&!pool.length&&all.length) list.append(emptyState('Todo hecho por hoy',`Has terminado ${pl(all.length,'tarea','tareas')} de hoy.`));
     else if(!vis.length) list.append(pool.length?emptyState('Nada coincide en esta vista',searchWords().length?'Mira abajo si aparece en otros proyectos o en el archivo.':'Prueba a pulsar «Limpiar».'):emptyState(...emptyMsg));
     groups.forEach(g=>{
       if(!g.items.length) return;
-      const h=el('div','group-title '+g.cls); h.append(ic(g.icon,'sm'),document.createTextNode(g.title+' '),el('span','n',`(${g.items.length})`));
+      const h=el('div','group-title '+g.cls);
+      if(g.pid){ const b=btn('','grp-link','Ir al proyecto',()=>switchToProject(g.pid)); if(g.emoji) b.append(el('span','proj-emoji',g.emoji)); else b.append(ic(g.icon,'sm')); b.append(document.createTextNode(g.title)); h.append(b,el('span','n',`(${g.items.length})`)); }
+      else h.append(ic(g.icon,'sm'),document.createTextNode(g.title+' '),el('span','n',`(${g.items.length})`));
       list.append(h);
-      doneLast(g.items,e=>e.it).forEach(({p,it})=>list.append(createCard(it,p,{manual:false,showProject:true})));
+      doneLast(g.items,e=>e.it).forEach(({p,it})=>list.append(createCard(it,p,{manual:false,showProject:!g.pid,secBadge:!!g.pid})));
     });
     hint='';
     $('schedBtn').hidden=true;
@@ -3457,7 +3527,7 @@ function renderApp(){
   hint=selectMode?'Selecciona varias tarjetas y usa la barra inferior. Esc para terminar.':'';
   $('dragHint').textContent=hint; $('dragHint').hidden=!hint;
   $('searchFilter').placeholder=isMobile()?'Buscar en todo':'Buscar en todo (pulsa / )';
-  const nf=[projFilter(),ui.status,ui.tag,ui.priority].filter(Boolean).length+(ui.sort!=='manual'?1:0);
+  const nf=[projFilter(),ui.status,tagFilt(),ui.priority].filter(Boolean).length+(ui.sort!=='manual'?1:0);
   $('filtersToggleText').textContent=nf?`Filtros (${nf})`:'Filtros';
   $('tbCount').textContent=$('countLabel').textContent;
   { const t=todayStr(); let n=0; appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status==='pending'&&!isSnoozed(it)&&!isWaiting(it)&&(!it.dueDate||it.dueDate<t)) n++; }));
@@ -3634,7 +3704,7 @@ function openModal(item=null){
     ['modTitle','modDate','modTime','modLink','modNotes','modWaitFor','modFollowUp','modPauseNote','modResumeAt'].forEach(id=>$(id).value='');
     $('modStatus').value='pending';
     if(['today','tomorrow','week'].includes(ui.mode)) $('modDate').value=ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):todayStr();
-    tempItemTags=ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
+    tempItemTags=ui.mode==='tag'&&getTag(ui.tagView)?[ui.tagView]:ui.tag&&ui.tag!=='__none'&&getTag(ui.tag)?[ui.tag]:[]; $('modPriority').value='normal'; $('modReminder').value='none';
     tempSubtasks=[]; modSubFold=false; editingRecOcc=1; editingHistory=[]; recToForm(null,$('modDate').value);
   }
   tempComments=[]; cmEditId=null; cmExpanded.clear(); $('cmInput').value=''; $('cmDrop').hidden=true;
@@ -4965,7 +5035,8 @@ function mailsToTasks(mails){
     mails.forEach(m=>{
       const o=mailOutcome(m), dst=(o.projectId&&projById(o.projectId))||base; used.add(dst);
       if(o.rules.length) auto++;
-      dst.items.push(normalizeItem({title:mailTitle(m),notes:mailNotes(m),dueDate:due,status:'pending',tags:o.tags,priority:o.priority||'normal'}));
+      const vt=ui.mode==='tag'&&getTag(ui.tagView)?[ui.tagView]:[];
+      dst.items.push(normalizeItem({title:mailTitle(m),notes:mailNotes(m),dueDate:due,status:'pending',tags:[...new Set([...vt,...o.tags])],priority:o.priority||'normal'}));
     });
     const where=used.size===1?` en «${[...used][0].name}»`:' en varios proyectos';
     return `✅ ${pl(mails.length,'tarea creada','tareas creadas')} a partir de correos${where}${auto?` · reglas aplicadas en ${auto}`:''}`;
@@ -5261,7 +5332,7 @@ function qaSubmit(){
   const dst=appState.projects.find(p=>p.id===(r.projectId||o.projectId))||addTarget();
   const due=r.dueDate||qaDefaultDate();
   const ok=commit(null,()=>{
-    const tags=[...new Set([...r.tags,...o.tags,...qaEnsureTags(r.newTags)])];
+    const tags=[...new Set([...(ui.mode==='tag'&&getTag(ui.tagView)?[ui.tagView]:[]),...r.tags,...o.tags,...qaEnsureTags(r.newTags)])];
     const rec=r.rec?{...r.rec,anchor:due}:null;
     let section=r.sectionId||(qaSec&&qaSec.pid===dst.id?qaSec.sid:'');
     if(section&&!(dst.sections||[]).some(y=>y.id===section)) section='';
@@ -6113,6 +6184,7 @@ $('todayBtn').addEventListener('click',switchToToday);
 $('tomorrowBtn').addEventListener('click',()=>switchToView('tomorrow'));
 $('weekBtn').addEventListener('click',()=>switchToView('week'));
 $('waitingBtn').addEventListener('click',()=>switchToView('waiting'));
+$('tagNavFold').addEventListener('click',()=>{ ui.tagsFold=!ui.tagsFold; saveUI(); renderTagNav(); });
 $('calendarBtn').addEventListener('click',()=>{ calAnchor=todayStr(); calSel=todayStr(); switchToView('calendar'); });
 ['waitCloseBtn','waitCancelBtn'].forEach(id=>$(id).addEventListener('click',()=>$('waitModal').close()));
 $('waitSaveBtn').addEventListener('click',saveWait);
@@ -6503,7 +6575,7 @@ function syncControls(){
   setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
   window.addEventListener('online',()=>syncNow());
-  window.__revisor={get state(){return appState;},fcPipOpen,get pipWin(){return pipWin;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,mailsToTasks,matchRules,mailIntro,ruleOutcome,mailOutcome,openRulesModal,openModal,get tempItemTags(){return tempItemTags;},parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,kbStepPc,kbPc,setView,get ui(){return ui;},fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
+  window.__revisor={get state(){return appState;},fcPipOpen,get pipWin(){return pipWin;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,mailsToTasks,switchToTag,renderTagNav,matchRules,mailIntro,ruleOutcome,mailOutcome,openRulesModal,openModal,get tempItemTags(){return tempItemTags;},parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,kbStepPc,kbPc,setView,get ui(){return ui;},fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>
