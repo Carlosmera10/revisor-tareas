@@ -148,6 +148,7 @@ input.title-input:focus{background:var(--field);border-color:var(--accent);outli
 .qa-chip button:hover{opacity:1;background:rgba(127,140,170,.18)}
 .qa-chip.title{background:transparent;color:var(--muted);border-color:transparent;font-weight:500;padding-left:2px}
 .qa-chip.newtag{background:var(--chip);color:var(--chip-ink);border-color:var(--line-strong)}
+.qa-chip.auto{border-style:dashed}
 .qa-actions{display:none;gap:8px;justify-content:flex-end}
 .actionbar>.big{flex-shrink:0}
 .toolbar{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
@@ -464,6 +465,15 @@ textarea.inactive{display:none}
 .tag-edit-row{display:flex;gap:8px;align-items:center;padding:8px;background:var(--subtle);border-radius:8px;margin-bottom:8px;border:1px solid var(--line);flex-wrap:wrap}
 .tag-edit-row input.tag-emoji{width:70px;flex:none;text-align:center}
 .tag-edit-row input.tag-name{flex:1;min-width:120px}
+.rule-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:10px;background:var(--subtle);border:1px solid var(--line);border-radius:8px;margin-bottom:8px}
+.rule-card.err{border-color:var(--danger);background:var(--danger-soft)}
+.rule-f{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;min-width:0}
+.rule-l{font-weight:600;font-size:.85rem}
+.rule-f.full,.rule-row{grid-column:1/-1}
+.rule-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end}
+.rule-tags{display:flex;flex-wrap:wrap;gap:6px}
+.rule-tags .tag-chip{font-size:.82rem;padding:3px 10px}
+@media(max-width:760px){.rule-card,.rule-row{grid-template-columns:minmax(0,1fr)}.rule-row>button{justify-self:end}}
 .tag-uses{font-size:.8rem;color:var(--muted);min-width:64px;text-align:right}
 .set-sec{border-top:1px solid var(--line);padding:16px 0}
 .set-sec:first-of-type{border-top:0}
@@ -1293,10 +1303,27 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   <div id="tagsListContainer" style="margin-bottom:16px"></div>
   <button type="button" id="addNewTagBtn" class="secondary" style="width:100%"><svg class="ic sm"><use href="#i-plus"/></svg>Crear etiqueta</button>
   <div class="modal-footer">
-    <span></span>
+    <button type="button" class="ghost" id="tagRulesBtn"><svg class="ic sm"><use href="#i-sliders"/></svg>Reglas automáticas</button>
     <div class="row">
       <button type="button" class="secondary" id="tagCancelBtn">Cancelar</button>
       <button type="button" id="saveTagsBtn"><svg class="ic sm"><use href="#i-check"/></svg>Guardar etiquetas</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Reglas automáticas -->
+<dialog id="rulesModal" style="max-width:760px" aria-labelledby="rulesHeading">
+  <div class="modal-header">
+    <h2 id="rulesHeading"><svg class="ic lg"><use href="#i-sliders"/></svg>Reglas automáticas</h2>
+    <button type="button" class="ghost icon" id="rulesCloseBtn" aria-label="Cerrar"><svg class="ic"><use href="#i-x"/></svg></button>
+  </div>
+  <div id="rulesList" style="margin-bottom:16px"></div>
+  <button type="button" id="addRuleBtn" class="secondary" style="width:100%"><svg class="ic sm"><use href="#i-plus"/></svg>Crear regla</button>
+  <div class="modal-footer">
+    <button type="button" class="ghost" id="rulesApplyBtn"><svg class="ic sm"><use href="#i-checks"/></svg>Aplicar a las tareas en proceso</button>
+    <div class="row">
+      <button type="button" class="secondary" id="rulesCancelBtn">Cancelar</button>
+      <button type="button" id="saveRulesBtn"><svg class="ic sm"><use href="#i-check"/></svg>Guardar reglas</button>
     </div>
   </div>
 </dialog>
@@ -1564,7 +1591,9 @@ button.ghost.icon.pin-btn.on{color:var(--pin-ink);background:var(--pin-bg)}
   <details class="help-sec"><summary><svg class="ic"><use href="#i-plus"/></svg>Añadir escribiendo<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><p>Escribe la tarea en el campo de arriba (en el móvil, con el botón <strong>+</strong>) y pulsa <kbd>Intro</kbd>. Lo que reconozca aparece debajo; pulsa la <strong>×</strong> de una ficha si no quieres que lo interprete.</p><ul><li><strong>Fecha:</strong> hoy, mañana, pasado mañana, el lunes, el próximo viernes, la semana que viene, el mes que viene, fin de semana, fin de mes, en 3 días, dentro de 2 semanas, el día 15, 15/11, 3 de diciembre, 25 oct.</li><li><strong>Hora:</strong> a las 10, a las 9:30, 17h, a las 5 de la tarde, esta tarde, mañana por la mañana, a mediodía. Con hora, la tarea avisa a esa hora.</li><li><strong>Repetición:</strong> cada día, cada lunes y jueves, días laborables, cada semana, cada mes el día 6, el día 6 de cada mes, cada 2 semanas, cada año.</li><li><strong>Proyecto:</strong> <code>#Trabajo</code> (sin el emoji; vale la primera palabra si no hay duda).</li><li><strong>Sección:</strong> <code>/Datos</code>, dentro del proyecto indicado o del actual.</li><li><strong>Etiqueta:</strong> <code>@Revisión</code>. Si no existe, se crea.</li><li><strong>Prioridad:</strong> <code>!alta</code>, <code>!urgente</code>, o <code>!!</code> (alta) y <code>!!!</code> (urgente).</li><li>Ejemplo: «Informe provincial mañana a las 10 #Trabajo !alta @Revisión».</li><li><kbd>Mayús</kbd>+<kbd>Intro</kbd> o «Ficha» abren la ficha completa con lo que hayas escrito. Tecla <kbd>Q</kbd> para ir al campo.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-mail"/></svg>Correos a tareas (ordenador)<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
-    <div class="help-body"><ul><li><strong>Arrastra un correo de Outlook</strong> a la ventana de la app y suéltalo: se abre la ficha con el asunto como título y, en las notas, el remitente, la fecha, los destinatarios, los nombres de los adjuntos y el texto. Elige fecha y proyecto y guarda.</li><li>Si sueltas varios correos a la vez, se crean directamente en el proyecto en el que estás.</li><li>También vale un archivo <strong>.eml</strong> (por ejemplo, un correo guardado desde el nuevo Outlook o desde el navegador).</li><li><strong>Copiar con remitente y fecha</strong>: abre el correo, pulsa «Reenviar», haz clic en el texto, <kbd>Ctrl</kbd>+<kbd>A</kbd> y <kbd>Ctrl</kbd>+<kbd>C</kbd>, descarta el reenvío y pega en la app. El bloque «De / Enviado / Para / Asunto» que añade Outlook se reconoce aunque tu firma vaya delante.</li><li><strong>Pegar</strong>: copia el texto de un correo (con sus líneas «De:», «Enviado:», «Asunto:», o sin ellas) y pulsa <kbd>Ctrl</kbd>+<kbd>V</kbd> en la app, fuera de cualquier campo, o pégalo en «Añadir tarea». Un texto de una sola línea se queda en «Añadir tarea» como siempre.</li><li>Se quitan los «RE:», «RV:» y «FW:» del asunto. Los adjuntos no se guardan (solo sus nombres) y el texto muy largo se recorta.</li><li>El correo no sale de tu ordenador: todo se lee dentro de la app.</li></ul></div></details>
+    <div class="help-body"><ul><li><strong>Arrastra un correo de Outlook</strong> a la ventana de la app y suéltalo: se abre la ficha con el asunto como título y, en las notas, el remitente, la fecha, los destinatarios, los nombres de los adjuntos y el texto. Elige fecha y proyecto y guarda.</li><li>Si sueltas varios correos a la vez, se crean directamente en el proyecto en el que estás.</li><li>También vale un archivo <strong>.eml</strong> (por ejemplo, un correo guardado desde el nuevo Outlook o desde el navegador).</li><li><strong>Desde Gmail</strong> no se puede arrastrar el correo de la lista (Gmail solo entrega un enlace). Abre el correo, pulsa los tres puntos <strong>⋮</strong> junto a «Responder» → <strong>«Descargar mensaje»</strong> y arrastra a la app el archivo .eml descargado (desde el aviso de descargas de Chrome o desde la carpeta Descargas). También vale «Reenviar» y pegar, como se explica abajo.</li><li><strong>Copiar con remitente y fecha</strong>: abre el correo, pulsa «Reenviar», haz clic en el texto, <kbd>Ctrl</kbd>+<kbd>A</kbd> y <kbd>Ctrl</kbd>+<kbd>C</kbd>, descarta el reenvío y pega en la app. El bloque «De / Enviado / Para / Asunto» que añade Outlook se reconoce aunque tu firma vaya delante.</li><li><strong>Pegar</strong>: copia el texto de un correo (con sus líneas «De:», «Enviado:», «Asunto:», o sin ellas) y pulsa <kbd>Ctrl</kbd>+<kbd>V</kbd> en la app, fuera de cualquier campo, o pégalo en «Añadir tarea». Un texto de una sola línea se queda en «Añadir tarea» como siempre.</li><li>Se quitan los «RE:», «RV:» y «FW:» del asunto. Los adjuntos no se guardan (solo sus nombres) y el texto muy largo se recorta.</li><li>El correo no sale de tu ordenador: todo se lee dentro de la app.</li></ul></div></details>
+  <details class="help-sec"><summary><svg class="ic"><use href="#i-sliders"/></svg>Reglas automáticas<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
+    <div class="help-body"><ul><li>Ponen solas <strong>etiquetas</strong>, el <strong>proyecto</strong> o la <strong>prioridad</strong> a las tareas nuevas según lo que digan. Se crean en «Etiquetas» → <strong>«Reglas automáticas»</strong> (en el móvil: «Más» → «Reglas automáticas»).</li><li><strong>Si contiene</strong>: palabras o frases separadas por comas. Basta con una. No importan las mayúsculas ni las tildes, y cuentan como palabra entera («calor» no salta con «caloría»).</li><li><strong>Y viene de</strong> (solo correos): <code>@dominio.es</code> para cualquier dirección de ese dominio, una dirección completa o un nombre. Si rellenas las dos cosas, tienen que cumplirse las dos; si solo rellenas el remitente, se aplica a todos sus correos.</li><li><strong>En los correos</strong> solo se mira el asunto, el remitente y el principio del texto, hasta la parte citada de mensajes anteriores (o unos 1.000 caracteres). No se busca en todo el cuerpo.</li><li><strong>En las demás tareas</strong> se mira el título y, en la ficha, también las notas.</li><li>Se aplican al <strong>crear</strong> una tarea: al soltar o pegar correos, al añadir escribiendo y en la ficha de una tarea nueva. Lo que ponen se ve antes de guardar: en «Añadir escribiendo» salen como fichas con borde discontinuo (pulsa la <strong>×</strong> para no aplicarla) y en la ficha aparecen ya marcadas. Si quitas una etiqueta o cambias el proyecto o la prioridad a mano, la regla no lo vuelve a cambiar.</li><li>Lo que escribas tú manda: un <code>#proyecto</code> o un <code>!alta</code> en «Añadir escribiendo» gana a la regla.</li><li>Si se cumplen varias reglas, se ponen todas sus etiquetas, el proyecto de la primera que lo indique y la prioridad más alta. La prioridad nunca se baja.</li><li>Las tareas que ya tienes no cambian solas. Para aplicar las reglas a las que están en proceso, pulsa <strong>«Aplicar a las tareas en proceso»</strong>: te dice cuántas cambian antes de hacerlo, y se puede deshacer.</li><li>Las reglas se guardan con tus datos: van en las copias de seguridad y se sincronizan entre dispositivos.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-message"/></svg>Comentarios de una tarea<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
     <div class="help-body"><ul><li>Cada ficha tiene <strong>Comentarios</strong>, como una conversación: cada uno va aparte, con su fecha y hora, del más antiguo al más reciente. En el ordenador están en un panel a la derecha de la ficha; en el móvil, al final de la ficha.</li><li>Pulsa el título «Comentarios» para desplegar u ocultar el panel. La app recuerda cómo lo dejaste.</li><li>Escribe y pulsa <kbd>Intro</kbd> o «Comentar» (<kbd>Mayús</kbd>+<kbd>Intro</kbd> para cambiar de línea). Se guarda en el momento, sin pulsar «Guardar» en la ficha.</li><li><strong>Correos</strong>: arrastra un correo de Outlook (o un archivo .eml) y suéltalo sobre la ficha abierta, o pulsa «Correo» para elegir el archivo. Queda como un comentario con el asunto, el remitente, los destinatarios, los nombres de los adjuntos y el texto, en la fecha en que se envió.</li><li>También puedes pegar un correo copiado (con sus líneas «De:», «Enviado:», «Asunto:») en el campo de comentario vacío, o con <kbd>Ctrl</kbd>+<kbd>V</kbd> en la ficha, fuera de los campos.</li><li>Con el lápiz editas un comentario (en los correos, su texto, por ejemplo para quitar el historial citado) y con la papelera lo borras.</li><li>Las tarjetas con comentarios muestran su número; púlsalo para abrir la ficha con el panel desplegado. El buscador también busca en los comentarios.</li></ul></div></details>
   <details class="help-sec"><summary><svg class="ic"><use href="#i-hourglass"/></svg>En espera de alguien<svg class="ic sm chev"><use href="#i-chev-right"/></svg></summary>
@@ -1889,7 +1918,22 @@ function normalizeState(x){
       arch:ar?{archivedAt:validIso(ar.archivedAt)?ar.archivedAt:deletedAt,reviewedAt:validIso(ar.reviewedAt)?ar.reviewedAt:''}:null,
       updatedAt:validIso(a.updatedAt)?a.updatedAt:legacyStamp(deletedAt)};
   });
-  return {version:STATE_VERSION,activeId:projects.some(p=>p.id===x.activeId)?x.activeId:projects[0].id,projects,tags,settings:normalizeSettings(x.settings),archive,trash,focus:normalizeFocus(x.focus),deleted:normalizeDeleted(x.deleted)};
+  const rules=normalizeRules(x.rules,tags,projects);
+  return {version:STATE_VERSION,activeId:projects.some(p=>p.id===x.activeId)?x.activeId:projects[0].id,projects,tags,rules,settings:normalizeSettings(x.settings),archive,trash,focus:normalizeFocus(x.focus),deleted:normalizeDeleted(x.deleted)};
+}
+/* Reglas automáticas: si el texto contiene alguna de las palabras (y, si se indica, el correo viene de alguno de los remitentes), ponen etiquetas, proyecto o prioridad */
+const RULE_MAX=100;
+const ruleList=v=>(Array.isArray(v)?v:String(v||'').split(/[,;\n]/)).map(w=>String(w).replace(/\s+/g,' ').trim().slice(0,80)).filter(Boolean).filter((w,i,a)=>a.findIndex(z=>norm(z)===norm(w))===i).slice(0,40);
+function normalizeRules(list,tags,projects){
+  const seen=new Set(), tagIds=new Set(tags.map(t=>t.id)), projIds=new Set(projects.map(p=>p.id));
+  return (Array.isArray(list)?list:[]).filter(r=>r&&typeof r==='object').slice(0,RULE_MAX).map(r=>{
+    let id=String(r.id||''); if(!id||seen.has(id)) id=newId(); seen.add(id);
+    return {id,words:ruleList(r.words),senders:ruleList(r.senders),
+      tags:[...new Set((Array.isArray(r.tags)?r.tags:[]).map(String))].filter(t=>tagIds.has(t)),
+      projectId:projIds.has(String(r.projectId||''))?String(r.projectId):'',
+      priority:PRIO_LABEL[r.priority]?String(r.priority):'',
+      updatedAt:validIso(r.updatedAt)?r.updatedAt:''};
+  }).filter(r=>(r.words.length||r.senders.length)&&(r.tags.length||r.projectId||r.priority));
 }
 /* Elementos borrados (para que un borrado se propague entre dispositivos): {clave: fecha ISO}; se olvidan pasados TOMB_DAYS días */
 function normalizeDeleted(d){
@@ -1901,7 +1945,7 @@ function normalizeDeleted(d){
 const blankProject=(n='Nuevo proyecto')=>({id:newId(),name:n,sections:[],items:[],updatedAt:''});
 function blankState(){
   const p=blankProject('Mi proyecto principal');
-  return {version:STATE_VERSION,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS).map(t=>({...t,updatedAt:''})),settings:normalizeSettings({}),archive:[],trash:[],focus:[],deleted:{}};
+  return {version:STATE_VERSION,activeId:p.id,projects:[p],tags:clone(DEFAULT_TAGS).map(t=>({...t,updatedAt:''})),rules:[],settings:normalizeSettings({}),archive:[],trash:[],focus:[],deleted:{}};
 }
 /* Datos de versiones anteriores, guardados en localStorage */
 function loadLegacy(){
@@ -2049,10 +2093,12 @@ function indexState(st){
     p.items.forEach(it=>{ m.set(it.id,{ref:it,sig:'T'+p.id+'|'+itemSig(it)}); indexComments(m,it); });
   });
   st.tags.forEach(t=>m.set('tag:'+t.id,{ref:t,sig:'G'+JSON.stringify([t.name,t.emoji,t.bg,t.text])}));
+  (st.rules||[]).forEach(r=>m.set('rule:'+r.id,{ref:r,sig:ruleSig(r)}));
   st.archive.forEach(a=>{ m.set(a.item.id,{ref:a,sig:'A'+JSON.stringify([a.pid,a.pname,a.archivedAt,a.reviewedAt])+itemSig(a.item)}); indexComments(m,a.item); });
   (st.trash||[]).forEach(a=>{ m.set(a.item.id,{ref:a,sig:trashSig(a)}); indexComments(m,a.item); });
   return m;
 }
+const ruleSig=r=>'R'+JSON.stringify([r.words,r.senders,r.tags,r.projectId,r.priority]);
 const trashSig=a=>'X'+JSON.stringify([a.pid,a.pname,a.deletedAt,a.byProject,a.arch])+itemSig(a.item);
 /* Cada comentario lleva su propio updatedAt y su borrado se anota (cm:id): así se fusionan uno a uno entre dispositivos */
 function indexComments(m,it){ (it.comments||[]).forEach(c=>m.set('cm:'+c.id,{ref:c,sig:'C'+itemSig(c)})); }
@@ -2466,6 +2512,7 @@ function openMoreSheet(){
     !isDayView()?{label:'Añadir sección',icon:'plus',fn:()=>addSection(p.id)}:null,
     !isDayView()&&(sched||ui.showScheduled)?{label:ui.showScheduled?'Ocultar programadas':'Ver programadas',note:String(sched),icon:'clock',fn:()=>{ ui.showScheduled=!ui.showScheduled; saveUI(); renderApp(); }}:null,
     {label:'Etiquetas',icon:'tag',fn:()=>$('openTagsBtn').click()},
+    {label:'Reglas automáticas',icon:'sliders',fn:openRulesModal},
     {label:'Ajustes y avisos',icon:'sliders',fn:()=>$('openSettingsBtn').click()},
     {label:'Archivo',icon:'archive',note:archivePending().length?pl(archivePending().length,'por revisar','por revisar'):String(appState.archive.length||''),fn:()=>openArchive()},
     {label:'Papelera',icon:'trash',note:String(appState.trash.length||''),fn:()=>openTrash()},
@@ -3515,7 +3562,7 @@ function renderTagPicker(){
   if(!appState.tags.length){ box.append(el('span','hint','No hay etiquetas. Créalas en «Etiquetas», en la barra lateral.')); return; }
   appState.tags.forEach(t=>{
     const on=tempItemTags.includes(t.id);
-    const b=btn('','tag-chip',null,()=>{ tempItemTags=tempItemTags.includes(t.id)?tempItemTags.filter(x=>x!==t.id):[...tempItemTags,t.id]; renderTagPicker(); });
+    const b=btn('','tag-chip',null,()=>{ if(tempItemTags.includes(t.id)){ tempItemTags=tempItemTags.filter(x=>x!==t.id); if(modRules.on) modRules.off.tags.add(t.id); } else tempItemTags=[...tempItemTags,t.id]; renderTagPicker(); });
     if(t.emoji) b.append(document.createTextNode(t.emoji+' ')); else b.append(el('span','tag-dot'));
     b.append(document.createTextNode(t.name));
     b.style.backgroundColor=t.bg; b.style.color=t.text;
@@ -3591,6 +3638,7 @@ function openModal(item=null){
     tempSubtasks=[]; modSubFold=false; editingRecOcc=1; editingHistory=[]; recToForm(null,$('modDate').value);
   }
   tempComments=[]; cmEditId=null; cmExpanded.clear(); $('cmInput').value=''; $('cmDrop').hidden=true;
+  modRulesReset(!item&&!!(appState.rules||[]).length);
   placeCmPane(); applyCmOpen();
   fillWaitPeople(); $('pauseField').hidden=$('modStatus').value!=='paused'; $('modNewSubtask').value='';
   $('recBox').open=!!(item&&item.recurrence);
@@ -4907,11 +4955,21 @@ function mailsToTasks(mails){
     if(document.querySelector('dialog[open]')) return;
     const m=mails[0]; openModal();
     $('modTitle').value=mailTitle(m); $('modNotes').value=mailNotes(m);
+    modRules.mail=m; modRules.extra=mailRuleText(m); modalRulesRefresh();
     showMarkdownEdit(); setTimeout(()=>{ $('modTitle').focus(); $('modTitle').select(); },30);
     return;
   }
-  const dst=addTarget(), due=qaDefaultDate();
-  commit(null,()=>{ mails.forEach(m=>dst.items.push(normalizeItem({title:mailTitle(m),notes:mailNotes(m),dueDate:due,status:'pending'}))); return `✅ ${pl(mails.length,'tarea creada','tareas creadas')} a partir de correos en «${dst.name}»`; });
+  const base=addTarget(), due=qaDefaultDate();
+  commit(null,()=>{
+    const used=new Set(); let auto=0;
+    mails.forEach(m=>{
+      const o=mailOutcome(m), dst=(o.projectId&&projById(o.projectId))||base; used.add(dst);
+      if(o.rules.length) auto++;
+      dst.items.push(normalizeItem({title:mailTitle(m),notes:mailNotes(m),dueDate:due,status:'pending',tags:o.tags,priority:o.priority||'normal'}));
+    });
+    const where=used.size===1?` en «${[...used][0].name}»`:' en varios proyectos';
+    return `✅ ${pl(mails.length,'tarea creada','tareas creadas')} a partir de correos${where}${auto?` · reglas aplicadas en ${auto}`:''}`;
+  });
 }
 async function mailFromFile(f){
   const name=(f.name||'').toLowerCase(), buf=await f.arrayBuffer(), u8=new Uint8Array(buf.slice(0,8));
@@ -4925,6 +4983,97 @@ async function handleMailFiles(files){
   if(bad.length) showToast(`No he podido leer: ${bad.slice(0,3).join(', ')}${bad.length>3?'…':''}. Arrastra correos de Outlook (.msg) o archivos .eml.`,{icon:'alert-circle',timeout:9000});
   mailsToTasks(mails);
 }
+
+/* ================= Reglas automáticas ================= */
+/* En los correos solo se mira el asunto, el remitente y el principio del texto (hasta la parte citada o la firma) */
+const RULE_INTRO_MAX=1000;
+const MAIL_QUOTE_RE=/^\s*(?:>|(?:de|from|enviado|sent)\s*:|-{2,}\s*(?:original message|mensaje original|forwarded message|mensaje reenviado)|_{5,}|-- ?$|el .{4,120} escribi[oó]:\s*$|on .{4,120} wrote:\s*$)/i;
+function mailIntro(body){
+  const out=[]; let n=0;
+  for(const l of String(body||'').replace(/\r\n?/g,'\n').split('\n')){
+    if(MAIL_QUOTE_RE.test(l)) break;
+    out.push(l); n+=l.length+1; if(n>=RULE_INTRO_MAX) break;
+  }
+  return out.join('\n').slice(0,RULE_INTRO_MAX);
+}
+const mailRuleText=m=>String(m.subject||'')+'\n'+mailIntro(m.body);
+const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+const ruleReCache=new Map();
+function ruleWordRe(w){
+  const k=norm(w).replace(/\s+/g,' ').trim(); let re=ruleReCache.get(k);
+  if(!re){ re=new RegExp('(?<![\\p{L}\\p{N}])'+reEsc(k).replace(/ /g,'\\s+')+'(?![\\p{L}\\p{N}])','u'); ruleReCache.set(k,re); }
+  return re;
+}
+/* «@dominio.es»: cualquier dirección de ese dominio; «ana@x.es»: esa dirección; un nombre: aparece en el nombre o la dirección del remitente */
+function senderMatches(pat,mail){
+  if(!mail) return false;
+  const p=norm(pat).trim(), em=norm(mail.fromEmail||'').trim(), who=norm((mail.fromName||'')+' '+(mail.fromEmail||''));
+  if(!p) return false;
+  if(p.startsWith('@')) return !!em&&em.endsWith(p);
+  if(p.includes('@')) return em===p||ruleWordRe(p).test(who);
+  return ruleWordRe(p).test(who);
+}
+/* Reglas que se cumplen, en su orden. Si una regla tiene palabras y remitentes, tienen que cumplirse las dos cosas. */
+function matchRules(text,mail,list=appState.rules||[]){
+  const t=norm(text);
+  return list.filter(r=>{
+    if(!r.words.length&&!r.senders.length) return false;
+    if(r.words.length&&!r.words.some(w=>ruleWordRe(w).test(t))) return false;
+    if(r.senders.length&&!r.senders.some(x=>senderMatches(x,mail))) return false;
+    return true;
+  });
+}
+/* Lo que ponen las reglas: etiquetas (todas), proyecto (el de la primera que lo indique) y prioridad (la más alta) */
+function ruleOutcome(rules,off={}){
+  const offTags=off.tags||new Set(), o={tags:[],projectId:'',priority:'',rules};
+  rules.forEach(r=>{
+    r.tags.forEach(id=>{ if(getTag(id)&&!offTags.has(id)&&!o.tags.includes(id)) o.tags.push(id); });
+    if(!off.proj&&!o.projectId&&r.projectId&&projById(r.projectId)) o.projectId=r.projectId;
+    if(!off.prio&&r.priority&&PRIO_WEIGHT[r.priority]>(PRIO_WEIGHT[o.priority]||0)) o.priority=r.priority;
+  });
+  return o;
+}
+const mailOutcome=m=>ruleOutcome(matchRules(mailRuleText(m),m));
+/* Para «Aplicar a las tareas en proceso»: si las notas vienen de un correo, solo cuentan el remitente y el principio del texto */
+function itemRuleInput(it){
+  const notes=String(it.notes||'');
+  if(/^\*\*De:\*\*/.test(notes)){
+    const fm=notes.match(/^\*\*De:\*\*\s*(.*)$/m), from=fm?fm[1].trim():'', em=from.match(/<([^>]+)>/)||from.match(/([^\s<>]+@[^\s<>]+)/);
+    const k=notes.search(/\n\s*\n/), body=k<0?'':notes.slice(k).trim();
+    return {text:it.title+'\n'+mailIntro(body),mail:{fromName:from.replace(/<[^>]*>/,'').trim(),fromEmail:em?em[1]:''}};
+  }
+  return {text:it.title+'\n'+notes,mail:null};
+}
+
+/* ---- Reglas en la ficha de una tarea nueva: se aplican mientras escribes y se retiran si dejan de cumplirse ---- */
+let modRules={on:false};
+function modRulesReset(on){ modRules={on,mail:null,extra:'',applied:new Map(),off:{tags:new Set(),proj:false,prio:false}}; }
+function modalRulesRefresh(){
+  if(!modRules.on||!$('itemModal').open) return;
+  const text=modRules.mail?modRules.extra+'\n'+$('modTitle').value:$('modTitle').value+'\n'+$('modNotes').value;
+  const now=matchRules(text,modRules.mail), ids=new Set(now.map(r=>r.id));
+  let tagsCh=false, projCh=false;
+  modRules.applied.forEach((a,id)=>{
+    if(ids.has(id)) return;
+    modRules.applied.delete(id);
+    const still=new Set([...modRules.applied.values()].flatMap(b=>b.tags));
+    a.tags.forEach(t=>{ if(!still.has(t)&&tempItemTags.includes(t)){ tempItemTags=tempItemTags.filter(x=>x!==t); tagsCh=true; } });
+    if(a.proj&&$('modProject').value===a.proj.to&&projById(a.proj.from)){ $('modProject').value=a.proj.from; projCh=true; }
+    if(a.prio&&$('modPriority').value===a.prio.to) $('modPriority').value=a.prio.from;
+  });
+  now.forEach(r=>{
+    if(modRules.applied.has(r.id)) return;
+    const a={tags:[],proj:null,prio:null}, o=ruleOutcome([r],modRules.off);
+    o.tags.forEach(t=>{ if(!tempItemTags.includes(t)){ tempItemTags.push(t); a.tags.push(t); tagsCh=true; } });
+    if(o.projectId&&![...modRules.applied.values()].some(b=>b.proj)&&$('modProject').value!==o.projectId){ a.proj={from:$('modProject').value,to:o.projectId}; $('modProject').value=o.projectId; projCh=true; }
+    if(o.priority&&PRIO_WEIGHT[o.priority]>PRIO_WEIGHT[$('modPriority').value]){ a.prio={from:$('modPriority').value,to:o.priority}; $('modPriority').value=o.priority; }
+    modRules.applied.set(r.id,a);
+  });
+  if(tagsCh) renderTagPicker();
+  if(projCh) fillSectionSelect('');
+}
+let modRulesTimer=0;
+const modRulesSoon=()=>{ if(!modRules.on) return; clearTimeout(modRulesTimer); modRulesTimer=setTimeout(modalRulesRefresh,300); };
 
 /* ================= Comentarios de la tarea ================= */
 /* En una tarea ya guardada, cada comentario se guarda al momento (commit); en una nueva, se guardan con la ficha. */
@@ -5065,6 +5214,10 @@ const qaIgnored=new Set();
 const QA_TAG_COLORS=[['#e8f0fe','#174ea6'],['#fce8e6','#c5221f'],['#e6f4ea','#137333'],['#fef7e0','#8a5a00'],['#f3e8fd','#6a1b9a'],['#e0f7fa','#006064'],['#fde7f3','#9c1d64']];
 const QA_ICON={sec:'list',date:'calendar',time:'clock',proj:'folder',prio:'flag',tag:'tag',newtag:'plus',rec:'repeat'};
 function qaParse(){ return parseQuick($('qaInput').value,qaIgnored); }
+/* Reglas automáticas en «Añadir escribiendo»: lo escrito a mano (#proyecto, @etiqueta, !prioridad) manda */
+const qaOff={tags:new Set(),proj:false,prio:false};
+function qaOffReset(){ qaOff.tags.clear(); qaOff.proj=false; qaOff.prio=false; }
+function qaAuto(r){ return ruleOutcome(matchRules(r.title,null),{tags:new Set([...qaOff.tags,...r.tags]),proj:qaOff.proj||!!r.projectId,prio:qaOff.prio||!!r.priority}); }
 function qaDefaultDate(){ if(ui.mode==='calendar') return isMobile()?calSel:''; return ui.mode==='today'||ui.mode==='week'?todayStr():ui.mode==='tomorrow'?ymd(addDays(new Date(),1)):''; }
 function renderQaChips(){
   const box=$('qaChips'); box.replaceChildren();
@@ -5079,7 +5232,17 @@ function renderQaChips(){
     if(t.raw){ const x=btn('','',`No interpretar «${t.raw}»`,()=>{ qaIgnored.add(norm(t.raw)); renderQaChips(); $('qaInput').focus(); },'x'); x.setAttribute('aria-label',`No interpretar «${t.raw}»`); c.append(x); }
     box.append(c);
   });
-  if(r.tokens.length&&r.title){ const tt=el('span','qa-chip title'); tt.textContent='«'+short(r.title,60)+'»'; box.prepend(tt); }
+  const o=qaAuto(r), autoChip=(icon,label,off)=>{
+    const c=el('span','qa-chip auto'); c.title='Regla automática';
+    c.append(ic(icon,'sm'),document.createTextNode(label));
+    const x=btn('','',`No aplicar «${label}»`,()=>{ off(); renderQaChips(); $('qaInput').focus(); },'x'); x.setAttribute('aria-label',`No aplicar «${label}»`); c.append(x);
+    box.append(c);
+  };
+  o.tags.forEach(id=>{ const t=getTag(id); autoChip('tag',t.name,()=>qaOff.tags.add(id)); });
+  if(o.projectId) autoChip('folder',projById(o.projectId).name||'Sin título',()=>{ qaOff.proj=true; });
+  if(o.priority) autoChip('flag',PRIO_LABEL[o.priority],()=>{ qaOff.prio=true; });
+  const autoN=o.tags.length+(o.projectId?1:0)+(o.priority?1:0);
+  if((r.tokens.length||autoN)&&r.title){ const tt=el('span','qa-chip title'); tt.textContent='«'+short(r.title,60)+'»'; box.prepend(tt); }
 }
 function qaEnsureTags(names){
   const ids=[];
@@ -5094,13 +5257,15 @@ function qaEnsureTags(names){
 function qaSubmit(){
   const r=qaParse();
   if(!r.title){ $('qaInput').focus(); showToast('Escribe el texto de la tarea',{icon:'pencil'}); return; }
-  const dst=appState.projects.find(p=>p.id===r.projectId)||addTarget();
+  const o=qaAuto(r);
+  const dst=appState.projects.find(p=>p.id===(r.projectId||o.projectId))||addTarget();
   const due=r.dueDate||qaDefaultDate();
   const ok=commit(null,()=>{
-    const tags=[...r.tags,...qaEnsureTags(r.newTags)];
+    const tags=[...new Set([...r.tags,...o.tags,...qaEnsureTags(r.newTags)])];
     const rec=r.rec?{...r.rec,anchor:due}:null;
-    const section=r.sectionId||(qaSec&&qaSec.pid===dst.id?qaSec.sid:'');
-    dst.items.push(normalizeItem({title:r.title,tags,priority:r.priority||'normal',dueDate:due,dueTime:due?r.dueTime:'',reminder:due&&r.dueTime?'at':'none',status:'pending',recurrence:rec,section}));
+    let section=r.sectionId||(qaSec&&qaSec.pid===dst.id?qaSec.sid:'');
+    if(section&&!(dst.sections||[]).some(y=>y.id===section)) section='';
+    dst.items.push(normalizeItem({title:r.title,tags,priority:r.priority||o.priority||'normal',dueDate:due,dueTime:due?r.dueTime:'',reminder:due&&r.dueTime?'at':'none',status:'pending',recurrence:rec,section}));
     const z=section&&(dst.sections||[]).find(y=>y.id===section);
     const bits=[];
     if(due) bits.push(fmtDate(due,true)+(r.dueTime?' '+r.dueTime:''));
@@ -5108,7 +5273,7 @@ function qaSubmit(){
     if(z) bits.push(z.name);
     return `✅ «${short(r.title,40)}» añadida`+(bits.length?' · '+bits.join(' · '):'');
   });
-  if(ok){ $('qaInput').value=''; qaIgnored.clear(); qaSec=null; renderQaChips(); if(!isMobile()) $('qaInput').focus(); }
+  if(ok){ $('qaInput').value=''; qaIgnored.clear(); qaOffReset(); qaSec=null; renderQaChips(); if(!isMobile()) $('qaInput').focus(); }
 }
 /* Abre la ficha completa con lo que se haya escrito */
 function qaOpenFull(){
@@ -5128,8 +5293,9 @@ function qaOpenFull(){
   tempItemTags=[...new Set([...tempItemTags,...tagIds])];
   recToForm(r.rec,due); $('recBox').open=!!r.rec;
   $('modTime').disabled=$('modReminder').disabled=!$('modDate').value;
+  if(modRules.on){ modRules.off={tags:new Set(qaOff.tags),proj:qaOff.proj||!!r.projectId,prio:qaOff.prio||!!r.priority}; modalRulesRefresh(); }
   renderDateChips(); renderTagPicker(); updateRecUI();
-  $('qaInput').value=''; qaIgnored.clear(); renderQaChips();
+  $('qaInput').value=''; qaIgnored.clear(); qaOffReset(); renderQaChips();
 }
 /* Móvil: el campo se abre como hoja inferior, por encima del teclado */
 function openQuickAdd(){
@@ -5302,6 +5468,100 @@ function openMoveModal(ids){
 }
 function syncMoveBtn(){ const t=$('moveTarget').value; $('moveMoveBtn').disabled=!moveCtx||moveCtx.ids.every(id=>{ const p=findProjectOf(id); return !p||p.id===t; }); }
 
+/* ================= Pantalla de reglas automáticas ================= */
+let tempRules=[];
+const blankRule=()=>({id:newId(),wordsTxt:'',sendersTxt:'',tags:[],projectId:'',priority:'',updatedAt:''});
+function openRulesModal(){
+  if(document.querySelector('dialog[open]')) return;
+  tempRules=(appState.rules||[]).map(r=>({...clone(r),wordsTxt:r.words.join(', '),sendersTxt:r.senders.join(', ')}));
+  if(!tempRules.length) tempRules.push(blankRule());
+  renderRules(); $('rulesModal').showModal();
+}
+function renderRules(){
+  const list=$('rulesList'); list.replaceChildren();
+  tempRules.forEach((r,idx)=>{
+    const card=el('div','rule-card'+(r.err?' err':''));
+    const field=(label,inp,cls)=>{ const w=el('label','rule-f'+(cls?' '+cls:'')); w.append(el('span','rule-l',label),inp); return w; };
+    const words=el('input','rule-words'); words.type='text'; words.value=r.wordsTxt; words.placeholder='calor, 49H, estrés térmico';
+    words.addEventListener('input',()=>{ r.wordsTxt=words.value; });
+    const snd=el('input','rule-senders'); snd.type='text'; snd.value=r.sendersTxt; snd.placeholder='@mites.gob.es, Ana García';
+    snd.addEventListener('input',()=>{ r.sendersTxt=snd.value; });
+    const tags=el('div','rule-tags'); tags.setAttribute('role','group');
+    if(!appState.tags.length) tags.append(el('span','hint','No hay etiquetas.'));
+    appState.tags.forEach(t=>{
+      const b=btn('','tag-chip',null,()=>{ r.tags=r.tags.includes(t.id)?r.tags.filter(x=>x!==t.id):[...r.tags,t.id]; b.setAttribute('aria-pressed',r.tags.includes(t.id)?'true':'false'); });
+      if(t.emoji) b.append(document.createTextNode(t.emoji+' ')); else b.append(el('span','tag-dot'));
+      b.append(document.createTextNode(t.name)); b.style.backgroundColor=t.bg; b.style.color=t.text;
+      b.setAttribute('aria-pressed',r.tags.includes(t.id)?'true':'false');
+      tags.append(b);
+    });
+    const proj=el('select','rule-proj'); proj.append(opt('','Sin cambiar el proyecto')); appState.projects.forEach(p=>proj.append(opt(p.id,p.name||'Sin título')));
+    proj.value=projById(r.projectId)?r.projectId:''; proj.addEventListener('change',()=>{ r.projectId=proj.value; });
+    const prio=el('select','rule-prio'); prio.append(opt('','Sin cambiar la prioridad'),opt('alta','Alta'),opt('urgente','Urgente'));
+    prio.value=r.priority==='alta'||r.priority==='urgente'?r.priority:''; prio.addEventListener('change',()=>{ r.priority=prio.value; });
+    const row=el('div','rule-row');
+    row.append(field('Mover al proyecto',proj),field('Prioridad',prio),btn('','ghost danger icon','Eliminar regla',()=>{ tempRules.splice(idx,1); renderRules(); },'trash'));
+    card.append(field('Si contiene',words),field('Y viene de (correos)',snd),field('Poner las etiquetas',tags,'full'),row);
+    list.append(card);
+  });
+  if(!tempRules.length) list.append(el('p','hint','No hay reglas.'));
+}
+/* Reglas del formulario, ya limpias. Devuelve null (y marca la regla) si alguna está a medias. */
+function rulesFromForm(){
+  const out=[]; let bad=-1;
+  tempRules.forEach((r,i)=>{
+    const words=ruleList(r.wordsTxt), senders=ruleList(r.sendersTxt), tags=r.tags.filter(id=>getTag(id)), projectId=projById(r.projectId)?r.projectId:'', priority=r.priority;
+    const cond=words.length||senders.length, act=tags.length||projectId||priority;
+    r.err=false;
+    if(!cond&&!act) return;
+    if(!cond||!act){ r.err=true; if(bad<0) bad=i; return; }
+    const old=(appState.rules||[]).find(x=>x.id===r.id);
+    out.push({id:r.id,words,senders,tags,projectId,priority,updatedAt:old?old.updatedAt:''});
+  });
+  if(bad>=0){
+    renderRules();
+    const r=tempRules[bad], card=$('rulesList').children[bad];
+    alert(`A la regla ${bad+1} le falta ${ruleList(r.wordsTxt).length||ruleList(r.sendersTxt).length?'qué poner: etiquetas, proyecto o prioridad':'cuándo aplicarse: palabras o remitente'}.`);
+    if(card){ card.scrollIntoView({block:'nearest'}); const f=card.querySelector('input'); if(f) f.focus(); }
+    return null;
+  }
+  return out;
+}
+function saveRules(){
+  const rules=rulesFromForm(); if(!rules) return;
+  $('rulesModal').close();
+  commit(null,()=>{ appState.rules=rules; return rules.length?`🏷️ ${pl(rules.length,'regla guardada','reglas guardadas')}`:'🏷️ Reglas guardadas'; });
+}
+/* Aplica unas reglas a una tarea: añade etiquetas, sube la prioridad y devuelve el proyecto al que moverla */
+function applyRulesTo(it,p,rules){
+  const {text,mail}=itemRuleInput(it), o=ruleOutcome(matchRules(text,mail,rules));
+  const tags=o.tags.filter(id=>!it.tags.includes(id));
+  const prio=o.priority&&PRIO_WEIGHT[o.priority]>PRIO_WEIGHT[it.priority]?o.priority:'';
+  const move=o.projectId&&o.projectId!==p.id?o.projectId:'';
+  return tags.length||prio||move?{tags,prio,move}:null;
+}
+function applyRulesToExisting(){
+  const rules=rulesFromForm(); if(!rules) return;
+  if(!rules.length){ alert('No hay reglas que aplicar.'); return; }
+  let total=0; const changes=[];
+  appState.projects.forEach(p=>p.items.forEach(it=>{ if(it.status==='done') return; total++; const c=applyRulesTo(it,p,rules); if(c) changes.push({id:it.id,...c}); }));
+  if(!changes.length){ alert(`Las reglas no cambian ninguna de las ${pl(total,'tarea','tareas')} en proceso.`); return; }
+  const nMove=changes.filter(c=>c.move).length;
+  if(!confirm(`Las reglas cambian ${pl(changes.length,'tarea','tareas')} de ${total} en proceso${nMove?` (${nMove} cambian de proyecto)`:''}. Se guardan las reglas y se aplican. ¿Seguir?`)) return;
+  $('rulesModal').close();
+  commit(null,()=>{
+    appState.rules=rules;
+    changes.forEach(c=>{
+      const f=findItem(c.id); if(!f) return;
+      f.it.tags=[...f.it.tags,...c.tags];
+      if(c.prio) f.it.priority=c.prio;
+      const dst=c.move&&projById(c.move);
+      if(dst&&dst!==f.p){ f.p.items=f.p.items.filter(i=>i!==f.it); f.it.section=''; dst.items.push(f.it); }
+    });
+    return `🏷️ Reglas aplicadas a ${pl(changes.length,'tarea','tareas')}`;
+  });
+}
+
 /* ================= Etiquetas ================= */
 function renderTagManager(){
   const list=$('tagsListContainer'); list.replaceChildren();
@@ -5328,6 +5588,8 @@ function saveTags(){
     appState.projects.forEach(p=>p.items.forEach(i=>{ const n=i.tags.length; i.tags=i.tags.filter(id=>keptIds.has(id)); if(i.tags.length!==n) affected++; }));
     const removed=appState.tags.filter(t=>!keptIds.has(t.id)).length;
     appState.tags=kept;
+    (appState.rules||[]).forEach(r=>{ r.tags=r.tags.filter(id=>keptIds.has(id)); });
+    appState.rules=(appState.rules||[]).filter(r=>r.tags.length||r.projectId||r.priority);
     if(ui.tag&&ui.tag!=='__none'&&!keptIds.has(ui.tag)){ ui.tag=''; saveUI(); }
     return removed?`🏷️ Etiquetas guardadas: ${pl(removed,'eliminada','eliminadas')}${affected?`, quitada de ${pl(affected,'tarea','tareas')}`:''}`:'🏷️ Etiquetas guardadas';
   });
@@ -5365,6 +5627,7 @@ function mergeStates(local,remote){
   const alive=(key,at)=>{ const t=del[key]; if(t===undefined) return true; if(tsOf(at)>tsOf(t)){ delete del[key]; return true; } return false; };
   const tags=unionWinners(local.tags,remote.tags,t=>t.id,t=>t.updatedAt,t=>JSON.stringify([t.name,t.emoji,t.bg,t.text]))
     .filter(x=>alive('tag:'+x.k,x.w.updatedAt)).map(x=>clone(x.w));
+  const rules=unionWinners(local.rules||[],remote.rules||[],r=>r.id,r=>r.updatedAt,ruleSig).filter(x=>alive('rule:'+x.k,x.w.updatedAt)).map(x=>clone(x.w));
   const projects=unionWinners(local.projects,remote.projects,p=>p.id,p=>p.updatedAt,p=>p.name)
     .filter(x=>alive(x.k,x.w.updatedAt)).map(x=>{
       /* Secciones: se unen las de las dos versiones (en cada una gana la más reciente), en el orden del proyecto ganador, y se respetan los borrados */
@@ -5385,12 +5648,12 @@ function mergeStates(local,remote){
     else if(w.kind==='x'){ const e=clone(w.entry); e.item=item; trash.push(e); }
     else (pMap.get(w.pid)||projects[0]).items.push(item);
   });
-  return normalizeState({version:STATE_VERSION,activeId:local.activeId,projects,tags,settings:local.settings,archive,trash,focus:mergeFocus(local.focus,remote.focus),deleted:del});
+  return normalizeState({version:STATE_VERSION,activeId:local.activeId,projects,tags,rules,settings:local.settings,archive,trash,focus:mergeFocus(local.focus,remote.focus),deleted:del});
 }
 /* Un dispositivo recién estrenado (sin datos propios) adopta lo de GitHub tal cual, para no sumar un proyecto vacío */
 function isPristine(st){
   return st.projects.length===1&&!st.projects[0].items.length&&st.projects[0].name==='Mi proyecto principal'&&!st.archive.length&&!(st.trash||[]).length
-    &&!Object.keys(st.deleted).length&&st.tags.every(t=>!t.updatedAt);
+    &&!Object.keys(st.deleted).length&&st.tags.every(t=>!t.updatedAt)&&!(st.rules||[]).length;
 }
 function adoptRemote(remote,local){ const st=clone(remote); st.settings=local.settings; st.focus=local.focus; st.activeId=st.projects[0].id; return normalizeState(st); }
 let renderPending=false;
@@ -5418,7 +5681,7 @@ async function pipeBytes(u8,stream){
   return new Uint8Array(await new Response(stream.readable).arrayBuffer());
 }
 async function encryptState(st,saltB64){
-  const payload={app:'revisor-tareas',v:1,savedAt:new Date().toISOString(),projects:st.projects,tags:st.tags,archive:st.archive,trash:st.trash,deleted:st.deleted};
+  const payload={app:'revisor-tareas',v:1,savedAt:new Date().toISOString(),projects:st.projects,tags:st.tags,rules:st.rules,archive:st.archive,trash:st.trash,deleted:st.deleted};
   let bytes=te.encode(JSON.stringify(payload)), z=0;
   if(typeof CompressionStream==='function'){ try{ bytes=await pipeBytes(bytes,new CompressionStream('gzip')); z=1; }catch(e){ bytes=te.encode(JSON.stringify(payload)); z=0; } }
   const salt=saltB64?b64d(saltB64):crypto.getRandomValues(new Uint8Array(16)), iv=crypto.getRandomValues(new Uint8Array(12));
@@ -5440,7 +5703,7 @@ async function decryptEnv(text){
     plain=await pipeBytes(plain,new DecompressionStream('gzip'));
   }
   let obj; try{ obj=JSON.parse(td.decode(plain)); }catch(e){ throw bad(); }
-  const st=normalizeState({projects:obj.projects,tags:obj.tags,archive:obj.archive,trash:obj.trash,deleted:obj.deleted,settings:{}});
+  const st=normalizeState({projects:obj.projects,tags:obj.tags,rules:obj.rules,archive:obj.archive,trash:obj.trash,deleted:obj.deleted,settings:{}});
   if(!st) throw bad();
   return {st,salt:env.salt};
 }
@@ -5968,6 +6231,16 @@ $('openTagsBtn').addEventListener('click',()=>{ tempTags=clone(appState.tags); r
 $('addNewTagBtn').addEventListener('click',()=>{ tempTags.push({id:newId(),name:'',emoji:'',bg:'#e2e6f0',text:'#3b465c'}); renderTagManager(); const ins=$('tagsListContainer').querySelectorAll('.tag-name'); if(ins.length) ins[ins.length-1].focus(); });
 $('tagModalCloseBtn').addEventListener('click',()=>$('tagModal').close());
 $('tagCancelBtn').addEventListener('click',()=>$('tagModal').close());
+$('tagRulesBtn').addEventListener('click',()=>{
+  const same=JSON.stringify(tempTags.filter(t=>t.name.trim()).map(t=>[t.id,t.name.trim(),t.emoji.trim(),t.bg,t.text]))===JSON.stringify(appState.tags.map(t=>[t.id,t.name,t.emoji,t.bg,t.text]));
+  if(same) $('tagModal').close(); else saveTags();
+  openRulesModal();
+});
+$('rulesCloseBtn').addEventListener('click',()=>$('rulesModal').close());
+$('rulesCancelBtn').addEventListener('click',()=>$('rulesModal').close());
+$('saveRulesBtn').addEventListener('click',saveRules);
+$('rulesApplyBtn').addEventListener('click',applyRulesToExisting);
+$('addRuleBtn').addEventListener('click',()=>{ tempRules.push(blankRule()); renderRules(); const c=$('rulesList').lastElementChild; if(c){ c.scrollIntoView({block:'nearest'}); c.querySelector('input').focus(); } });
 $('saveTagsBtn').addEventListener('click',saveTags);
 
 $('moveTarget').addEventListener('change',syncMoveBtn);
@@ -6088,7 +6361,10 @@ $('bulkPinBtn').addEventListener('click',()=>{
 $('kbBy').addEventListener('click',e=>{ const b=e.target.closest('button[data-by]'); if(!b) return; const p=currentProject();
   if(b.dataset.by==='section') ui.kbBy[p.id]='section'; else delete ui.kbBy[p.id];
   kbIndex=0; saveUI(); renderApp(); });
-$('modProject').addEventListener('change',()=>fillSectionSelect($('modSection').value));
+$('modProject').addEventListener('change',()=>{ if(modRules.on) modRules.off.proj=true; fillSectionSelect($('modSection').value); });
+$('modPriority').addEventListener('change',()=>{ if(modRules.on) modRules.off.prio=true; });
+$('modTitle').addEventListener('input',modRulesSoon);
+$('modNotes').addEventListener('input',modRulesSoon);
 $('bulkMoveBtn').addEventListener('click',()=>openMoveModal(selectedEntries().map(x=>x.it.id)));
 $('bulkDeleteBtn').addEventListener('click',()=>commit(null,()=>{
   const n=trashItems([...selected]); if(!n) return false;
@@ -6227,7 +6503,7 @@ function syncControls(){
   setInterval(()=>{ if(!document.hidden) syncNow(); },180000);
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&syncCfg&&Date.now()-tsOf(syncCfg.lastSync)>60000) syncNow(); });
   window.addEventListener('online',()=>syncNow());
-  window.__revisor={get state(){return appState;},fcPipOpen,get pipWin(){return pipWin;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,kbStepPc,kbPc,setView,get ui(){return ui;},fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
+  window.__revisor={get state(){return appState;},fcPipOpen,get pipWin(){return pipWin;},abRun,abTick,abDue,abPick,abOff,get abErr(){return abErr;},get abNeed(){return abNeed;},setAbDir(d){abDir=d;},setSubFold,subFolded,habPayload,msgParse,emlParse,textMailParse,mailNotes,mailTitle,mailsToTasks,matchRules,mailIntro,ruleOutcome,mailOutcome,openRulesModal,openModal,get tempItemTags(){return tempItemTags;},parseQuick:(t,ig)=>parseQuick(t,new Set(ig||[])),computeNext,firstOccurrence,recSummary,normalizeState,parseMD,undo,quickDates,mergeStates,trashItems,restoreTrash,kbStepPc,kbPc,setView,get ui(){return ui;},fcStart,fcStop,fcTick,fcPause,focusCsv,fcStreak,get fs(){return fs;},purgeTrash,drainNotifActions,checkReminders,encryptState,decryptEnv,fingerprint,syncNow,get syncCfg(){return syncCfg;},setSyncCfg(c){ syncCfg=c; keyCache.id=''; },whenSaved:()=>new Promise(r=>{ const w=()=>persisting?setTimeout(w,20):r(); w(); })};
 })();
 })();
 </script>
